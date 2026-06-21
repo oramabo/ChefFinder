@@ -1,0 +1,12 @@
+.programmatic h1 {
+  max-inline-size: 18ch;
+}
+
+.programmatic__faq summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.programmatic__faq p {
+  margin-block-start: var(--space-2);
+}

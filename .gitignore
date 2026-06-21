@@ -1,0 +1,23 @@
+node_modules
+dist
+.DS_Store
+
+# Local secrets — never commit
+.dev.vars
+.env
+.env.local
+*.local
+
+# Cloudflare / wrangler
+.wrangler
+
+# Supabase local
+supabase/.branches
+supabase/.temp
+
+# Logs
+npm-debug.log*
+*.log
+
+# Test output
+coverage

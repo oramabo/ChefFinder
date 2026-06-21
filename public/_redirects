@@ -1,0 +1,4 @@
+# SPA fallback: client-only routes (e.g. /lead/:token) resolve to the app shell.
+# Existing static assets (prerendered SEO pages) and /api/* Functions are served
+# first; this only catches otherwise-unmatched paths.
+/*    /index.html    200

@@ -1,0 +1,38 @@
+:root {
+  /* Premium dark palette (verified for WCAG AA against text colors below). */
+  --color-bg: #0e0e10; /* near-black base */
+  --color-surface: #17171b; /* charcoal panels */
+  --color-surface-2: #1f1f25;
+  --color-border: #2c2c34;
+
+  --color-text: #f4f2ed; /* warm off-white on dark (contrast > 13:1) */
+  --color-text-muted: #b6b2a8; /* muted (contrast > 6:1) */
+
+  --color-accent: #c9a227; /* brushed gold */
+  --color-accent-strong: #e0bb45;
+  --color-accent-contrast: #0e0e10; /* text on gold */
+
+  --color-success: #4caf76;
+  --color-danger: #e06a5a;
+
+  /* Typography */
+  --font-sans: "Heebo", "Assistant", system-ui, -apple-system, "Segoe UI", Arial,
+    sans-serif;
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+  --space-10: 4rem;
+  --space-12: 6rem;
+
+  --radius: 12px;
+  --radius-lg: 20px;
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+
+  --maxw: 1100px;
+}

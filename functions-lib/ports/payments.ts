@@ -12,8 +12,11 @@ export interface CreatePaymentInput {
 }
 
 export interface CreatePaymentResult {
+  // Hosted-checkout URL to redirect to. Empty for manual Bit (no redirect).
   payment_url: string;
   provider_ref: string;
+  // Present only in manual Bit mode: instructions to show the chef in-page.
+  manual_bit?: { phone: string; link?: string };
 }
 
 export type WebhookResult =

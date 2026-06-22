@@ -32,6 +32,12 @@ export interface Env {
   TG_CHAT_ID?: string;
 
   TURNSTILE_SECRET?: string;
+
+  // Manual Bit payments (no aggregator): the operator's Bit phone number and an
+  // optional Bit payment-request link. When set (and Grow is not configured), the
+  // chef sees Bit instructions and the operator confirms payment in /admin.
+  BIT_PHONE?: string;
+  BIT_LINK?: string;
 }
 
 export function globalStubs(env: Env): boolean {
@@ -65,9 +71,25 @@ export function mockPaymentsEnabled(env: Env): boolean {
   return String(env.MOCK_PAYMENTS).toLowerCase() === "true";
 }
 
-// A checkout flow can run: either stubbed, explicitly mocked, or a real provider.
+// Manual Bit mode: a Bit phone number is configured and no real aggregator is.
+// The chef pays via Bit and the operator confirms the payment in /admin.
+export function bitManualEnabled(env: Env): boolean {
+  if (globalStubs(env) || useReal(env, "payments")) return false;
+  return present(env.BIT_PHONE);
+}
+
+export function bitInfo(env: Env): { phone: string; link?: string } {
+  return { phone: env.BIT_PHONE ?? "", link: present(env.BIT_LINK) ? env.BIT_LINK : undefined };
+}
+
+// A checkout flow can run: stubbed, explicitly mocked, manual Bit, or a real provider.
 export function paymentsAvailable(env: Env): boolean {
-  return globalStubs(env) || mockPaymentsEnabled(env) || useReal(env, "payments");
+  return (
+    globalStubs(env) ||
+    mockPaymentsEnabled(env) ||
+    bitManualEnabled(env) ||
+    useReal(env, "payments")
+  );
 }
 
 // The mock-complete helper may run only when payments are intentionally mocked.

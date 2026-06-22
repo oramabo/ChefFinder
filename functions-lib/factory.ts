@@ -2,12 +2,13 @@ import type { DbPort } from "./ports/db.ts";
 import type { PaymentsPort } from "./ports/payments.ts";
 import type { MessagingPort } from "./ports/messaging.ts";
 import type { TurnstilePort } from "./ports/turnstile.ts";
-import { type Env, globalStubs, useReal } from "./env.ts";
+import { type Env, globalStubs, useReal, bitManualEnabled } from "./env.ts";
 
 import { createMockDb } from "./adapters/db.mock.ts";
 import { createSupabaseDb } from "./adapters/db.supabase.ts";
 import { createMockPayments } from "./adapters/payments.mock.ts";
 import { createGrowPayments } from "./adapters/payments.grow.ts";
+import { createBitPayments } from "./adapters/payments.bit.ts";
 import { createMockMessaging } from "./adapters/messaging.mock.ts";
 import { createWhatsAppMessaging } from "./adapters/messaging.whatsapp.ts";
 import { createTelegramMessaging } from "./adapters/messaging.telegram.ts";
@@ -36,7 +37,9 @@ export function buildContainer(env: Env, _request?: Request): Container {
 
   const payments: PaymentsPort = useReal(env, "payments")
     ? createGrowPayments(env)
-    : createMockPayments();
+    : bitManualEnabled(env)
+      ? createBitPayments(env)
+      : createMockPayments();
 
   const turnstile: TurnstilePort = useReal(env, "turnstile")
     ? createTurnstile(env.TURNSTILE_SECRET!)

@@ -7,7 +7,7 @@ import { Button } from "../components/Button.tsx";
 import { Field, TextInput } from "../components/Field.tsx";
 import { EVENT_TYPES, CUISINES } from "@shared/constants.ts";
 import type { PublicLead, LeadContact } from "@shared/types.ts";
-import { getLead, reserveLead, getContact, mockComplete } from "../lib/api.ts";
+import { getLead, reserveLead, getContact, mockComplete, type ManualBit } from "../lib/api.ts";
 import { formatDate, formatCurrency } from "../lib/format.ts";
 import { track, identify } from "../lib/analytics.ts";
 import { sha256Hex } from "../lib/hash.ts";
@@ -31,6 +31,7 @@ export default function LeadUnlock() {
   const [notFound, setNotFound] = useState(false);
   const [working, setWorking] = useState(false);
   const [message, setMessage] = useState("");
+  const [bit, setBit] = useState<ManualBit | null>(null);
 
   const refreshLead = useCallback(async () => {
     const res = await getLead(token);
@@ -85,6 +86,18 @@ export default function LeadUnlock() {
     };
   }, [token, params, refreshLead, tryReveal]);
 
+  // While awaiting a manual Bit confirmation, poll for the unlock.
+  useEffect(() => {
+    if (!bit || contact) return;
+    const id = setInterval(async () => {
+      const storedReveal =
+        typeof window !== "undefined" ? localStorage.getItem(revealKey(token)) ?? "" : "";
+      const ok = await tryReveal(storedReveal);
+      if (ok) clearInterval(id);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [bit, contact, token, tryReveal]);
+
   async function pay() {
     if (working) return;
     const trimmed = phone.trim();
@@ -100,6 +113,15 @@ export default function LeadUnlock() {
       identify(`chef_${await sha256Hex(trimmed)}`);
       localStorage.setItem(phoneKey(token), trimmed);
       const res = await reserveLead(token, trimmed);
+      if (res.ok && res.manual_bit) {
+        // Manual Bit: no redirect — show instructions and poll until the
+        // operator confirms the payment.
+        if (res.reveal_token) localStorage.setItem(revealKey(token), res.reveal_token);
+        track("reserve_won");
+        track("payment_started");
+        setBit(res.manual_bit);
+        return;
+      }
       if (res.ok && res.payment_url) {
         // Persist the reveal token BEFORE leaving for payment; it's how we
         // unlock the contact on return.
@@ -211,6 +233,42 @@ export default function LeadUnlock() {
                 {contact.client_email}
               </a>
             )}
+          </div>
+        ) : bit ? (
+          <div className="leadunlock__bit">
+            <Badge tone="accent">ממתין לתשלום בביט</Badge>
+            <p className="leadunlock__price">
+              לתשלום: <strong className="accent">{formatCurrency(bit.amount)}</strong>
+            </p>
+            <p>שלחו תשלום בביט אל המספר:</p>
+            <p className="leadunlock__bitphone" dir="ltr">
+              {bit.phone}
+            </p>
+            {bit.link && (
+              <a className="btn btn--primary" href={bit.link} target="_blank" rel="noopener noreferrer">
+                פתחו את ביט
+              </a>
+            )}
+            <p className="leadunlock__bitref">
+              אסמכתא לתשלום: <code>{bit.reference}</code>
+              <br />
+              ציינו אותה בהערת התשלום כדי שנזהה אותו במהירות.
+            </p>
+            <p>
+              לאחר אישור התשלום, פרטי הלקוח ייחשפו כאן אוטומטית — אפשר להשאיר את הדף
+              פתוח.
+            </p>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                const r =
+                  typeof window !== "undefined" ? localStorage.getItem(revealKey(token)) ?? "" : "";
+                void tryReveal(r);
+              }}
+            >
+              בדקו אם אושר
+            </Button>
           </div>
         ) : lead.status === "sold_out" || lead.slots_left <= 0 ? (
           <div className="leadunlock__soldout">

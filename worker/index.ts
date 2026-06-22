@@ -23,6 +23,7 @@ import { onRequestPost as mockComplete } from "../functions/api/payment/mock-com
 import { onRequestPost as paymentWebhook } from "../functions/api/payment/webhook.ts";
 import { onRequestGet as adminLeads } from "../functions/api/admin/leads.ts";
 import { onRequestPost as adminNotify } from "../functions/api/admin/notify.ts";
+import { onRequestPost as adminConfirm } from "../functions/api/admin/confirm.ts";
 import { onRequestGet as sitemap } from "../functions/sitemap.xml.ts";
 
 // Minimal local typings for the Workers runtime, so this file typechecks under
@@ -56,6 +57,7 @@ const routes: Route[] = [
   { method: "POST", pattern: "/api/payment/webhook", handler: paymentWebhook },
   { method: "GET", pattern: "/api/admin/leads", handler: adminLeads },
   { method: "POST", pattern: "/api/admin/lead/:token/notify", handler: adminNotify },
+  { method: "POST", pattern: "/api/admin/purchase/:ref/confirm", handler: adminConfirm },
   { method: "GET", pattern: "/sitemap.xml", handler: sitemap },
 ];
 

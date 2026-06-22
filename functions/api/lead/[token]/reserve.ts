@@ -57,6 +57,10 @@ export const onRequestPost: Handler = async ({ request, env, params }) => {
       ok: true,
       reason: "reserved",
       payment_url: payment.payment_url,
+      // Manual Bit mode: instructions for the in-page Bit panel (no redirect).
+      manual_bit: payment.manual_bit
+        ? { ...payment.manual_bit, amount: lead.price, reference: purchase.id }
+        : undefined,
       purchase_id: purchase.id,
       reveal_token,
     });

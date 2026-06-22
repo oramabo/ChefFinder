@@ -35,10 +35,18 @@ export function getLead(token: string): Promise<GetLeadResponse> {
   return getJson<GetLeadResponse>(`/api/lead/${encodeURIComponent(token)}`);
 }
 
+export interface ManualBit {
+  phone: string;
+  link?: string;
+  amount: number;
+  reference: string;
+}
+
 export interface ReserveResponse {
   ok: boolean;
   reason?: string;
   payment_url?: string;
+  manual_bit?: ManualBit;
   purchase_id?: string;
   reveal_token?: string;
   error?: string;
@@ -117,6 +125,19 @@ export interface NotifyResponse {
   notify?: Partial<Record<NotifyChannel, "sent" | "failed">>;
   error?: string;
   reason?: string;
+}
+
+// Operator action (admin-gated): confirm a manual Bit payment by its reference
+// (the purchase id), which unlocks the contact for the paying chef.
+export async function confirmPurchase(
+  reference: string,
+  adminToken: string,
+): Promise<{ status: number; body: { ok: boolean; transitioned?: boolean; error?: string } }> {
+  const res = await fetch(`/api/admin/purchase/${encodeURIComponent(reference)}/confirm`, {
+    method: "POST",
+    headers: adminToken ? { "x-admin-token": adminToken } : {},
+  });
+  return { status: res.status, body: (await res.json()) as { ok: boolean; transitioned?: boolean; error?: string } };
 }
 
 // Operator action (admin-gated): re-send a lead's distribution message. Omit

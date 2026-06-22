@@ -3,7 +3,13 @@ import Seo from "../components/Seo.tsx";
 import Badge from "../components/Badge.tsx";
 import { Button } from "../components/Button.tsx";
 import { Field, TextInput } from "../components/Field.tsx";
-import { listRecentLeads, resendNotify, type AdminLead, type NotifyChannel } from "../lib/api.ts";
+import {
+  listRecentLeads,
+  resendNotify,
+  confirmPurchase,
+  type AdminLead,
+  type NotifyChannel,
+} from "../lib/api.ts";
 import { formatDate, formatCurrency } from "../lib/format.ts";
 import "./Admin.css";
 
@@ -22,6 +28,10 @@ export default function Admin() {
   // Per-lead transient action feedback (re-send / copy), keyed by lead_token.
   const [rowMsg, setRowMsg] = useState<Record<string, string>>({});
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  // Manual Bit confirmation.
+  const [bitRef, setBitRef] = useState("");
+  const [bitMsg, setBitMsg] = useState("");
+  const [bitBusy, setBitBusy] = useState(false);
 
   const setMsg = (leadToken: string, text: string) =>
     setRowMsg((m) => ({ ...m, [leadToken]: text }));
@@ -55,6 +65,25 @@ export default function Admin() {
       setMsg(leadToken, link);
     }
   }, []);
+
+  const confirmBit = useCallback(async () => {
+    const ref = bitRef.trim();
+    if (!ref) return setBitMsg("נא להזין אסמכתא.");
+    setBitBusy(true);
+    setBitMsg("מאשר…");
+    try {
+      const { status, body } = await confirmPurchase(ref, token);
+      if (status === 401) return setBitMsg("אסימון שגוי או חסר.");
+      if (status === 404) return setBitMsg("האסמכתא לא נמצאה.");
+      if (!body.ok) return setBitMsg(body.error || "האישור נכשל.");
+      setBitMsg(body.transitioned ? "התשלום אושר — הפרטים נחשפו לשף ✓" : "כבר אושר קודם.");
+      setBitRef("");
+    } catch {
+      setBitMsg("שגיאת רשת.");
+    } finally {
+      setBitBusy(false);
+    }
+  }, [bitRef, token]);
 
   const load = useCallback(async (t: string) => {
     setLoading(true);
@@ -110,6 +139,28 @@ export default function Admin() {
       </div>
 
       {error && <p className="admin__error">{error}</p>}
+
+      <div className="admin__bit">
+        <h2>אישור תשלום בביט</h2>
+        <p className="admin__note">
+          קיבלתם תשלום בביט? הזינו את האסמכתא שהשף ציין, והפרטים ייחשפו לו אוטומטית.
+        </p>
+        <div className="admin__bar">
+          <Field label="אסמכתא (מזהה רכישה)" htmlFor="bit_ref">
+            <TextInput
+              id="bit_ref"
+              type="text"
+              value={bitRef}
+              onChange={(e) => setBitRef(e.target.value)}
+              placeholder="לדוגמה: 3f9a…"
+            />
+          </Field>
+          <Button type="button" onClick={confirmBit} disabled={bitBusy}>
+            {bitBusy ? "מאשר…" : "אישור תשלום"}
+          </Button>
+        </div>
+        {bitMsg && <p className="admin__bitmsg">{bitMsg}</p>}
+      </div>
 
       {leads && (
         <>

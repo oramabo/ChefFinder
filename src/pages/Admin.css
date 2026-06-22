@@ -60,3 +60,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.admin__actionrow {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.admin__btn.btn {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.8rem;
+}
+
+.admin__rowmsg {
+  display: block;
+  margin-block-start: var(--space-2);
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  white-space: normal;
+  max-inline-size: 240px;
+}

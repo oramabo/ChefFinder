@@ -3,17 +3,58 @@ import Seo from "../components/Seo.tsx";
 import Badge from "../components/Badge.tsx";
 import { Button } from "../components/Button.tsx";
 import { Field, TextInput } from "../components/Field.tsx";
-import { listRecentLeads, type AdminLead } from "../lib/api.ts";
+import { listRecentLeads, resendNotify, type AdminLead, type NotifyChannel } from "../lib/api.ts";
 import { formatDate, formatCurrency } from "../lib/format.ts";
 import "./Admin.css";
 
 const tokenKey = "admin_token";
+
+function leadLink(token: string): string {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  return `${origin}/lead/${token}`;
+}
 
 export default function Admin() {
   const [token, setToken] = useState("");
   const [leads, setLeads] = useState<AdminLead[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // Per-lead transient action feedback (re-send / copy), keyed by lead_token.
+  const [rowMsg, setRowMsg] = useState<Record<string, string>>({});
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+
+  const setMsg = (leadToken: string, text: string) =>
+    setRowMsg((m) => ({ ...m, [leadToken]: text }));
+
+  const resend = useCallback(
+    async (leadToken: string, channel: NotifyChannel) => {
+      const label = channel === "whatsapp" ? "וואטסאפ" : "טלגרם";
+      setBusyKey(`${leadToken}:${channel}`);
+      setMsg(leadToken, `שולח ל${label}…`);
+      try {
+        const { status, body } = await resendNotify(leadToken, channel, token);
+        if (status === 401) return setMsg(leadToken, "אסימון שגוי או חסר.");
+        if (!body.ok) return setMsg(leadToken, body.error || "שליחה נכשלה.");
+        setMsg(leadToken, body.notify?.[channel] === "sent" ? `${label}: נשלח ✓` : `${label}: נכשל ✗`);
+      } catch {
+        setMsg(leadToken, "שגיאת רשת.");
+      } finally {
+        setBusyKey(null);
+      }
+    },
+    [token],
+  );
+
+  const copyLink = useCallback(async (leadToken: string) => {
+    const link = leadLink(leadToken);
+    try {
+      await navigator.clipboard.writeText(link);
+      setMsg(leadToken, "הקישור הועתק ✓");
+    } catch {
+      // Clipboard API unavailable (e.g. insecure context) — surface the link.
+      setMsg(leadToken, link);
+    }
+  }, []);
 
   const load = useCallback(async (t: string) => {
     setLoading(true);
@@ -88,6 +129,7 @@ export default function Admin() {
                   <th>לקוח</th>
                   <th>טלפון</th>
                   <th>מקור</th>
+                  <th>פעולות</th>
                 </tr>
               </thead>
               <tbody>
@@ -114,6 +156,41 @@ export default function Admin() {
                       <a href={`tel:${l.client_phone}`}>{l.client_phone}</a>
                     </td>
                     <td className="admin__source">{l.source ?? "—"}</td>
+                    <td className="admin__actions">
+                      <div className="admin__actionrow">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="admin__btn"
+                          onClick={() => copyLink(l.lead_token)}
+                        >
+                          העתק קישור
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="admin__btn"
+                          disabled={busyKey === `${l.lead_token}:whatsapp`}
+                          onClick={() => resend(l.lead_token, "whatsapp")}
+                        >
+                          שלח לוואטסאפ
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="admin__btn"
+                          disabled={busyKey === `${l.lead_token}:telegram`}
+                          onClick={() => resend(l.lead_token, "telegram")}
+                        >
+                          שלח לטלגרם
+                        </Button>
+                      </div>
+                      {rowMsg[l.lead_token] && (
+                        <span className="admin__rowmsg" dir="auto">
+                          {rowMsg[l.lead_token]}
+                        </span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

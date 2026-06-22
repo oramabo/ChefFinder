@@ -109,3 +109,30 @@ export async function listRecentLeads(token: string): Promise<{ status: number; 
   });
   return { status: res.status, body: (await res.json()) as AdminLeadsResponse };
 }
+
+export type NotifyChannel = "whatsapp" | "telegram";
+
+export interface NotifyResponse {
+  ok: boolean;
+  notify?: Partial<Record<NotifyChannel, "sent" | "failed">>;
+  error?: string;
+  reason?: string;
+}
+
+// Operator action (admin-gated): re-send a lead's distribution message. Omit
+// `channel` to send to both. Sends the shared token as a header.
+export async function resendNotify(
+  leadToken: string,
+  channel: NotifyChannel | undefined,
+  adminToken: string,
+): Promise<{ status: number; body: NotifyResponse }> {
+  const res = await fetch(`/api/admin/lead/${encodeURIComponent(leadToken)}/notify`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...(adminToken ? { "x-admin-token": adminToken } : {}),
+    },
+    body: JSON.stringify(channel ? { channel } : {}),
+  });
+  return { status: res.status, body: (await res.json()) as NotifyResponse };
+}

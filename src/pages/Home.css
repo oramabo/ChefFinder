@@ -46,10 +46,13 @@
   color: var(--color-text-muted);
 }
 
-.hero__art {
-  inline-size: min(100%, 30rem);
+.hero__photo {
+  inline-size: 100%;
   block-size: auto;
-  justify-self: center;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
 }
 
 /* ── Editorial divider ────────────────────────────────────────────────────── */
@@ -123,19 +126,41 @@
   grid-column: 1 / -1;
 }
 
-/* ── Trust card ───────────────────────────────────────────────────────────── */
+/* ── Trust card: copy beside a pomegranate still-life ─────────────────────── */
 .home__trust {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--space-6);
-  align-items: flex-start;
+  align-items: center;
+  padding: 0;
+  overflow: hidden;
+}
+
+.home__trust-copy {
+  padding: var(--space-6);
+}
+
+.home__trust-img {
+  display: none;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 320px;
+  object-fit: cover;
+}
+
+@media (min-width: 760px) {
+  .home__trust {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
+  .home__trust-img {
+    display: block;
+  }
 }
 
 .home__list {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  margin-block-start: var(--space-5);
+  margin-block: var(--space-5) var(--space-6);
 }
 
 .home__list li {
@@ -149,4 +174,34 @@
   flex-shrink: 0;
   color: var(--color-olive);
   margin-block-start: 0.1em;
+}
+
+/* ── Closing band: a candlelit table photo with a warm overlay + CTA. ──────── */
+.closing {
+  margin-block-start: var(--space-10);
+  background-image: linear-gradient(
+      to bottom,
+      rgba(42, 33, 27, 0.55),
+      rgba(42, 33, 27, 0.7)
+    ),
+    url("/images/og.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.closing__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+  padding-block: clamp(var(--space-10), 12vw, var(--space-12));
+}
+
+.closing__eyebrow {
+  color: var(--color-saffron-soft);
+}
+
+.closing__title {
+  color: #fdf3ec;
+  max-inline-size: 18ch;
 }

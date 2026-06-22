@@ -15,6 +15,14 @@ export default function Chefs() {
         אנחנו מביאים לכם לקוחות אמיתיים שמחפשים שף פרטי לאירוע — אתם משלמים רק על
         ליד שמעניין אתכם.
       </p>
+      <img
+        className="page-banner"
+        src="/images/olive.jpg"
+        width={1200}
+        height={525}
+        alt="ענף זית וזעתר טרי על מפת פשתן"
+        loading="lazy"
+      />
       <div className="grid grid-3" style={{ marginBlockStart: "var(--space-6)" }}>
         <div className="card">
           <h3>לידים בקבוצה</h3>

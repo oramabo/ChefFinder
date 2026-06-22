@@ -1,6 +1,6 @@
 import Seo from "../components/Seo.tsx";
 import { LinkButton } from "../components/Button.tsx";
-import { HeroPlate, Divider, IconForm, IconChef, IconCloche, IconSprig } from "../components/art.tsx";
+import { Divider, IconForm, IconChef, IconCloche, IconSprig } from "../components/art.tsx";
 import { DEFAULT_CAP } from "@shared/constants.ts";
 import "./Home.css";
 
@@ -72,7 +72,14 @@ export default function Home() {
               עד שלושה שפים לכל פנייה · שירות בכל הארץ · בלי דמי תיווך
             </p>
           </div>
-          <HeroPlate className="hero__art" />
+          <img
+            className="hero__photo"
+            src="/images/hero.jpg"
+            width={1200}
+            height={800}
+            alt="שף פרטי מסדר מנה לבנטינית עם רימון ועשבי תיבול על צלחת קרמיקה"
+            loading="eager"
+          />
         </div>
       </section>
 
@@ -97,7 +104,7 @@ export default function Home() {
 
       <section className="section container">
         <div className="card home__trust">
-          <div>
+          <div className="home__trust-copy">
             <p className="eyebrow">למה השף שלי</p>
             <h2 className="home__h2">שולחן אחד, תשומת לב מלאה</h2>
             <ul className="home__list">
@@ -108,9 +115,27 @@ export default function Home() {
                 </li>
               ))}
             </ul>
+            <LinkButton to="/find-a-chef" variant="primary">
+              התחילו עכשיו
+            </LinkButton>
           </div>
+          <img
+            className="home__trust-img"
+            src="/images/pomegranate.jpg"
+            width={900}
+            height={1100}
+            alt="רימון פתוח עם גרגרים על מפת פשתן"
+            loading="lazy"
+          />
+        </div>
+      </section>
+
+      <section className="closing">
+        <div className="container closing__inner">
+          <p className="eyebrow closing__eyebrow">השולחן שלכם מחכה</p>
+          <h2 className="closing__title">הכינו את השולחן — את השף נשאיר לנו</h2>
           <LinkButton to="/find-a-chef" variant="primary">
-            התחילו עכשיו
+            מצאו שף עכשיו
           </LinkButton>
         </div>
       </section>

@@ -93,6 +93,17 @@ a {
   box-shadow: var(--shadow-sm);
 }
 
+/* A full-width rounded photo banner used at the top of content pages. */
+.page-banner {
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 16 / 7;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-block: var(--space-5) var(--space-8);
+}
+
 .grid {
   display: grid;
   gap: var(--space-5);

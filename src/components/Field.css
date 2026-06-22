@@ -38,15 +38,28 @@
 .optiongroup__item {
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-pill);
+  padding: var(--space-3) var(--space-5);
   color: var(--color-text);
   font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.optiongroup__item:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  transform: translateY(-1px);
 }
 
 .optiongroup__item.is-selected {
   background: var(--color-accent);
   color: var(--color-accent-contrast);
   border-color: var(--color-accent);
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.optiongroup__item.is-selected:hover {
+  color: var(--color-accent-contrast);
 }

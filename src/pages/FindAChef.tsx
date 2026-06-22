@@ -143,12 +143,13 @@ export default function FindAChef() {
   return (
     <div className="section container findachef">
       <Seo
-        title="מצאו שף פרטי לאירוע | טופs הזמנה — Sofré"
+        title="מצאו שף פרטי לאירוע | טופס הזמנה — Sofré"
         description="מלאו טופס קצר וקבלו עד 3 הצעות משפים פרטיים מקצועיים לאירוע שלכם."
         noindex
       />
+      <p className="eyebrow">בקשת שף</p>
       <h1>בואו נמצא לכם שף</h1>
-      <p className="findachef__sub">כמה פרטים קצרים — ועד 3 שפים יחזרו אליכם.</p>
+      <p className="findachef__sub">כמה פרטים קצרים — ועד שלושה שפים יחזרו אליכם עם הצעה.</p>
 
       <div className="card findachef__card">
         <Stepper steps={STEP_LABELS} current={step} />

@@ -16,6 +16,7 @@ export default function JoinChefs() {
         description="שפים פרטיים: הצטרפו לקבוצת הוואטסאפ או הטלגרם שלנו וקבלו התראה על כל ליד חדש של לקוח שמחפש שף לאירוע."
         canonicalPath="/chefs/join"
       />
+      <p className="eyebrow">לשפים</p>
       <h1>הצטרפו לקבוצת השפים</h1>
       <p className="lead-text" style={{ marginBlock: "var(--space-4)" }}>
         כל ליד חדש נשלח לקבוצות שלנו (ללא פרטי הלקוח). הצטרפו כדי לקבל התראה על

@@ -42,8 +42,16 @@
   flex-direction: column;
   gap: var(--space-2);
   align-items: flex-start;
-  padding-block-start: var(--space-4);
-  border-block-start: 1px solid var(--color-border);
+  margin-block-start: var(--space-5);
+  padding: var(--space-5);
+  border: 1px solid var(--color-saffron-soft);
+  border-radius: var(--radius-lg);
+  background: radial-gradient(
+      130% 120% at 100% 0%,
+      rgba(217, 154, 43, 0.16),
+      transparent 60%
+    ),
+    var(--color-surface);
 }
 
 .leadunlock__client {
@@ -53,9 +61,11 @@
 }
 
 .leadunlock__phone {
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 700;
   letter-spacing: 0.02em;
+  color: var(--color-accent);
 }
 
 .leadunlock__email {

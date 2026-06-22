@@ -1,22 +1,41 @@
 .findachef__sub {
   margin-block: var(--space-3) var(--space-6);
+  font-size: 1.1rem;
 }
 
 .findachef__card {
   max-inline-size: 640px;
 }
 
+/* The kosher toggle, set as a quiet selectable chip rather than a bare box. */
 .findachef__check {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   color: var(--color-text);
-  margin-block: var(--space-3);
+  margin-block: var(--space-4) var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.findachef__check:has(input:checked) {
+  border-color: var(--color-accent);
+  background: rgba(140, 34, 51, 0.06);
+}
+
+.findachef__check input {
+  accent-color: var(--color-accent);
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
 }
 
 .findachef__consent {
   font-size: 0.85rem;
-  margin-block-start: var(--space-3);
+  margin-block-start: var(--space-4);
+  line-height: 1.6;
 }
 
 .findachef__consent a {
@@ -27,6 +46,7 @@
 .findachef__error {
   color: var(--color-danger);
   margin-block-start: var(--space-3);
+  font-weight: 600;
 }
 
 .findachef__nav {
@@ -34,6 +54,8 @@
   justify-content: space-between;
   gap: var(--space-3);
   margin-block-start: var(--space-6);
+  padding-block-start: var(--space-5);
+  border-block-start: 1px solid var(--color-border);
 }
 
 .findachef__nav .btn:only-child {

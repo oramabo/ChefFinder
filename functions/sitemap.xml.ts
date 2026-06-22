@@ -4,7 +4,7 @@ import type { Handler } from "../functions-lib/handler.ts";
 // GET /sitemap.xml — built from the same programmatic page data as the routes.
 export const onRequestGet: Handler = async ({ request }) => {
   const origin = new URL(request.url).origin;
-  const staticPaths = ["/", "/find-a-chef", "/how-it-works", "/chefs", "/faq"];
+  const staticPaths = ["/", "/find-a-chef", "/how-it-works", "/chefs", "/chefs/join", "/faq"];
   const seoPaths = allSeoPages().map((p) => p.path);
   const all = [...staticPaths, ...seoPaths];
 

@@ -1,4 +1,5 @@
 import Seo from "../components/Seo.tsx";
+import { LinkButton } from "../components/Button.tsx";
 import { DEFAULT_PRICE, DEFAULT_CAP } from "@shared/constants.ts";
 import { formatCurrency } from "../lib/format.ts";
 
@@ -30,6 +31,11 @@ export default function Chefs() {
           <h3>הוגן לשפים</h3>
           <p>כל ליד נמכר לעד {DEFAULT_CAP} שפים בלבד — סיכוי הוגן לסגור את העבודה.</p>
         </div>
+      </div>
+      <div style={{ marginBlockStart: "var(--space-6)", textAlign: "center" }}>
+        <LinkButton to="/chefs/join" variant="primary">
+          הצטרפו לקבוצת הלידים
+        </LinkButton>
       </div>
     </div>
   );

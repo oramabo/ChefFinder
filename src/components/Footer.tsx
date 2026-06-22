@@ -6,9 +6,15 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="container footer__inner">
-        <div>
-          <div className="footer__brand">השף שלי</div>
-          <p>שף פרטי לאירוע שלכם — מהיר, מקצועי, אמין.</p>
+        <div className="footer__brandcol">
+          <img
+            className="footer__logo"
+            src="/images/logo.png"
+            width={170}
+            height={170}
+            alt="השף שלי — מחברים בין טעם לאנשים"
+            loading="lazy"
+          />
         </div>
         <nav className="footer__links" aria-label="ניווט תחתון">
           <Link to="/how-it-works">איך זה עובד</Link>

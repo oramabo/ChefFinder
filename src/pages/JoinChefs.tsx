@@ -23,6 +23,14 @@ export default function JoinChefs() {
         כל ליד חדש נשלח לקבוצות שלנו (ללא פרטי הלקוח). הצטרפו כדי לקבל התראה על
         לידים חדשים ראשונים — ולסגור עבודות.
       </p>
+      <img
+        className="page-banner"
+        src="/images/chef.jpg"
+        width={1200}
+        height={525}
+        alt="שף פרטי מסדר מנה במטבח ביתי חמים עם סירי נחושת ועשבי תיבול"
+        loading="lazy"
+      />
 
       <div className="grid grid-2" style={{ marginBlockStart: "var(--space-6)" }}>
         <div className="card join__card">

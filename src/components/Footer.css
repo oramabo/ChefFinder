@@ -18,6 +18,11 @@
   margin-block-end: var(--space-2);
 }
 
+.footer__logo {
+  inline-size: 150px;
+  block-size: auto;
+}
+
 .footer__links {
   display: flex;
   flex-wrap: wrap;

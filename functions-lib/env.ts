@@ -27,6 +27,8 @@ export interface Env {
   // Language code of the approved WhatsApp template (must match Meta exactly,
   // e.g. "he", "he_IL", "en"). Defaults to "he".
   WA_TEMPLATE_LANG?: string;
+  // Template for the operator reservation alert (defaults to "new_reservation").
+  WA_RESERVATION_TEMPLATE?: string;
 
   TG_TOKEN?: string;
   TG_CHAT_ID?: string;

@@ -85,6 +85,10 @@ There are three places a value can live:
 | `WA_MY_NUMBER` | Operator WhatsApp number(s), E.164. Multiple allowed — separate with commas (e.g. `9725...,9725...`) |
 | `WA_TEMPLATE_NAME` | `new_lead` (the approved template name) |
 | `WA_TEMPLATE_LANG` | Template language code, must match Meta exactly (default `he`; e.g. `he_IL`) |
+| `WA_RESERVATION_TEMPLATE` | Operator reservation-alert template (default `new_reservation`; named params `chef_phone, city, amount, reference`) |
+| `TG_ADMIN_CHAT_ID` | Separate **operator** Telegram channel id for reservation/payment alerts (uses the same `TG_TOKEN`) |
+| `BIT_PHONE` | Your Bit phone number (manual Bit mode — shown to chefs). Setting it enables Bit checkout |
+| `BIT_LINK` | Optional Bit payment-request link (adds an "open Bit" button) |
 | `GROW_API_KEY` | Grow/Meshulam API key |
 | `GROW_USER_ID` | Grow user id |
 | `GROW_PAGE_CODE` | Grow payment page code |

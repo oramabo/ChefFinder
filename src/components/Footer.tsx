@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { reopenConsent } from "../lib/consent.ts";
 import "./Footer.css";
 
 export default function Footer() {
@@ -16,6 +17,9 @@ export default function Footer() {
           <Link to="/faq">שאלות נפוצות</Link>
           <Link to="/privacy">פרטיות</Link>
           <Link to="/terms">תנאים</Link>
+          <button type="button" className="footer__linkbtn" onClick={reopenConsent}>
+            הגדרות עוגיות
+          </button>
         </nav>
       </div>
       <div className="container footer__copy">

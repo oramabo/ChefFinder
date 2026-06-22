@@ -29,6 +29,21 @@
   color: var(--color-text);
 }
 
+/* "Cookie settings" rendered as a link-styled button. */
+.footer__linkbtn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.footer__linkbtn:hover {
+  color: var(--color-text);
+}
+
 .footer__copy {
   margin-block-start: var(--space-6);
   color: var(--color-text-muted);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./Button.tsx";
-import { getConsent, setConsent } from "../lib/consent.ts";
+import { getConsent, setConsent, CONSENT_EVENT } from "../lib/consent.ts";
 import { initAnalytics } from "../lib/analytics.ts";
 import "./CookieBanner.css";
 
@@ -14,6 +14,9 @@ export default function CookieBanner() {
 
   useEffect(() => {
     if (getConsent() === null) setVisible(true);
+    const reopen = () => setVisible(true);
+    window.addEventListener(CONSENT_EVENT, reopen);
+    return () => window.removeEventListener(CONSENT_EVENT, reopen);
   }, []);
 
   if (!visible) return null;

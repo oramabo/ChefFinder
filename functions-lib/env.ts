@@ -24,6 +24,9 @@ export interface Env {
   WA_PHONE_NUMBER_ID?: string;
   WA_MY_NUMBER?: string;
   WA_TEMPLATE_NAME?: string;
+  // Language code of the approved WhatsApp template (must match Meta exactly,
+  // e.g. "he", "he_IL", "en"). Defaults to "he".
+  WA_TEMPLATE_LANG?: string;
 
   TG_TOKEN?: string;
   TG_CHAT_ID?: string;

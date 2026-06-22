@@ -84,6 +84,7 @@ There are three places a value can live:
 | `ADMIN_TOKEN` | Secret to access the read-only `/admin` leads view (shows PII) |
 | `WA_MY_NUMBER` | Operator WhatsApp number(s), E.164. Multiple allowed — separate with commas (e.g. `9725...,9725...`) |
 | `WA_TEMPLATE_NAME` | `new_lead` (the approved template name) |
+| `WA_TEMPLATE_LANG` | Template language code, must match Meta exactly (default `he`; e.g. `he_IL`) |
 | `GROW_API_KEY` | Grow/Meshulam API key |
 | `GROW_USER_ID` | Grow user id |
 | `GROW_PAGE_CODE` | Grow payment page code |
@@ -143,6 +144,12 @@ server-side and fails closed on invalid tokens.
    `city, date, guests, cuisine, budget, price`, and a **URL button** whose
    dynamic parameter is the `lead_token` (matching
    `functions-lib/adapters/messaging.whatsapp.ts`). Set `WA_TEMPLATE_NAME=new_lead`.
+   The template must be **Approved** before it can send.
+4. **Language must match exactly.** The app sends the template in `WA_TEMPLATE_LANG`
+   (default `he`). If Meta returns **`(#132001) template name (new_lead) does not
+   exist in he`**, the template either isn't approved yet, has a different name
+   (`WA_TEMPLATE_NAME`), or was created under a different language code — set
+   `WA_TEMPLATE_LANG` to the exact code shown in WhatsApp Manager (e.g. `he_IL`).
 
 ## 5. Grow / Meshulam (payments + invoice) — when ready for real charges
 

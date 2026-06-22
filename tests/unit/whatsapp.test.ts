@@ -86,4 +86,25 @@ describe("createWhatsAppMessaging multi-recipient", () => {
     const wa = createWhatsAppMessaging({ ...baseEnv, WA_MY_NUMBER: "" });
     await expect(wa.sendWhatsApp(input)).rejects.toThrow(/no recipient/);
   });
+
+  it("uses template language 'he' by default and honours WA_TEMPLATE_LANG", async () => {
+    const fetchMock = vi.fn(
+      async (_input: unknown, _init?: RequestInit) => new Response("{}", { status: 200 }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const def = createWhatsAppMessaging({ ...baseEnv, WA_MY_NUMBER: "972500000001" });
+    await def.sendWhatsApp(input);
+    const sent1 = JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string);
+    expect(sent1.template.language.code).toBe("he");
+
+    const custom = createWhatsAppMessaging({
+      ...baseEnv,
+      WA_MY_NUMBER: "972500000001",
+      WA_TEMPLATE_LANG: "he_IL",
+    });
+    await custom.sendWhatsApp(input);
+    const sent2 = JSON.parse((fetchMock.mock.calls[1][1] as RequestInit).body as string);
+    expect(sent2.template.language.code).toBe("he_IL");
+  });
 });

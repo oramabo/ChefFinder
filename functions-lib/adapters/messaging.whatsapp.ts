@@ -21,6 +21,9 @@ export function createWhatsAppMessaging(env: Env): Pick<MessagingPort, "sendWhat
   const phoneNumberId = env.WA_PHONE_NUMBER_ID ?? "";
   const recipients = parseRecipients(env.WA_MY_NUMBER);
   const templateName = env.WA_TEMPLATE_NAME || "new_lead";
+  // Must match the approved template's language exactly (Meta error #132001 means
+  // no template with this name+language exists). Configurable for e.g. "he_IL".
+  const templateLang = env.WA_TEMPLATE_LANG || "he";
 
   return {
     async sendWhatsApp(input: NotifyInput): Promise<void> {
@@ -45,7 +48,7 @@ export function createWhatsAppMessaging(env: Env): Pick<MessagingPort, "sendWhat
           type: "template",
           template: {
             name: templateName,
-            language: { code: "he" },
+            language: { code: templateLang },
             components: [
               { type: "body", parameters: bodyParams },
               {

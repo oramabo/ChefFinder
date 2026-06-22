@@ -16,7 +16,7 @@ design. This repo is the **M1 Core MVP**.
 | Layer | Choice |
 |---|---|
 | Frontend | Vite + React (RTL), prerendered via `vite-react-ssg` for SEO pages |
-| API | Cloudflare Pages Functions (`/functions`) |
+| API | Cloudflare Worker (`worker/`) routing handlers in `functions/` |
 | DB | Supabase / Postgres (atomic `reserve_lead` RPC + TTL sweep) |
 | Payments | Grow (Meshulam) — Bit + cards + invoice (mock by default) |
 | Distribution | WhatsApp Cloud API (to operator) + Telegram Bot API |
@@ -43,8 +43,8 @@ cp .env.example .dev.vars         # fill in or leave blank to run on stubs
 # Fast UI loop (Vite only):
 npm run dev:web
 
-# Full edge loop (SPA + Functions):
-npm run dev                       # wrangler pages dev
+# Full edge loop (SPA + Worker API):
+npm run dev                       # wrangler dev (build first: npm run build)
 
 # With a real local database:
 npm run db:start                  # supabase start
@@ -71,7 +71,8 @@ and a fourth buyer past the cap of 3 sees "sold out".
 
 ```
 src/                React SPA (pages, components, styles, lib)
-functions/          Cloudflare Pages Functions (file-based API routing)
+worker/             Cloudflare Worker entry: routes /api/* + /sitemap.xml, serves assets
+functions/          Request handlers (framework-agnostic FnCtx), wired by worker/
 functions-lib/      Server domain logic: ports, adapters, factory, notifyLead
 shared/             Isomorphic: zod schema, types, constants, SEO data
 supabase/migrations Schema, reserve_lead RPC, sweep, RLS

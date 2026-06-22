@@ -88,6 +88,7 @@ export function createMockDb(store: MockStore = globalStore): DbPort {
         amount: input.amount,
         provider_ref: input.provider_ref ?? null,
         invoice_ref: null,
+        reveal_token: input.reveal_token ?? null,
         status: PURCHASE_STATUS.pending,
         created_at: new Date().toISOString(),
       };
@@ -103,6 +104,13 @@ export function createMockDb(store: MockStore = globalStore): DbPort {
     async getPurchaseByProviderRef(ref: string): Promise<Purchase | null> {
       for (const p of store.purchases.values()) {
         if (p.provider_ref === ref) return structuredClone(p);
+      }
+      return null;
+    },
+
+    async getPurchaseByRevealToken(revealToken: string): Promise<Purchase | null> {
+      for (const p of store.purchases.values()) {
+        if (p.reveal_token === revealToken) return structuredClone(p);
       }
       return null;
     },

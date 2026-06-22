@@ -28,9 +28,11 @@ export interface DbPort {
     chef_phone: string;
     amount: number;
     provider_ref?: string | null;
+    reveal_token?: string | null;
   }): Promise<Purchase>;
   getPurchase(id: string): Promise<Purchase | null>;
   getPurchaseByProviderRef(ref: string): Promise<Purchase | null>;
+  getPurchaseByRevealToken(revealToken: string): Promise<Purchase | null>;
   setPurchaseProviderRef(id: string, providerRef: string): Promise<void>;
   // pending -> paid, append chef to lead.paid_by (idempotent). true if transitioned.
   completePurchase(id: string, invoiceRef?: string | null): Promise<boolean>;

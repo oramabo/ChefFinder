@@ -24,13 +24,20 @@ function doReserve(token: string, chef: string) {
 }
 
 describe("POST /api/lead/:token/reserve", () => {
-  it("reserves a slot and returns a payment url", async () => {
+  it("reserves a slot and returns a payment url + reveal token", async () => {
     const token = await seedLead(3);
     const res = await doReserve(token, "0521111111");
-    const json = (await res.json()) as { ok: boolean; payment_url?: string; purchase_id?: string };
+    const json = (await res.json()) as {
+      ok: boolean;
+      payment_url?: string;
+      purchase_id?: string;
+      reveal_token?: string;
+    };
     expect(json.ok).toBe(true);
     expect(json.payment_url).toContain("mock_pay=1");
     expect(json.purchase_id).toBeTruthy();
+    expect(json.reveal_token).toBeTruthy();
+    expect((json.reveal_token ?? "").length).toBeGreaterThanOrEqual(24);
   });
 
   it("reports sold_out once the cap is exhausted", async () => {

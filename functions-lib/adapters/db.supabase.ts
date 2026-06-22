@@ -62,6 +62,16 @@ export function createSupabaseDb(url: string, serviceKey: string): DbPort {
       return (data as Purchase) ?? null;
     },
 
+    async getPurchaseByRevealToken(revealToken: string): Promise<Purchase | null> {
+      const { data, error } = await sb
+        .from("purchases")
+        .select("*")
+        .eq("reveal_token", revealToken)
+        .maybeSingle();
+      if (error) throw new Error(`getPurchaseByRevealToken: ${error.message}`);
+      return (data as Purchase) ?? null;
+    },
+
     async setPurchaseProviderRef(id: string, providerRef: string): Promise<void> {
       const { error } = await sb.from("purchases").update({ provider_ref: providerRef }).eq("id", id);
       if (error) throw new Error(`setPurchaseProviderRef: ${error.message}`);

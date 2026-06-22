@@ -2,19 +2,22 @@ import { buildContainer } from "../../../../functions-lib/factory.ts";
 import { json, error } from "../../../../functions-lib/http.ts";
 import type { Handler } from "../../../../functions-lib/handler.ts";
 
-// GET /api/lead/:token/contact?chef=... — the ONLY endpoint that returns client
-// PII, and only to a chef whose phone is in the lead's paid_by list.
+// GET /api/lead/:token/contact?reveal=... — the ONLY endpoint that returns client
+// PII. Gated by the per-purchase reveal_token (an unguessable secret issued to
+// the chef at reserve time), and only once that purchase is paid. The chef's
+// phone is NOT an access credential.
 export const onRequestGet: Handler = async ({ env, params, request }) => {
   const token = String(params.token);
-  const chef = new URL(request.url).searchParams.get("chef") ?? "";
-  if (!chef) return error("חסר מזהה שף", 400, { reason: "missing_chef" });
+  const reveal = new URL(request.url).searchParams.get("reveal") ?? "";
+  if (!reveal) return error("חסר אסימון גישה", 400, { reason: "missing_reveal" });
 
   const { db } = buildContainer(env, request);
   const lead = await db.getLeadByToken(token);
   if (!lead) return error("הליד לא נמצא", 404, { reason: "not_found" });
 
-  if (!lead.paid_by.includes(chef)) {
-    return error("התשלום לא נמצא עבור מספר זה", 403, { reason: "not_paid" });
+  const purchase = await db.getPurchaseByRevealToken(reveal);
+  if (!purchase || purchase.lead_id !== lead.id || purchase.status !== "paid") {
+    return error("התשלום לא אומת", 403, { reason: "not_paid" });
   }
 
   return json({

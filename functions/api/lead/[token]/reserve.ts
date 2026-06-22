@@ -1,6 +1,7 @@
 import { buildContainer } from "../../../../functions-lib/factory.ts";
 import { json, error, readJson, validate } from "../../../../functions-lib/http.ts";
 import { publicBaseUrl } from "../../../../functions-lib/env.ts";
+import { generateLeadToken } from "../../../../functions-lib/crypto.ts";
 import type { Handler } from "../../../../functions-lib/handler.ts";
 import { ReserveInput } from "@shared/schema.ts";
 import { toLeadSummary } from "@shared/types.ts";
@@ -24,10 +25,14 @@ export const onRequestPost: Handler = async ({ request, env, params }) => {
   if (!reserved.ok) return json({ ok: false, reason: reserved.reason });
 
   // Slot held (buyers_count incremented). Create the pending purchase + payment.
+  // The reveal_token is the chef's bearer secret for unlocking contact details
+  // once paid; it is returned only here and never placed in a URL or message.
+  const reveal_token = generateLeadToken(32);
   const purchase = await db.createPurchase({
     lead_id: lead.id,
     chef_phone,
     amount: lead.price,
+    reveal_token,
   });
 
   const base = publicBaseUrl(env, request);
@@ -41,7 +46,13 @@ export const onRequestPost: Handler = async ({ request, env, params }) => {
       webhookUrl: `${base}/api/payment/webhook`,
     });
     await db.setPurchaseProviderRef(purchase.id, payment.provider_ref);
-    return json({ ok: true, reason: "reserved", payment_url: payment.payment_url, purchase_id: purchase.id });
+    return json({
+      ok: true,
+      reason: "reserved",
+      payment_url: payment.payment_url,
+      purchase_id: purchase.id,
+      reveal_token,
+    });
   } catch (err) {
     // Payment couldn't be started — release the held slot so it isn't lost.
     console.error("createPayment failed:", err);

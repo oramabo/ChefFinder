@@ -56,6 +56,7 @@ export interface Purchase {
   amount: number;
   provider_ref: string | null;
   invoice_ref: string | null;
+  reveal_token: string | null;
   status: PurchaseStatus;
   created_at: string;
 }

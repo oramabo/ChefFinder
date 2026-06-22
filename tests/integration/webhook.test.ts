@@ -24,7 +24,7 @@ async function reserveOne(token: string, chef: string) {
   const res = await reserve(
     ctx({ method: "POST", url: `http://localhost/api/lead/${token}/reserve`, body: { chef_phone: chef }, params: { token } }),
   );
-  return (await res.json()) as { ok: boolean; purchase_id: string };
+  return (await res.json()) as { ok: boolean; purchase_id: string; reveal_token: string };
 }
 
 function postWebhook(body: Record<string, string>) {
@@ -34,7 +34,7 @@ function postWebhook(body: Record<string, string>) {
 describe("POST /api/payment/webhook", () => {
   it("marks paid, reveals contact, and is idempotent on replay", async () => {
     const token = await seedLead(3);
-    const { purchase_id } = await reserveOne(token, "0521111111");
+    const { purchase_id, reveal_token } = await reserveOne(token, "0521111111");
     const purchase = await db.getPurchase(purchase_id);
     const providerRef = purchase!.provider_ref!;
 
@@ -42,9 +42,9 @@ describe("POST /api/payment/webhook", () => {
     const res1 = (await (await postWebhook(body)).json()) as any;
     expect(res1).toEqual({ ok: true, status: "paid", transitioned: true });
 
-    // Contact now revealed to the paying chef.
+    // Contact now revealed via the reveal token (not the phone).
     const c = await contact(
-      ctx({ url: `http://localhost/api/lead/${token}/contact?chef=0521111111`, params: { token } }),
+      ctx({ url: `http://localhost/api/lead/${token}/contact?reveal=${reveal_token}`, params: { token } }),
     );
     expect(c.status).toBe(200);
 

@@ -18,6 +18,7 @@ const cuisineHe = (slug: string | null) =>
   CUISINES.find((c) => c.slug === slug)?.he ?? slug ?? "";
 
 const phoneKey = (token: string) => `chef_phone:${token}`;
+const revealKey = (token: string) => `reveal:${token}`;
 
 export default function LeadUnlock() {
   const { token = "" } = useParams();
@@ -41,8 +42,9 @@ export default function LeadUnlock() {
   }, [token]);
 
   const tryReveal = useCallback(
-    async (chefPhone: string) => {
-      const res = await getContact(token, chefPhone);
+    async (revealToken: string) => {
+      if (!revealToken) return false;
+      const res = await getContact(token, revealToken);
       if (res.ok && res.contact) {
         setContact(res.contact);
         track("phone_revealed");
@@ -58,8 +60,11 @@ export default function LeadUnlock() {
     (async () => {
       setLoading(true);
       track("lead_page_viewed", { token });
-      const stored = typeof window !== "undefined" ? localStorage.getItem(phoneKey(token)) : null;
-      if (stored) setPhone(stored);
+      const storedPhone =
+        typeof window !== "undefined" ? localStorage.getItem(phoneKey(token)) : null;
+      if (storedPhone) setPhone(storedPhone);
+      const storedReveal =
+        typeof window !== "undefined" ? localStorage.getItem(revealKey(token)) : null;
 
       // Returning from the (mock) payment page: finish + reveal.
       const mockPay = params.get("mock_pay");
@@ -71,7 +76,7 @@ export default function LeadUnlock() {
       }
 
       await refreshLead();
-      if (stored) await tryReveal(stored);
+      if (storedReveal) await tryReveal(storedReveal);
       if (!cancelled) setLoading(false);
     })();
     return () => {
@@ -93,6 +98,9 @@ export default function LeadUnlock() {
       localStorage.setItem(phoneKey(token), trimmed);
       const res = await reserveLead(token, trimmed);
       if (res.ok && res.payment_url) {
+        // Persist the reveal token BEFORE leaving for payment; it's how we
+        // unlock the contact on return.
+        if (res.reveal_token) localStorage.setItem(revealKey(token), res.reveal_token);
         track("reserve_won");
         track("payment_started");
         window.location.href = res.payment_url;
@@ -101,8 +109,9 @@ export default function LeadUnlock() {
       track("reserve_sold_out", { reason: res.reason });
       if (res.reason === "already_purchased") {
         await refreshLead();
-        const ok = await tryReveal(trimmed);
-        if (!ok) setMessage("כבר רכשת ליד זה.");
+        const storedReveal = localStorage.getItem(revealKey(token)) ?? "";
+        const ok = await tryReveal(storedReveal);
+        if (!ok) setMessage("כבר רכשת ליד זה. אם הקישור נפתח במכשיר אחר, פנו אלינו.");
       } else if (res.reason === "sold_out") {
         setMessage("הליד נמכר. כל המקומות נתפסו.");
         await refreshLead();

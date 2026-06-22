@@ -40,6 +40,7 @@ export interface ReserveResponse {
   reason?: string;
   payment_url?: string;
   purchase_id?: string;
+  reveal_token?: string;
   error?: string;
 }
 
@@ -56,9 +57,9 @@ export interface ContactResponse {
   error?: string;
 }
 
-export function getContact(token: string, chefPhone: string): Promise<ContactResponse> {
+export function getContact(token: string, revealToken: string): Promise<ContactResponse> {
   return getJson<ContactResponse>(
-    `/api/lead/${encodeURIComponent(token)}/contact?chef=${encodeURIComponent(chefPhone)}`,
+    `/api/lead/${encodeURIComponent(token)}/contact?reveal=${encodeURIComponent(revealToken)}`,
   );
 }
 

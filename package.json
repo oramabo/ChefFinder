@@ -25,6 +25,7 @@
     "@fontsource/assistant": "^5.2.9",
     "@fontsource/frank-ruhl-libre": "^5.2.8",
     "@fontsource/heebo": "^5.2.8",
+    "@fontsource/open-sans": "^5.2.7",
     "@fontsource/roboto": "^5.2.10",
     "@supabase/supabase-js": "^2.45.4",
     "posthog-js": "^1.161.6",

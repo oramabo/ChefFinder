@@ -30,12 +30,9 @@
   --color-success: #4f7a4f;
   --color-danger: #b23b2e;
 
-  /* Typography — Hebrew literary serif display + a Roboto-matched sans body.
-     Roboto leads for Latin/numerals; Heebo (Roboto's Hebrew counterpart) renders
-     Hebrew, so the body reads as one consistent Roboto-style face. */
-  --font-display: "Frank Ruhl Libre", "Heebo", Georgia, serif;
-  --font-sans: "Roboto", "Heebo", "Assistant", system-ui, -apple-system, "Segoe UI",
-    Arial, sans-serif;
+  /* Typography — Hebrew literary serif display + Open Sans (Latin + Hebrew) body. */
+  --font-display: "Frank Ruhl Libre", "Open Sans", Georgia, serif;
+  --font-sans: "Open Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 
   /* Spacing scale */
   --space-1: 0.25rem;

@@ -7,7 +7,7 @@ export default function Chefs() {
   return (
     <div className="section container">
       <Seo
-        title="לשפים — קניית לידים | Sofré"
+        title="לשפים — קניית לידים | השף שלי"
         description="שפים פרטיים: קבלו לידים אמיתיים של לקוחות שמחפשים שף לאירוע. תשלום פר ליד, חשיפת טלפון מיידית."
       />
       <h1>לשפים: איך קונים ליד</h1>

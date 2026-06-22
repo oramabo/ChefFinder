@@ -1,68 +1,35 @@
-/* ── Hero: the signature. A warm candlelight field with a faint "plate" ring
-   behind an oversized Hebrew serif headline. ──────────────────────────────── */
+/* ── Hero: asymmetric, illustration-led. No gradients — the drawing carries it. */
 .hero {
-  position: relative;
-  overflow: hidden;
-  padding-block: clamp(var(--space-10), 12vw, var(--space-12));
-  border-block-end: 1px solid var(--color-border);
+  padding-block: clamp(var(--space-8), 9vw, var(--space-12));
 }
 
-/* Candlelight glow — saffron warmth rising from the start-side of the hero. */
-.hero__glow {
-  position: absolute;
-  inset-block-start: -20%;
-  inset-inline-start: -10%;
-  inline-size: 60vw;
-  block-size: 60vw;
-  max-inline-size: 720px;
-  max-block-size: 720px;
-  background: radial-gradient(
-    circle,
-    rgba(217, 154, 43, 0.28),
-    rgba(217, 154, 43, 0) 62%
-  );
-  pointer-events: none;
+.hero__grid {
+  display: grid;
+  gap: var(--space-8);
+  align-items: center;
 }
 
-/* The plate: a faint concentric ring, the table-setting motif. */
-.hero__plate {
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-end: -14%;
-  inline-size: 46vw;
-  block-size: 46vw;
-  max-inline-size: 560px;
-  max-block-size: 560px;
-  transform: translateY(-50%);
-  border: 1.5px solid var(--color-saffron-soft);
-  border-radius: 50%;
-  opacity: 0.5;
-  pointer-events: none;
-}
-.hero__plate::after {
-  content: "";
-  position: absolute;
-  inset: 12%;
-  border: 1px solid var(--color-border);
-  border-radius: 50%;
+@media (min-width: 880px) {
+  .hero__grid {
+    grid-template-columns: 1.05fr 0.95fr;
+  }
 }
 
-.hero__inner {
-  position: relative;
-  max-inline-size: 44rem;
+.hero__copy {
+  max-inline-size: 36rem;
 }
 
-.hero__eyebrow {
-  margin-block-end: var(--space-4);
+.eyebrow + .hero__title,
+.hero__title {
+  margin-block: var(--space-4) var(--space-5);
 }
 
 .hero__title {
-  font-size: clamp(2.6rem, 7vw, 4.4rem);
-  margin-block-end: var(--space-5);
+  font-size: clamp(2.5rem, 6.4vw, 4.2rem);
 }
 
 .hero__sub {
-  max-inline-size: 42ch;
+  max-inline-size: 40ch;
   margin-block-end: var(--space-6);
 }
 
@@ -79,47 +46,38 @@
   color: var(--color-text-muted);
 }
 
-/* Entrance: a calm staggered rise. Disabled under reduced-motion (global). */
-.hero__eyebrow,
-.hero__title,
-.hero__sub,
-.hero__cta,
-.hero__trust {
-  animation: hero-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-}
-.hero__title {
-  animation-delay: 0.06s;
-}
-.hero__sub {
-  animation-delay: 0.12s;
-}
-.hero__cta {
-  animation-delay: 0.18s;
-}
-.hero__trust {
-  animation-delay: 0.24s;
+.hero__art {
+  inline-size: min(100%, 30rem);
+  block-size: auto;
+  justify-self: center;
 }
 
-@keyframes hero-rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ── Editorial divider ────────────────────────────────────────────────────── */
+.rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  max-inline-size: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--space-5);
+  color: var(--color-olive);
 }
 
+.rule__line {
+  flex: 1;
+  block-size: 1px;
+  background: var(--color-border);
+}
+
+/* ── Process: real numbered sequence, each course with its own line mark. ──── */
 .home__h2 {
   margin-block: var(--space-3) var(--space-8);
-  max-inline-size: 24ch;
+  max-inline-size: 26ch;
 }
 
-/* ── Process: an honest numbered sequence, set as menu courses. ───────────── */
 .home__steps {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-8);
   list-style: none;
 }
 
@@ -130,24 +88,39 @@
 }
 
 .home__step {
-  display: flex;
-  gap: var(--space-4);
-  align-items: flex-start;
-  padding-block-start: var(--space-4);
-  border-block-start: 2px solid var(--color-border);
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: start;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.home__step-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  border-radius: 50%;
+  color: var(--color-accent);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
 }
 
 .home__step-num {
   font-family: var(--font-display);
-  font-size: 1.6rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: var(--color-accent);
+  color: var(--color-olive);
   font-feature-settings: "tnum";
-  line-height: 1;
 }
 
 .home__step h3 {
-  margin-block-end: var(--space-2);
+  grid-column: 1 / -1;
+  margin-block: var(--space-3) var(--space-1);
+}
+
+.home__step p {
+  grid-column: 1 / -1;
 }
 
 /* ── Trust card ───────────────────────────────────────────────────────────── */
@@ -156,32 +129,24 @@
   flex-direction: column;
   gap: var(--space-6);
   align-items: flex-start;
-  background:
-    radial-gradient(120% 140% at 100% 0%, rgba(217, 154, 43, 0.1), transparent 55%),
-    var(--color-surface);
 }
 
 .home__list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
   margin-block-start: var(--space-5);
 }
 
 .home__list li {
-  padding-inline-start: var(--space-6);
-  position: relative;
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
   color: var(--color-text);
 }
 
-.home__list li::before {
-  content: "";
-  position: absolute;
-  inset-inline-start: 0;
-  inset-block-start: 0.6em;
-  inline-size: 0.7rem;
-  block-size: 0.7rem;
-  background: var(--color-olive);
-  border-radius: 50% 50% 50% 0;
-  transform: rotate(45deg);
+.home__list-icon {
+  flex-shrink: 0;
+  color: var(--color-olive);
+  margin-block-start: 0.1em;
 }

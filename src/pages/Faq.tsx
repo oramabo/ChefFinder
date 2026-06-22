@@ -36,7 +36,7 @@ export default function Faq() {
   return (
     <div className="section container">
       <Seo
-        title="שאלות נפוצות | שף פרטי לאירוע — Sofré"
+        title="שאלות נפוצות | שף פרטי לאירוע — השף שלי"
         description="כל מה שצריך לדעת על הזמנת שף פרטי לאירוע: מחירים, זמני מענה, כשרות ועוד."
         jsonLd={jsonLd}
       />

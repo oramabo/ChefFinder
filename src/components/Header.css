@@ -22,15 +22,9 @@
 .header__wordmark {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 1.7rem;
-  letter-spacing: 0.01em;
+  font-size: 1.6rem;
+  letter-spacing: 0;
   color: var(--color-text);
-}
-
-/* A pomegranate "place-setting" period — the one small flourish in the chrome. */
-.header__wordmark::after {
-  content: ".";
-  color: var(--color-accent);
 }
 
 .header__nav {

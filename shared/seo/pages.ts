@@ -30,7 +30,7 @@ function eventCityPage(event: SeoEvent, city: City): SeoPage {
     path: `/private-chef/${event.slug}-${city.slug}`,
     citySlug: city.slug,
     eventSlug: event.slug,
-    title: `שף פרטי ל${event.heFor} ב${city.he} | Sofré`,
+    title: `שף פרטי ל${event.heFor} ב${city.he} | השף שלי`,
     h1: `שף פרטי ל${event.heFor} ב${city.he}`,
     description: `שף פרטי ל${event.heFor} ב${city.he}. מלאו טופס קצר וקבלו הצעות משפים מקצועיים. תפריט מותאם, חוויה קולינרית בבית.`,
   };

@@ -1,4 +1,5 @@
 import Seo from "../components/Seo.tsx";
+import { IconChat, IconSend } from "../components/art.tsx";
 import "./Join.css";
 
 // Public invite links, set at build time (Workers Builds → build variables).
@@ -12,7 +13,7 @@ export default function JoinChefs() {
   return (
     <div className="section container">
       <Seo
-        title="הצטרפות שפים לקבוצת הלידים | Sofré"
+        title="הצטרפות שפים לקבוצת הלידים | השף שלי"
         description="שפים פרטיים: הצטרפו לקבוצת הוואטסאפ או הטלגרם שלנו וקבלו התראה על כל ליד חדש של לקוח שמחפש שף לאירוע."
         canonicalPath="/chefs/join"
       />
@@ -34,6 +35,7 @@ export default function JoinChefs() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <IconChat width={20} height={20} />
               הצטרפו בוואטסאפ
             </a>
           ) : (
@@ -51,6 +53,7 @@ export default function JoinChefs() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <IconSend width={20} height={20} />
               הצטרפו בטלגרם
             </a>
           ) : (

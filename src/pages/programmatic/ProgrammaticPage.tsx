@@ -28,7 +28,7 @@ export default function ProgrammaticPage() {
     "@type": "Service",
     serviceType: "שף פרטי",
     areaServed: cityHe,
-    provider: { "@type": "LocalBusiness", name: "Sofré" },
+    provider: { "@type": "LocalBusiness", name: "השף שלי" },
     description: page.description,
   };
 

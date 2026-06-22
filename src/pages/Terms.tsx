@@ -7,8 +7,8 @@ export default function Terms() {
   return (
     <div className="section container legal">
       <Seo
-        title="תנאי שימוש — Sofré"
-        description="תנאי השימוש בשירות Sofré — חיבור בין לקוחות לשפים פרטיים, תשלום פר-ליד, אחריות ודין חל."
+        title="תנאי שימוש — השף שלי"
+        description="תנאי השימוש בשירות השף שלי — חיבור בין לקוחות לשפים פרטיים, תשלום פר-ליד, אחריות ודין חל."
         canonicalPath="/terms"
       />
       <h1>תנאי שימוש</h1>

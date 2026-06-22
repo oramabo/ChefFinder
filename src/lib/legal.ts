@@ -4,10 +4,10 @@
 // point, not legal advice).
 export const LEGAL = {
   // Public/brand name of the service.
-  operatorName: "Sofré",
+  operatorName: "השף שלי",
   // TODO: registered company/business name + number (ע.מ/ח.פ). Leave the brand
   // name if you operate as a sole proprietor under it.
-  legalEntity: "Sofré",
+  legalEntity: "השף שלי",
   // Contact address for privacy/data requests and general inquiries.
   contactEmail: "info@chefleads.co.il",
   // Courts with jurisdiction (governing-law clause).

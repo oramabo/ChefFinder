@@ -1,12 +1,13 @@
 import Seo from "../components/Seo.tsx";
 import { LinkButton } from "../components/Button.tsx";
+import { HeroPlate, Divider, IconForm, IconChef, IconCloche, IconSprig } from "../components/art.tsx";
 import { DEFAULT_CAP } from "@shared/constants.ts";
 import "./Home.css";
 
 const STEPS = [
-  { title: "ממלאים טופס קצר", body: "פרטי האירוע: תאריך, מיקום, מספר אורחים ותקציב." },
-  { title: "שפים פונים אליכם", body: "עד שלושה שפים מקצועיים חוזרים אליכם עם הצעה מותאמת." },
-  { title: "בוחרים ומארחים", body: "משווים הצעות, בוחרים שף, ומגישים ארוחה בלתי נשכחת." },
+  { Icon: IconForm, title: "ממלאים טופס קצר", body: "פרטי האירוע: תאריך, מיקום, מספר אורחים ותקציב." },
+  { Icon: IconChef, title: "שפים פונים אליכם", body: "עד שלושה שפים מקצועיים חוזרים אליכם עם הצעה מותאמת." },
+  { Icon: IconCloche, title: "בוחרים ומארחים", body: "משווים הצעות, בוחרים שף, ומגישים ארוחה בלתי נשכחת." },
 ];
 
 const REASONS = [
@@ -42,49 +43,53 @@ export default function Home() {
   return (
     <>
       <Seo
-        title="שף פרטי לאירוע | הזמנת שף פרטי עד הבית — Sofré"
+        title="שף פרטי לאירוע | הזמנת שף פרטי עד הבית — השף שלי"
         description="מחפשים שף פרטי לאירוע? מלאו טופס קצר ועד 3 שפים מקצועיים יחזרו אליכם עם הצעה מותאמת. חוויה קולינרית פרימיום עד הבית."
         jsonLd={faqJsonLd}
         canonicalPath="/"
       />
 
       <section className="hero">
-        <span className="hero__glow" aria-hidden="true" />
-        <span className="hero__plate" aria-hidden="true" />
-        <div className="container hero__inner">
-          <p className="eyebrow hero__eyebrow">שף פרטי · עד הבית</p>
-          <h1 className="hero__title">
-            השף הפרטי שמגיע <span className="accent">לשולחן שלכם</span>
-          </h1>
-          <p className="hero__sub lead-text">
-            מלאו טופס קצר ועד שלושה שפים מקצועיים יחזרו אליכם עם הצעה מותאמת —
-            לארוחה זוגית, לחגיגה משפחתית או לאירוע עסקי.
-          </p>
-          <div className="hero__cta">
-            <LinkButton to="/find-a-chef" variant="primary">
-              מצאו שף עכשיו
-            </LinkButton>
-            <LinkButton to="/how-it-works" variant="ghost">
-              איך זה עובד
-            </LinkButton>
+        <div className="container hero__grid">
+          <div className="hero__copy">
+            <p className="eyebrow">שף פרטי · עד הבית</p>
+            <h1 className="hero__title">
+              השף הפרטי שמגיע <span className="accent">לשולחן שלכם</span>
+            </h1>
+            <p className="hero__sub lead-text">
+              מלאו טופס קצר ועד שלושה שפים מקצועיים יחזרו אליכם עם הצעה מותאמת —
+              לארוחה זוגית, לחגיגה משפחתית או לאירוע עסקי.
+            </p>
+            <div className="hero__cta">
+              <LinkButton to="/find-a-chef" variant="primary">
+                מצאו שף עכשיו
+              </LinkButton>
+              <LinkButton to="/how-it-works" variant="ghost">
+                איך זה עובד
+              </LinkButton>
+            </div>
+            <p className="hero__trust">
+              עד שלושה שפים לכל פנייה · שירות בכל הארץ · בלי דמי תיווך
+            </p>
           </div>
-          <p className="hero__trust">
-            עד שלושה שפים לכל פנייה · שירות בכל הארץ · בלי דמי תיווך
-          </p>
+          <HeroPlate className="hero__art" />
         </div>
       </section>
+
+      <Divider />
 
       <section className="section container">
         <p className="eyebrow">התהליך</p>
         <h2 className="home__h2">מהבקשה ועד הסועדים — בשלושה צעדים</h2>
         <ol className="home__steps">
-          {STEPS.map((s, i) => (
-            <li className="home__step" key={s.title}>
+          {STEPS.map(({ Icon, title, body }, i) => (
+            <li className="home__step" key={title}>
+              <span className="home__step-icon">
+                <Icon width={24} height={24} />
+              </span>
               <span className="home__step-num">{String(i + 1).padStart(2, "0")}</span>
-              <div>
-                <h3>{s.title}</h3>
-                <p>{s.body}</p>
-              </div>
+              <h3>{title}</h3>
+              <p>{body}</p>
             </li>
           ))}
         </ol>
@@ -93,11 +98,14 @@ export default function Home() {
       <section className="section container">
         <div className="card home__trust">
           <div>
-            <p className="eyebrow">למה Sofré</p>
+            <p className="eyebrow">למה השף שלי</p>
             <h2 className="home__h2">שולחן אחד, תשומת לב מלאה</h2>
             <ul className="home__list">
               {REASONS.map((r) => (
-                <li key={r}>{r}</li>
+                <li key={r}>
+                  <IconSprig className="home__list-icon" width={20} height={20} />
+                  <span>{r}</span>
+                </li>
               ))}
             </ul>
           </div>

@@ -185,8 +185,15 @@ and disallowed in `robots.txt`.
    **Build output directory** `dist`. Node 20 is read from `.nvmrc`.
 4. Functions: ensure `nodejs_compat` and a recent `compatibility_date` are active
    (declared in the root `wrangler.toml`; confirm under Settings → Functions).
-5. Add all variables and secrets from the tables above (Production environment).
-6. Deploy. Note the `https://<project>.pages.dev` URL and set it as
+5. **Leave the "Deploy command" empty.** This is a Pages project
+   (`wrangler.toml` sets `pages_build_output_dir = "dist"`), so Git integration
+   auto-publishes the `dist/` output after the build — no deploy command is
+   needed. Do **not** set `npx wrangler deploy`; that is the Workers command and
+   it fails with *"It looks like you've run a Workers-specific command in a Pages
+   project."* If you must set an explicit deploy command, use
+   `npx wrangler pages deploy dist` (note the `pages` subcommand).
+6. Add all variables and secrets from the tables above (Production environment).
+7. Deploy. Note the `https://<project>.pages.dev` URL and set it as
    `PUBLIC_BASE_URL`, then redeploy if it changed.
 
 ## 8. Post-deploy smoke test (live)

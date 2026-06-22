@@ -1,8 +1,11 @@
 // Typed environment bindings for Cloudflare Pages Functions, plus helpers that
 // decide whether a given integration should use its real adapter or a mock.
+import { timingSafeEqual } from "./crypto.ts";
 
 export interface Env {
   USE_STUBS?: string;
+  // Shared secret protecting the read-only operator/admin view (it returns PII).
+  ADMIN_TOKEN?: string;
   // Placeholder-payments mode: use the mock checkout (no real provider) while
   // every other service runs for real. Lets the full lead → link → unlock flow
   // be tested end-to-end before Grow is wired.
@@ -67,6 +70,15 @@ export function paymentsAvailable(env: Env): boolean {
 // The mock-complete helper may run only when payments are intentionally mocked.
 export function allowMockComplete(env: Env): boolean {
   return globalStubs(env) || mockPaymentsEnabled(env);
+}
+
+// Operator/admin view auth. Open in stub/dev mode for convenience; otherwise
+// requires ADMIN_TOKEN to be configured AND to match the provided token. Fails
+// closed (denies) when no token is configured in a real deployment.
+export function adminAuthorized(env: Env, provided: string | null): boolean {
+  if (globalStubs(env)) return true;
+  if (!present(env.ADMIN_TOKEN)) return false;
+  return !!provided && timingSafeEqual(provided, env.ADMIN_TOKEN!);
 }
 
 export function publicBaseUrl(env: Env, request?: Request): string {

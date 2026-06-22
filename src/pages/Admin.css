@@ -1,0 +1,62 @@
+.admin__note {
+  margin-block: var(--space-3) var(--space-5);
+}
+
+.admin__bar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  max-inline-size: 480px;
+  margin-block-end: var(--space-4);
+}
+
+.admin__bar .field {
+  flex: 1;
+  margin-block-end: 0;
+}
+
+.admin__error {
+  color: var(--color-danger);
+  margin-block-end: var(--space-4);
+}
+
+.admin__count {
+  color: var(--color-text-muted);
+  margin-block-end: var(--space-3);
+}
+
+.admin__tablewrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.admin__table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.admin__table th,
+.admin__table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: start;
+  border-block-end: 1px solid var(--color-border);
+}
+
+.admin__table thead th {
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.admin__table tbody tr:hover {
+  background: var(--color-surface);
+}
+
+.admin__source {
+  max-inline-size: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -39,7 +39,9 @@ milestone). Paths are repo-relative.
 ### §6.3 Operator-facing
 - ✅ PostHog analytics; 🟡 Cloudflare Web Analytics (enable zero-config in
   dashboard — see DEPLOYMENT.md §6).
-- ✅ Lead/sales data in Supabase (`leads`, `purchases`).
+- ✅ Lead/sales data in Supabase (`leads`, `purchases`), plus a read-only in-app
+  operator view at `/admin` (token-gated, `functions/api/admin/leads.ts`,
+  `src/pages/Admin.tsx`).
 - ✅ Automated tax invoice per payment (`PaymentsPort.issueInvoice`, Grow adapter).
 
 ### §7 Flows

@@ -25,6 +25,16 @@ export function createSupabaseDb(url: string, serviceKey: string): DbPort {
       return (data as Lead) ?? null;
     },
 
+    async listRecentLeads(limit: number): Promise<Lead[]> {
+      const { data, error } = await sb
+        .from("leads")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (error) throw new Error(`listRecentLeads: ${error.message}`);
+      return (data as Lead[]) ?? [];
+    },
+
     async reserveLead(token: string, chefPhone: string): Promise<ReserveResult> {
       const { data, error } = await sb.rpc("reserve_lead", {
         p_token: token,

@@ -75,3 +75,37 @@ export function mockComplete(purchaseId: string): Promise<MockCompleteResponse> 
     purchase_id: purchaseId,
   });
 }
+
+export interface AdminLead {
+  lead_token: string;
+  created_at: string;
+  event_type: string | null;
+  event_date: string | null;
+  city: string | null;
+  guests: number | null;
+  budget: number | null;
+  cuisine: string | null;
+  kosher: boolean;
+  status: string;
+  buyers_count: number;
+  buyers_cap: number;
+  source: string | null;
+  client_name: string;
+  client_phone: string;
+  client_email: string | null;
+}
+
+export interface AdminLeadsResponse {
+  ok: boolean;
+  leads?: AdminLead[];
+  error?: string;
+  reason?: string;
+}
+
+// Operator view (admin-gated). Sends the shared token as a header.
+export async function listRecentLeads(token: string): Promise<{ status: number; body: AdminLeadsResponse }> {
+  const res = await fetch("/api/admin/leads?limit=100", {
+    headers: token ? { "x-admin-token": token } : {},
+  });
+  return { status: res.status, body: (await res.json()) as AdminLeadsResponse };
+}

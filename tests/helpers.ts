@@ -6,15 +6,16 @@ interface CtxOptions {
   body?: unknown;
   params?: Record<string, string>;
   env?: Partial<Env>;
+  headers?: Record<string, string>;
 }
 
 // Builds a minimal Pages Functions EventContext for calling handlers directly.
 export function ctx(opts: CtxOptions): any {
-  const { method = "GET", url, body, params = {}, env = { USE_STUBS: "true" } } = opts;
-  const init: RequestInit = { method };
+  const { method = "GET", url, body, params = {}, env = { USE_STUBS: "true" }, headers = {} } = opts;
+  const init: RequestInit = { method, headers: { ...headers } };
   if (body !== undefined) {
     init.body = JSON.stringify(body);
-    init.headers = { "content-type": "application/json" };
+    init.headers = { "content-type": "application/json", ...headers };
   }
   const request = new Request(url, init);
   return {

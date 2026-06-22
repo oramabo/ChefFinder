@@ -22,6 +22,8 @@ export interface InsertLeadInput {
 export interface DbPort {
   insertLead(input: InsertLeadInput): Promise<Lead>;
   getLeadByToken(token: string): Promise<Lead | null>;
+  // Operator view: most-recent leads first (includes PII; admin-gated callers only).
+  listRecentLeads(limit: number): Promise<Lead[]>;
   reserveLead(token: string, chefPhone: string): Promise<ReserveResult>;
   createPurchase(input: {
     lead_id: string;

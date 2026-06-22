@@ -63,6 +63,13 @@ export function createMockDb(store: MockStore = globalStore): DbPort {
       return lead ? structuredClone(lead) : null;
     },
 
+    async listRecentLeads(limit: number): Promise<Lead[]> {
+      return [...store.leads.values()]
+        .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
+        .slice(0, limit)
+        .map((l) => structuredClone(l));
+    },
+
     async reserveLead(token: string, chefPhone: string): Promise<ReserveResult> {
       const lead = leadByToken(token);
       if (!lead) return { ok: false, reason: RESERVE_REASON.not_found };

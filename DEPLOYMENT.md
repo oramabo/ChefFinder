@@ -57,6 +57,7 @@ runtime (used by Functions).
 | `TG_CHAT_ID` | Chef group/channel id |
 | `WA_CLOUD_TOKEN` | Meta WhatsApp Cloud API token |
 | `WA_PHONE_NUMBER_ID` | Meta WhatsApp phone number id |
+| `ADMIN_TOKEN` | Secret to access the read-only `/admin` leads view (shows PII) |
 | `WA_MY_NUMBER` | Operator's WhatsApp number (E.164) |
 | `WA_TEMPLATE_NAME` | `new_lead` (the approved template name) |
 | `GROW_API_KEY` | Grow/Meshulam API key |
@@ -165,6 +166,14 @@ minute on those paths. This is the edge-native approach (no app state / KV
 required) and is the recommended mechanism for the DRP's rate-limit requirement.
 
 ---
+
+## 6c. Operator view (`/admin`)
+
+A read-only recent-leads table lives at `/admin` (shows PII: name, phone, email,
+status, buyers). Set **`ADMIN_TOKEN`** to a strong secret; the operator enters it
+once on the page (stored in their browser). Without `ADMIN_TOKEN` set, `/admin`
+is denied in production (it's open only under `USE_STUBS`). The page is `noindex`
+and disallowed in `robots.txt`.
 
 ## 7. Cloudflare Pages project
 

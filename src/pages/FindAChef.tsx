@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../components/Seo.tsx";
 import Stepper from "../components/Stepper.tsx";
@@ -47,13 +47,29 @@ export default function FindAChef() {
   const [error, setError] = useState("");
   const [started, setStarted] = useState(false);
 
+  // Refs mirror state so the unmount cleanup sees current values (not stale ones).
+  const stepRef = useRef(step);
+  stepRef.current = step;
+  const startedRef = useRef(false);
+  const submittedRef = useRef(false);
+
   const set = useCallback(<K extends keyof FormState>(k: K, v: FormState[K]) => {
     setForm((f) => ({ ...f, [k]: v }));
     if (!started) {
       setStarted(true);
+      startedRef.current = true;
       track("form_start");
     }
   }, [started]);
+
+  // Fire form_abandoned if the user leaves after starting but before submitting.
+  useEffect(() => {
+    return () => {
+      if (startedRef.current && !submittedRef.current) {
+        track("form_abandoned", { last_step: STEP_LABELS[stepRef.current] });
+      }
+    };
+  }, []);
 
   function stepValid(): boolean {
     switch (step) {
@@ -113,6 +129,7 @@ export default function FindAChef() {
         setSubmitting(false);
         return;
       }
+      submittedRef.current = true;
       track("lead_submitted");
       navigate("/lead-received");
     } catch {

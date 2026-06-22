@@ -20,3 +20,10 @@ export function track(event: string, props?: Record<string, unknown>): void {
   if (!initialized) return;
   posthog.capture(event, props);
 }
+
+// Identify the chef by a hashed phone (never the raw number) at purchase time.
+export function identify(distinctId: string, props?: Record<string, unknown>): void {
+  if (typeof window === "undefined") return;
+  if (!initialized) return;
+  posthog.identify(distinctId, props);
+}

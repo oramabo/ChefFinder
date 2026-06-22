@@ -13,6 +13,19 @@ payment provider is missing, so half-configured states can't leak data.
 > Security: never paste secrets into chat, commits, or screenshots. Enter them
 > directly in the provider and Cloudflare dashboards.
 
+## Recommended first deploy: full flow, placeholder checkout
+
+To test the **complete flow** — lead capture, distribution, unlock-link
+generation, slot reservation, and contact reveal — **before** wiring real
+payments, deploy with everything real **except** payments:
+
+- Set **`MOCK_PAYMENTS=true`**. The checkout becomes an instant click-through
+  that completes the reservation and reveals the contact (the mock provider),
+  while Supabase, Turnstile, Telegram, WhatsApp, and PostHog all run for real.
+- Skip the Grow section (5) for now. When you're ready for real charges, remove
+  `MOCK_PAYMENTS` and add the `GROW_*` secrets — the reserve flow switches to the
+  real provider automatically and the placeholder endpoint becomes 404.
+
 ---
 
 ## Environment variables
@@ -28,7 +41,9 @@ runtime (used by Functions).
 | `VITE_TURNSTILE_SITE_KEY` | Turnstile widget site key |
 | `VITE_POSTHOG_KEY` | PostHog project API key |
 | `VITE_POSTHOG_HOST` | `https://eu.i.posthog.com` (or your region) |
+| `VITE_SITE_URL` | `https://<project>.pages.dev` (for canonical + hreflang) |
 | `PUBLIC_BASE_URL` | `https://<project>.pages.dev` (your live origin) |
+| `MOCK_PAYMENTS` | `true` for the placeholder-checkout test deploy; remove for real payments |
 
 > Do **not** set `USE_STUBS` in production (or set it to `false`).
 
@@ -101,7 +116,11 @@ server-side and fails closed on invalid tokens.
    dynamic parameter is the `lead_token` (matching
    `functions-lib/adapters/messaging.whatsapp.ts`). Set `WA_TEMPLATE_NAME=new_lead`.
 
-## 5. Grow / Meshulam (payments + invoice)
+## 5. Grow / Meshulam (payments + invoice) — when ready for real charges
+
+> Skip this for the placeholder test deploy (`MOCK_PAYMENTS=true`). Do it when you
+> want real payments; then remove `MOCK_PAYMENTS` and add the `GROW_*` secrets.
+
 
 1. Create a Grow account; obtain `GROW_API_KEY`, `GROW_USER_ID`, `GROW_PAGE_CODE`
    (and a webhook signing secret if Grow provides one → `GROW_WEBHOOK_SECRET`).
@@ -125,7 +144,25 @@ Once `GROW_*` are set, the reserve flow goes live automatically and the dev-only
 
 Create a PostHog project; copy the project API key → `VITE_POSTHOG_KEY` and set
 `VITE_POSTHOG_HOST` to your region host. Analytics is a no-op until the key is
-present. Redeploy after setting (build-time inlining).
+present. Redeploy after setting (build-time inlining). The app emits the client
+funnel (`form_start`, `form_step_completed`, `form_abandoned`, `lead_submitted`)
+and chef funnel (`lead_page_viewed`, `pay_clicked`, `reserve_won`/`reserve_sold_out`,
+`payment_started`, `payment_completed`, `phone_revealed`) and identifies the chef
+by a **hashed** phone at purchase.
+
+### Cloudflare Web Analytics (free, zero-config)
+
+In the Cloudflare dashboard → Web Analytics, enable analytics for the Pages
+project (automatic injection). No code change is needed — this is in addition to
+PostHog and gives free edge traffic metrics.
+
+## 6b. Rate limiting (abuse protection)
+
+Turnstile already gates the lead form. For network-level protection of
+`/api/lead` and `/api/lead/*/reserve`, add **Cloudflare Rate Limiting Rules**
+(dashboard → Security → WAF → Rate limiting) — e.g. cap requests per IP per
+minute on those paths. This is the edge-native approach (no app state / KV
+required) and is the recommended mechanism for the DRP's rate-limit requirement.
 
 ---
 
@@ -148,9 +185,10 @@ present. Redeploy after setting (build-time inlining).
 - Submit `/find-a-chef` → a row appears in Supabase `leads`; the Telegram group
   and the operator's WhatsApp receive the alert (confirm **no** name/phone/email
   in either message).
-- Open the unlock link `/lead/:token` → enter a chef phone → Pay → complete a
-  real (or Grow-sandbox) payment → the contact details reveal; a tax invoice is
-  issued; a 4th buyer beyond the cap of 3 sees "sold out".
+- Open the unlock link `/lead/:token` → enter a chef phone → Pay. With
+  `MOCK_PAYMENTS=true` this is an instant click-through that reveals the contact;
+  with Grow it's a real (or sandbox) charge that reveals on webhook + issues a
+  tax invoice. A 4th buyer beyond the cap of 3 sees "sold out".
 - View-source `/private-chef/tel-aviv` → prerendered H1 + Service/FAQ JSON-LD;
   check `/sitemap.xml` and `/robots.txt`.
 - Confirm PostHog receives `lead_submitted`, `pay_clicked`, `payment_completed`,

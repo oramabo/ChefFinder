@@ -38,6 +38,7 @@ export default function Home() {
         title="שף פרטי לאירוע | הזמנת שף פרטי עד הבית — ChefLeads"
         description="מחפשים שף פרטי לאירוע? מלאו טופס קצר ועד 3 שפים מקצועיים יחזרו אליכם עם הצעה מותאמת. חוויה קולינרית פרימיום עד הבית."
         jsonLd={faqJsonLd}
+        canonicalPath="/"
       />
 
       <section className="hero">

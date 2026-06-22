@@ -9,7 +9,8 @@ import { EVENT_TYPES, CUISINES } from "@shared/constants.ts";
 import type { PublicLead, LeadContact } from "@shared/types.ts";
 import { getLead, reserveLead, getContact, mockComplete } from "../lib/api.ts";
 import { formatDate, formatCurrency } from "../lib/format.ts";
-import { track } from "../lib/analytics.ts";
+import { track, identify } from "../lib/analytics.ts";
+import { sha256Hex } from "../lib/hash.ts";
 import "./LeadUnlock.css";
 
 const eventHe = (slug: string | null) =>
@@ -95,6 +96,8 @@ export default function LeadUnlock() {
     setMessage("");
     track("pay_clicked", { token });
     try {
+      // Identify the chef by hashed phone (no raw PII leaves the browser).
+      identify(`chef_${await sha256Hex(trimmed)}`);
       localStorage.setItem(phoneKey(token), trimmed);
       const res = await reserveLead(token, trimmed);
       if (res.ok && res.payment_url) {

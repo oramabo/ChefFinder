@@ -3,6 +3,10 @@
 
 export interface Env {
   USE_STUBS?: string;
+  // Placeholder-payments mode: use the mock checkout (no real provider) while
+  // every other service runs for real. Lets the full lead → link → unlock flow
+  // be tested end-to-end before Grow is wired.
+  MOCK_PAYMENTS?: string;
 
   SUPABASE_URL?: string;
   SUPABASE_SERVICE_KEY?: string;
@@ -48,6 +52,21 @@ export function useReal(env: Env, service: "db" | "payments" | "wa" | "tg" | "tu
     case "turnstile":
       return present(env.TURNSTILE_SECRET);
   }
+}
+
+// Placeholder-payments mode is explicitly enabled (independent of USE_STUBS).
+export function mockPaymentsEnabled(env: Env): boolean {
+  return String(env.MOCK_PAYMENTS).toLowerCase() === "true";
+}
+
+// A checkout flow can run: either stubbed, explicitly mocked, or a real provider.
+export function paymentsAvailable(env: Env): boolean {
+  return globalStubs(env) || mockPaymentsEnabled(env) || useReal(env, "payments");
+}
+
+// The mock-complete helper may run only when payments are intentionally mocked.
+export function allowMockComplete(env: Env): boolean {
+  return globalStubs(env) || mockPaymentsEnabled(env);
 }
 
 export function publicBaseUrl(env: Env, request?: Request): string {

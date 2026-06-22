@@ -57,7 +57,12 @@ export default function ProgrammaticPage() {
 
   return (
     <>
-      <Seo title={page.title} description={page.description} jsonLd={[serviceLd, faqLd]} />
+      <Seo
+        title={page.title}
+        description={page.description}
+        jsonLd={[serviceLd, faqLd]}
+        canonicalPath={page.path}
+      />
       <section className="section container programmatic">
         <h1>{page.h1}</h1>
         <p className="lead-text" style={{ marginBlock: "var(--space-4)", maxInlineSize: "46ch" }}>

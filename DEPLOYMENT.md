@@ -140,9 +140,9 @@ server-side and fails closed on invalid tokens.
    `972500000001,972500000002` — the template is sent to each one. Every number
    must have opted in / be a valid WhatsApp recipient for your Cloud API app.
 3. Create + get approval for a **utility template** named `new_lead`, language
-   **Hebrew (`he`)**, with **6 body parameters** in this order:
-   `city, date, guests, cuisine, budget, price`, and a **URL button** whose
-   dynamic parameter is the `lead_token` (matching
+   **Hebrew (`he`)**, using **named** body variables (not numbered):
+   `{{city}}, {{date}}, {{guests}}, {{cuisine}}, {{budget}}, {{price}}`, and a
+   **URL button** whose dynamic parameter is the `lead_token` (matching
    `functions-lib/adapters/messaging.whatsapp.ts`). Set `WA_TEMPLATE_NAME=new_lead`.
    The template must be **Approved** before it can send.
 4. **Language must match exactly.** The app sends the template in `WA_TEMPLATE_LANG`

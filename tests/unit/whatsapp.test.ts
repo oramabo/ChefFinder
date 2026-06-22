@@ -60,6 +60,18 @@ describe("createWhatsAppMessaging multi-recipient", () => {
     expect(fetchMock).toHaveBeenCalledTimes(3);
     const sentTo = fetchMock.mock.calls.map((c) => JSON.parse((c[1] as RequestInit).body as string).to);
     expect(sentTo).toEqual(["972500000001", "972500000002", "972500000003"]);
+
+    // Body uses named parameters matching the approved template's variables.
+    const first = JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string);
+    const body = first.template.components.find((c: { type: string }) => c.type === "body");
+    expect(body.parameters.map((p: { parameter_name: string }) => p.parameter_name)).toEqual([
+      "city",
+      "date",
+      "guests",
+      "cuisine",
+      "budget",
+      "price",
+    ]);
   });
 
   it("resolves when at least one recipient succeeds", async () => {

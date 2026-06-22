@@ -32,14 +32,17 @@ export function createWhatsAppMessaging(env: Env): Pick<MessagingPort, "sendWhat
       }
 
       const l = input.lead;
+      // Named template parameters (the template body uses {{city}}, {{date}}, …).
+      // `parameter_name` must match the variable names in the approved template
+      // exactly. Budget/price already include ₪; missing fields send "-".
       const bodyParams = [
-        l.city ?? "-",
-        l.event_date ?? "-",
-        l.guests != null ? String(l.guests) : "-",
-        l.cuisine ?? "-",
-        l.budget != null ? `₪${l.budget}` : "-",
-        `₪${l.price}`,
-      ].map((text) => ({ type: "text", text }));
+        { parameter_name: "city", text: l.city ?? "-" },
+        { parameter_name: "date", text: l.event_date ?? "-" },
+        { parameter_name: "guests", text: l.guests != null ? String(l.guests) : "-" },
+        { parameter_name: "cuisine", text: l.cuisine ?? "-" },
+        { parameter_name: "budget", text: l.budget != null ? `₪${l.budget}` : "-" },
+        { parameter_name: "price", text: `₪${l.price}` },
+      ].map((p) => ({ type: "text", ...p }));
 
       const sendOne = async (to: string): Promise<void> => {
         const payload = {

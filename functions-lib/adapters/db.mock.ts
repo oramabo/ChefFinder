@@ -70,6 +70,25 @@ export function createMockDb(store: MockStore = globalStore): DbPort {
         .map((l) => structuredClone(l));
     },
 
+    async listPendingPurchases(limit: number) {
+      return [...store.purchases.values()]
+        .filter((p) => p.status === PURCHASE_STATUS.pending)
+        .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
+        .slice(0, limit)
+        .map((p) => {
+          const lead = store.leads.get(p.lead_id);
+          return {
+            id: p.id,
+            chef_phone: p.chef_phone,
+            amount: p.amount,
+            created_at: p.created_at,
+            lead_token: lead?.lead_token ?? "",
+            city: lead?.city ?? null,
+            event_type: lead?.event_type ?? null,
+          };
+        });
+    },
+
     async reserveLead(token: string, chefPhone: string): Promise<ReserveResult> {
       const lead = leadByToken(token);
       if (!lead) return { ok: false, reason: RESERVE_REASON.not_found };

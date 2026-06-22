@@ -35,6 +35,34 @@ export function createSupabaseDb(url: string, serviceKey: string): DbPort {
       return (data as Lead[]) ?? [];
     },
 
+    async listPendingPurchases(limit: number) {
+      const { data, error } = await sb
+        .from("purchases")
+        .select("id, chef_phone, amount, created_at, leads(lead_token, city, event_type)")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (error) throw new Error(`listPendingPurchases: ${error.message}`);
+      return (data ?? []).map((r) => {
+        const row = r as unknown as {
+          id: string;
+          chef_phone: string;
+          amount: number;
+          created_at: string;
+          leads: { lead_token: string; city: string | null; event_type: string | null } | null;
+        };
+        return {
+          id: row.id,
+          chef_phone: row.chef_phone,
+          amount: row.amount,
+          created_at: row.created_at,
+          lead_token: row.leads?.lead_token ?? "",
+          city: row.leads?.city ?? null,
+          event_type: row.leads?.event_type ?? null,
+        };
+      });
+    },
+
     async reserveLead(token: string, chefPhone: string): Promise<ReserveResult> {
       const { data, error } = await sb.rpc("reserve_lead", {
         p_token: token,

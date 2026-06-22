@@ -11,9 +11,9 @@
 }
 
 .badge--accent {
-  background: rgba(140, 34, 51, 0.1);
+  background: rgba(31, 146, 84, 0.1);
   color: var(--color-accent);
-  border-color: rgba(140, 34, 51, 0.3);
+  border-color: rgba(31, 146, 84, 0.3);
 }
 
 .badge--success {

@@ -5,11 +5,12 @@ import { generateLeadToken } from "../../../../functions-lib/crypto.ts";
 import type { Handler } from "../../../../functions-lib/handler.ts";
 import { ReserveInput } from "@shared/schema.ts";
 import { toLeadSummary } from "@shared/types.ts";
+import { notifyReservation } from "../../../../functions-lib/adminAlert.ts";
 
 // POST /api/lead/:token/reserve — atomically reserve a slot then start payment.
 // Convention: validation errors -> 422; business outcomes (sold_out, etc.) ->
 // 200 with { ok:false, reason } so the SPA renders states uniformly.
-export const onRequestPost: Handler = async ({ request, env, params }) => {
+export const onRequestPost: Handler = async ({ request, env, params, waitUntil }) => {
   const token = String(params.token);
   const body = await readJson(request);
   const parsed = validate(ReserveInput, body);
@@ -53,6 +54,20 @@ export const onRequestPost: Handler = async ({ request, env, params }) => {
       webhookUrl: `${base}/api/payment/webhook`,
     });
     await db.setPurchaseProviderRef(purchase.id, payment.provider_ref);
+
+    // Manual Bit: alert the operator's admin Telegram channel that a payment is
+    // pending. Fire-and-forget so it never delays the chef's response.
+    if (payment.manual_bit) {
+      waitUntil(
+        notifyReservation(env, {
+          chefPhone: chef_phone,
+          amount: lead.price,
+          city: lead.city,
+          reference: purchase.id,
+        }),
+      );
+    }
+
     return json({
       ok: true,
       reason: "reserved",

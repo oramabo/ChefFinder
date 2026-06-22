@@ -30,6 +30,8 @@ export interface Env {
 
   TG_TOKEN?: string;
   TG_CHAT_ID?: string;
+  // Separate operator/admin Telegram channel for reservation + payment alerts.
+  TG_ADMIN_CHAT_ID?: string;
 
   TURNSTILE_SECRET?: string;
 

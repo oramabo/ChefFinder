@@ -1,4 +1,4 @@
-import type { Lead, Purchase, ReserveResult } from "@shared/types.ts";
+import type { Lead, Purchase, PendingPurchase, ReserveResult } from "@shared/types.ts";
 
 export interface InsertLeadInput {
   lead_token: string;
@@ -24,6 +24,8 @@ export interface DbPort {
   getLeadByToken(token: string): Promise<Lead | null>;
   // Operator view: most-recent leads first (includes PII; admin-gated callers only).
   listRecentLeads(limit: number): Promise<Lead[]>;
+  // Operator view: pending purchases awaiting manual confirmation, newest first.
+  listPendingPurchases(limit: number): Promise<PendingPurchase[]>;
   reserveLead(token: string, chefPhone: string): Promise<ReserveResult>;
   createPurchase(input: {
     lead_id: string;

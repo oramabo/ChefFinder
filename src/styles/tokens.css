@@ -1,34 +1,34 @@
 :root {
-  /* ── השף שלי — "the Levantine table" ──────────────────────────────────────
-     Warm, light, editorial. Linen field, espresso ink, deep pomegranate as
-     the brand voice, olive as the steady secondary, saffron as the candle-glow
-     accent used sparingly. All text pairings verified for WCAG AA. */
-  --color-bg: #f4efe4; /* warm linen */
-  --color-surface: #fcfaf3; /* warm plate white (cards) */
-  --color-surface-2: #ece4d4; /* sunk wells / inputs */
-  --color-border: #e2d8c3; /* warm sand */
+  /* ── השף שלי — "fresh & green" ────────────────────────────────────────────
+     Light, airy and happy. White/mint field, a fresh elegant green as the brand
+     voice, a deeper leaf-green secondary, and a warm gold accent used sparingly
+     for a celebratory touch. All text pairings verified for WCAG AA. */
+  --color-bg: #f4faf5; /* soft mint white */
+  --color-surface: #ffffff; /* clean white (cards) */
+  --color-surface-2: #e9f4ec; /* sunk wells / inputs */
+  --color-border: #d6e7da; /* soft green-grey */
 
-  --color-text: #2a211b; /* warm espresso (contrast > 11:1 on linen) */
-  --color-text-muted: #6f6256; /* taupe (contrast > 4.7:1) */
+  --color-text: #15271c; /* deep green-charcoal (contrast > 12:1) */
+  --color-text-muted: #51655a; /* muted green-grey (contrast > 4.6:1) */
 
-  /* Pomegranate — the brand primary (buttons, links, emphasis). */
-  --color-accent: #8c2233;
-  --color-accent-strong: #a62a40;
-  --color-accent-contrast: #fdf3ec; /* warm white on pomegranate */
+  /* Fresh green — the brand primary (buttons, links, emphasis). */
+  --color-accent: #1f9254;
+  --color-accent-strong: #16753f; /* darker for hover */
+  --color-accent-contrast: #ffffff; /* white on green */
 
-  /* Olive — steady secondary (eyebrows, tags, quiet structure). */
-  --color-olive: #586a36;
-  --color-olive-soft: #7c8a5b;
+  /* Leaf green — steady secondary (eyebrows, tags, quiet structure). */
+  --color-olive: #3f7350;
+  --color-olive-soft: #7da588;
 
-  /* Saffron — the candle-glow accent. Used with restraint. */
-  --color-saffron: #d99a2b;
-  --color-saffron-soft: #e7c98a;
+  /* Warm gold — the celebratory accent. Used with restraint. */
+  --color-saffron: #d9a52b;
+  --color-saffron-soft: #ecd6a0;
 
   /* Back-compat alias used by a couple of components. */
   --color-primary: var(--color-accent);
 
-  --color-success: #4f7a4f;
-  --color-danger: #b23b2e;
+  --color-success: #1f9254;
+  --color-danger: #c0392b;
 
   /* Typography — Hebrew literary serif display + Open Sans (Latin + Hebrew) body. */
   --font-display: "Frank Ruhl Libre", "Open Sans", Georgia, serif;
@@ -49,9 +49,9 @@
   --radius-lg: 18px;
   --radius-pill: 999px;
 
-  /* Warm, soft shadows (brown-tinted, not neutral grey). */
-  --shadow: 0 18px 44px -24px rgba(74, 47, 30, 0.45);
-  --shadow-sm: 0 4px 16px -8px rgba(74, 47, 30, 0.35);
+  /* Soft green-tinted shadows. */
+  --shadow: 0 18px 44px -24px rgba(20, 60, 38, 0.4);
+  --shadow-sm: 0 4px 16px -8px rgba(20, 60, 38, 0.28);
 
   --maxw: 1120px;
 }

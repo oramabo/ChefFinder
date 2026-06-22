@@ -1,4 +1,4 @@
-import type { PublicLead, LeadContact } from "@shared/types.ts";
+import type { PublicLead, LeadContact, PendingPurchase } from "@shared/types.ts";
 import type { LeadInputType } from "@shared/schema.ts";
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
@@ -125,6 +125,22 @@ export interface NotifyResponse {
   notify?: Partial<Record<NotifyChannel, "sent" | "failed">>;
   error?: string;
   reason?: string;
+}
+
+export type { PendingPurchase } from "@shared/types.ts";
+
+export interface PendingResponse {
+  ok: boolean;
+  pending?: PendingPurchase[];
+  error?: string;
+}
+
+// Operator view (admin-gated): purchases awaiting manual Bit confirmation.
+export async function listPending(token: string): Promise<{ status: number; body: PendingResponse }> {
+  const res = await fetch("/api/admin/pending?limit=100", {
+    headers: token ? { "x-admin-token": token } : {},
+  });
+  return { status: res.status, body: (await res.json()) as PendingResponse };
 }
 
 // Operator action (admin-gated): confirm a manual Bit payment by its reference

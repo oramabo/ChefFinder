@@ -95,6 +95,18 @@ export function toPublicLead(lead: Lead): PublicLead {
   };
 }
 
+// A pending purchase awaiting manual confirmation, joined with its lead for the
+// operator's pending-payments view.
+export interface PendingPurchase {
+  id: string;
+  chef_phone: string;
+  amount: number;
+  created_at: string;
+  lead_token: string;
+  city: string | null;
+  event_type: string | null;
+}
+
 export function toLeadSummary(lead: Lead): LeadSummary {
   return {
     lead_token: lead.lead_token,

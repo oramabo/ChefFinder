@@ -1,8 +1,15 @@
-# Deploying ChefLeads to Cloudflare Pages
+# Deploying ChefLeads to Cloudflare Workers
 
 This is the full go-live runbook with **all** integrations wired: Supabase,
 Turnstile, Telegram, WhatsApp, Grow (payments), and PostHog. Deployment is via
-**Cloudflare Pages Git integration** (auto-deploy on push).
+**Cloudflare Workers Builds Git integration** (auto-deploy on push): `npm run
+build` produces the static site in `dist/`, and `npx wrangler deploy` publishes
+the Worker (`worker/index.ts`) together with those assets.
+
+The app is a single Worker with [Static Assets](https://developers.cloudflare.com/workers/static-assets/):
+`worker/index.ts` routes `/api/*` and `/sitemap.xml` to the request handlers in
+`functions/`, while every other path is served from `dist/` (with an SPA shell
+fallback). Routing and the assets binding are declared in `wrangler.toml`.
 
 The application needs no code changes to enable any integration — the container
 factory (`functions-lib/factory.ts`, `functions-lib/env.ts`) uses the real
@@ -30,7 +37,7 @@ payments, deploy with everything real **except** payments:
 
 ## Environment variables
 
-Cloudflare Pages has two kinds of values. **Plaintext variables** are available
+Cloudflare Workers has two kinds of values. **Plaintext variables** are available
 at build *and* runtime — `VITE_*` must be plaintext because Vite inlines them
 into the bundle at build time. **Secrets** are encrypted and available only at
 runtime (used by Functions).
@@ -41,8 +48,8 @@ runtime (used by Functions).
 | `VITE_TURNSTILE_SITE_KEY` | Turnstile widget site key |
 | `VITE_POSTHOG_KEY` | PostHog project API key |
 | `VITE_POSTHOG_HOST` | `https://eu.i.posthog.com` (or your region) |
-| `VITE_SITE_URL` | `https://<project>.pages.dev` (for canonical + hreflang) |
-| `PUBLIC_BASE_URL` | `https://<project>.pages.dev` (your live origin) |
+| `VITE_SITE_URL` | `https://<name>.<subdomain>.workers.dev` (for canonical + hreflang) |
+| `PUBLIC_BASE_URL` | `https://<name>.<subdomain>.workers.dev` (your live origin) |
 | `MOCK_PAYMENTS` | `true` for the placeholder-checkout test deploy; remove for real payments |
 
 > Do **not** set `USE_STUBS` in production (or set it to `false`).
@@ -91,7 +98,7 @@ the `VITE_*` values.
 
 ## 2. Turnstile (anti-spam)
 
-Cloudflare dashboard → Turnstile → add a widget for your `*.pages.dev` hostname
+Cloudflare dashboard → Turnstile → add a widget for your `*.workers.dev` hostname
 (and any custom domain later). Record the **site key** (→ `VITE_TURNSTILE_SITE_KEY`)
 and **secret** (→ `TURNSTILE_SECRET`). With these set, the form verifies
 server-side and fails closed on invalid tokens.
@@ -153,8 +160,8 @@ by a **hashed** phone at purchase.
 
 ### Cloudflare Web Analytics (free, zero-config)
 
-In the Cloudflare dashboard → Web Analytics, enable analytics for the Pages
-project (automatic injection). No code change is needed — this is in addition to
+In the Cloudflare dashboard → Web Analytics, enable analytics for the Worker
+(automatic injection). No code change is needed — this is in addition to
 PostHog and gives free edge traffic metrics.
 
 ## 6b. Rate limiting (abuse protection)
@@ -175,26 +182,33 @@ once on the page (stored in their browser). Without `ADMIN_TOKEN` set, `/admin`
 is denied in production (it's open only under `USE_STUBS`). The page is `noindex`
 and disallowed in `robots.txt`.
 
-## 7. Cloudflare Pages project
+## 7. Cloudflare Worker project
 
-1. **Merge the PR into `main` first** — Pages builds the production branch and
-   `main` must contain the app (it currently holds the empty initial commit).
-2. Cloudflare dashboard → Workers & Pages → Create → Pages → **Connect to Git**
-   → `oramabo/cheffinder`; set production branch = `main`.
-3. Build settings: Framework preset **None**; **Build command** `npm run build`;
-   **Build output directory** `dist`. Node 20 is read from `.nvmrc`.
-4. Functions: ensure `nodejs_compat` and a recent `compatibility_date` are active
-   (declared in the root `wrangler.toml`; confirm under Settings → Functions).
-5. **Leave the "Deploy command" empty.** This is a Pages project
-   (`wrangler.toml` sets `pages_build_output_dir = "dist"`), so Git integration
-   auto-publishes the `dist/` output after the build — no deploy command is
-   needed. Do **not** set `npx wrangler deploy`; that is the Workers command and
-   it fails with *"It looks like you've run a Workers-specific command in a Pages
-   project."* If you must set an explicit deploy command, use
-   `npx wrangler pages deploy dist` (note the `pages` subcommand).
-6. Add all variables and secrets from the tables above (Production environment).
-7. Deploy. Note the `https://<project>.pages.dev` URL and set it as
+1. **Merge the PR into `main` first** — Workers Builds builds the production
+   branch and `main` must contain the app.
+2. Cloudflare dashboard → Workers & Pages → **Create** → **Workers** → **Connect
+   to Git** (Import a repository) → `oramabo/cheffinder`; set production branch =
+   `main`. (Pick **Worker**, not Pages — this repo is a Worker.)
+3. Build settings:
+   - **Build command:** `npm run build`
+   - **Deploy command:** `npx wrangler deploy` (the dashboard default — it now
+     works because `wrangler.toml` declares a Worker with a `[assets]` directory,
+     not a Pages project). Node 20 is read from `.nvmrc`.
+   - No "build output directory" field — the assets directory comes from
+     `wrangler.toml` (`[assets] directory = "./dist"`).
+4. The Worker config in `wrangler.toml` already sets `nodejs_compat`, a recent
+   `compatibility_date`, the `ASSETS` binding, `not_found_handling =
+   "single-page-application"`, and `run_worker_first = ["/api/*", "/sitemap.xml"]`
+   (so API routes hit the Worker while everything else is served statically).
+   `_headers` (security/CSP) is honoured natively from `dist/`.
+5. Add all variables and secrets from the tables above (Production environment).
+6. Deploy. Note the `https://<name>.<subdomain>.workers.dev` URL and set it as
    `PUBLIC_BASE_URL`, then redeploy if it changed.
+
+> Migrated from Pages? Delete any old Pages project for this repo so the two
+> don't both build on push. The old Pages-only files (`_routes.json`,
+> `_redirects`) have been removed; SPA fallback is handled by
+> `not_found_handling` and API routing by `run_worker_first`.
 
 ## 8. Post-deploy smoke test (live)
 
@@ -212,6 +226,7 @@ and disallowed in `robots.txt`.
 
 ## 9. Custom domain (when ready)
 
-Pages → Custom domains → add your domain (DNS on Cloudflare). Then update
+Your Worker → Settings → **Domains & Routes** → add a custom domain (DNS on
+Cloudflare). Then update
 `PUBLIC_BASE_URL`, add the domain to the Turnstile widget, point Grow's
 webhook/return URLs at it, and re-run the smoke test.

@@ -1,7 +1,19 @@
 name = "chefleads"
-pages_build_output_dir = "dist"
+main = "worker/index.ts"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
+
+# Static Assets: the Vite/SSG build output in `dist/` is served directly for all
+# paths except those routed to the Worker below. `_headers` and `_redirects` in
+# `dist/` are honoured natively (same format as Cloudflare Pages).
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+# Unmatched paths (e.g. /lead/:token) serve the SPA shell (index.html, 200).
+not_found_handling = "single-page-application"
+# Force these paths to the Worker even though no static file matches them —
+# otherwise `not_found_handling` would serve index.html for /api/* too.
+run_worker_first = ["/api/*", "/sitemap.xml"]
 
 # Secrets and vars are provided via the Cloudflare dashboard in production and
 # via .dev.vars locally (see .env.example). Do not commit real secrets here.

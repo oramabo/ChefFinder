@@ -18,5 +18,5 @@
       "@shared/*": ["shared/*"]
     }
   },
-  "include": ["functions", "functions-lib", "shared", "tests"]
+  "include": ["functions", "functions-lib", "shared", "tests", "worker"]
 }

@@ -25,7 +25,7 @@ export default function JoinChefs() {
       </p>
       <img
         className="page-banner"
-        src="/images/chef.jpg"
+        src="/images/chef.png"
         width={1200}
         height={525}
         alt="שף פרטי מסדר מנה במטבח ביתי חמים עם סירי נחושת ועשבי תיבול"

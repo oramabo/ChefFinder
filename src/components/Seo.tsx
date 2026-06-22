@@ -15,7 +15,7 @@ interface SeoProps {
 const SITE_URL = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, "");
 
 // Renders <head> tags at build time (prerendered) and on the client.
-export default function Seo({ title, description, jsonLd, noindex, canonicalPath, image = "/images/og.jpg" }: SeoProps) {
+export default function Seo({ title, description, jsonLd, noindex, canonicalPath, image = "/images/og.png" }: SeoProps) {
   const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   const canonical = SITE_URL && canonicalPath ? `${SITE_URL}${canonicalPath}` : undefined;
   const ogImage = SITE_URL ? `${SITE_URL}${image}` : undefined;

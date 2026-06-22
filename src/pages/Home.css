@@ -184,7 +184,7 @@
       rgba(42, 33, 27, 0.55),
       rgba(42, 33, 27, 0.7)
     ),
-    url("/images/og.jpg");
+    url("/images/og.png");
   background-size: cover;
   background-position: center;
 }

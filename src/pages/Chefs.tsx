@@ -17,7 +17,7 @@ export default function Chefs() {
       </p>
       <img
         className="page-banner"
-        src="/images/olive.jpg"
+        src="/images/olive.png"
         width={1200}
         height={525}
         alt="ענף זית וזעתר טרי על מפת פשתן"

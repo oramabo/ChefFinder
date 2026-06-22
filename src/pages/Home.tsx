@@ -74,7 +74,7 @@ export default function Home() {
           </div>
           <img
             className="hero__photo"
-            src="/images/hero.jpg"
+            src="/images/hero.png"
             width={1200}
             height={800}
             alt="שף פרטי מסדר מנה לבנטינית עם רימון ועשבי תיבול על צלחת קרמיקה"
@@ -121,7 +121,7 @@ export default function Home() {
           </div>
           <img
             className="home__trust-img"
-            src="/images/pomegranate.jpg"
+            src="/images/pomegranate.png"
             width={900}
             height={1100}
             alt="רימון פתוח עם גרגרים על מפת פשתן"

@@ -82,7 +82,7 @@ There are three places a value can live:
 | `WA_CLOUD_TOKEN` | Meta WhatsApp Cloud API token |
 | `WA_PHONE_NUMBER_ID` | Meta WhatsApp phone number id |
 | `ADMIN_TOKEN` | Secret to access the read-only `/admin` leads view (shows PII) |
-| `WA_MY_NUMBER` | Operator's WhatsApp number (E.164) |
+| `WA_MY_NUMBER` | Operator WhatsApp number(s), E.164. Multiple allowed — separate with commas (e.g. `9725...,9725...`) |
 | `WA_TEMPLATE_NAME` | `new_lead` (the approved template name) |
 | `GROW_API_KEY` | Grow/Meshulam API key |
 | `GROW_USER_ID` | Grow user id |
@@ -134,7 +134,10 @@ server-side and fails closed on invalid tokens.
    token (`WA_CLOUD_TOKEN`) and phone number id (`WA_PHONE_NUMBER_ID`).
 2. `WA_MY_NUMBER` = the operator's own WhatsApp number (E.164, e.g. `9725…`).
    The operator forwards messages to the chef group manually (ban-safe; no
-   automated group posting).
+   automated group posting). **Multiple recipients:** list several numbers
+   separated by commas (also spaces/semicolons/newlines), e.g.
+   `972500000001,972500000002` — the template is sent to each one. Every number
+   must have opted in / be a valid WhatsApp recipient for your Cloud API app.
 3. Create + get approval for a **utility template** named `new_lead`, language
    **Hebrew (`he`)**, with **6 body parameters** in this order:
    `city, date, guests, cuisine, budget, price`, and a **URL button** whose

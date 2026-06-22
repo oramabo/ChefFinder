@@ -7,26 +7,22 @@
 
 .footer__inner {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-6);
-  justify-content: space-between;
-}
-
-.footer__brand {
-  font-weight: 800;
-  font-size: 1.1rem;
-  margin-block-end: var(--space-2);
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-5);
 }
 
 .footer__logo {
-  inline-size: 150px;
+  inline-size: 130px;
   block-size: auto;
 }
 
 .footer__links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-4);
+  justify-content: center;
+  gap: var(--space-3) var(--space-5);
   color: var(--color-text-muted);
 }
 
@@ -51,6 +47,7 @@
 
 .footer__copy {
   margin-block-start: var(--space-6);
+  text-align: center;
   color: var(--color-text-muted);
   font-size: 0.85rem;
 }

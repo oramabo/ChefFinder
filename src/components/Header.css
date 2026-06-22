@@ -16,15 +16,13 @@
 
 .header__brand {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
 }
 
-.header__wordmark {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 1.6rem;
-  letter-spacing: 0;
-  color: var(--color-text);
+.header__logo {
+  block-size: 52px;
+  inline-size: auto;
+  display: block;
 }
 
 .header__nav {

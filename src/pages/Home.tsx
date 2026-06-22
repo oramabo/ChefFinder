@@ -91,10 +91,12 @@ export default function Home() {
         <ol className="home__steps">
           {STEPS.map(({ Icon, title, body }, i) => (
             <li className="home__step" key={title}>
-              <span className="home__step-icon">
-                <Icon width={24} height={24} />
-              </span>
-              <span className="home__step-num">{String(i + 1).padStart(2, "0")}</span>
+              <div className="home__step-head">
+                <span className="home__step-icon">
+                  <Icon width={24} height={24} />
+                </span>
+                <span className="home__step-num">{String(i + 1).padStart(2, "0")}</span>
+              </div>
               <h3>{title}</h3>
               <p>{body}</p>
             </li>

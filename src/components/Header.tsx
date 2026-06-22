@@ -7,7 +7,7 @@ export default function Header() {
     <header className="header">
       <div className="container header__inner">
         <Link to="/" className="header__brand" aria-label="השף שלי — דף הבית">
-          <span className="header__wordmark">השף שלי</span>
+          <img className="header__logo" src="/images/logo.png" width={120} height={120} alt="השף שלי" />
         </Link>
         <nav className="header__nav" aria-label="ניווט ראשי">
           <Link to="/how-it-works">איך זה עובד</Link>

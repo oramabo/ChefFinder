@@ -5,7 +5,6 @@ import FindAChef from "./pages/FindAChef.tsx";
 import LeadReceived from "./pages/LeadReceived.tsx";
 import LeadUnlock from "./pages/LeadUnlock.tsx";
 import Chefs from "./pages/Chefs.tsx";
-import JoinChefs from "./pages/JoinChefs.tsx";
 import HowItWorks from "./pages/HowItWorks.tsx";
 import Faq from "./pages/Faq.tsx";
 import Privacy from "./pages/Privacy.tsx";
@@ -31,7 +30,6 @@ export const routes: RouteRecord[] = [
       { path: "find-a-chef", Component: FindAChef },
       { path: "lead-received", Component: LeadReceived },
       { path: "chefs", Component: Chefs },
-      { path: "chefs/join", Component: JoinChefs },
       { path: "how-it-works", Component: HowItWorks },
       { path: "faq", Component: Faq },
       { path: "privacy", Component: Privacy },

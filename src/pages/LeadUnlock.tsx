@@ -115,6 +115,8 @@ export default function LeadUnlock() {
       } else if (res.reason === "sold_out") {
         setMessage("הליד נמכר. כל המקומות נתפסו.");
         await refreshLead();
+      } else if (res.reason === "payments_unavailable") {
+        setMessage("רכישת לידים תיפתח בקרוב. תודה על הסבלנות!");
       } else if (res.reason === "not_found") {
         setNotFound(true);
       } else {

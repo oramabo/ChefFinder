@@ -2,7 +2,7 @@ import type { DbPort } from "./ports/db.ts";
 import type { PaymentsPort } from "./ports/payments.ts";
 import type { MessagingPort } from "./ports/messaging.ts";
 import type { TurnstilePort } from "./ports/turnstile.ts";
-import { type Env, useReal } from "./env.ts";
+import { type Env, globalStubs, useReal } from "./env.ts";
 
 import { createMockDb } from "./adapters/db.mock.ts";
 import { createSupabaseDb } from "./adapters/db.supabase.ts";
@@ -24,6 +24,12 @@ export interface Container {
 // its real adapter only when configured; otherwise it falls back to a mock, so a
 // partially-configured environment still runs end-to-end.
 export function buildContainer(env: Env, _request?: Request): Container {
+  // Fail loud in production: a missing Supabase config would otherwise silently
+  // use the in-memory mock and lose all data. Only allowed under explicit stubs.
+  if (!globalStubs(env) && !useReal(env, "db")) {
+    throw new Error("Database not configured: set SUPABASE_URL + SUPABASE_SERVICE_KEY (or USE_STUBS=true)");
+  }
+
   const db: DbPort = useReal(env, "db")
     ? createSupabaseDb(env.SUPABASE_URL!, env.SUPABASE_SERVICE_KEY!)
     : createMockDb();

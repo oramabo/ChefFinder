@@ -1,6 +1,6 @@
 import { buildContainer } from "../../../../functions-lib/factory.ts";
 import { json, error, readJson, validate } from "../../../../functions-lib/http.ts";
-import { publicBaseUrl } from "../../../../functions-lib/env.ts";
+import { publicBaseUrl, globalStubs, useReal } from "../../../../functions-lib/env.ts";
 import { generateLeadToken } from "../../../../functions-lib/crypto.ts";
 import type { Handler } from "../../../../functions-lib/handler.ts";
 import { ReserveInput } from "@shared/schema.ts";
@@ -15,6 +15,13 @@ export const onRequestPost: Handler = async ({ request, env, params }) => {
   const parsed = validate(ReserveInput, body);
   if (!parsed.success) return parsed.response;
   const { chef_phone } = parsed.data;
+
+  // Fail closed when running for real without a payment provider configured:
+  // never reserve a slot for a flow that cannot legitimately complete (which
+  // would otherwise let a chef reach contact details without paying).
+  if (!globalStubs(env) && !useReal(env, "payments")) {
+    return json({ ok: false, reason: "payments_unavailable" });
+  }
 
   const { db, payments } = buildContainer(env, request);
 

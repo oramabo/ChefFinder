@@ -1,13 +1,14 @@
-import { useReal } from "../../../functions-lib/env.ts";
+import { globalStubs } from "../../../functions-lib/env.ts";
 import { buildContainer } from "../../../functions-lib/factory.ts";
 import { json, error, readJson } from "../../../functions-lib/http.ts";
 import type { Handler } from "../../../functions-lib/handler.ts";
 
 // POST /api/payment/mock-complete — dev-only helper to finish the mock payment
-// flow (the mock "payment page" redirects back here). Disabled whenever a real
-// payment provider is configured, so it can never be used in production.
+// flow (the mock "payment page" redirects back here). Available ONLY in explicit
+// stub mode (USE_STUBS=true); always 404 in production so it can never be used to
+// unlock contact details without a real payment.
 export const onRequestPost: Handler = async ({ request, env }) => {
-  if (useReal(env, "payments")) {
+  if (!globalStubs(env)) {
     return error("לא זמין", 404, { reason: "disabled" });
   }
 

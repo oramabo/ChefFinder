@@ -61,4 +61,20 @@ describe("POST /api/lead/:token/reserve", () => {
     );
     expect(res.status).toBe(422);
   });
+
+  it("fails closed with payments_unavailable in production when no provider is configured", async () => {
+    const token = await seedLead();
+    // Simulate production: not in stub mode and no Grow keys present.
+    const res = await reserve(
+      ctx({
+        method: "POST",
+        url: `http://localhost/api/lead/${token}/reserve`,
+        body: { chef_phone: "0521111111" },
+        params: { token },
+        env: { USE_STUBS: "false" },
+      }),
+    );
+    const json = (await res.json()) as any;
+    expect(json).toEqual({ ok: false, reason: "payments_unavailable" });
+  });
 });

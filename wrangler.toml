@@ -15,5 +15,17 @@ not_found_handling = "single-page-application"
 # otherwise `not_found_handling` would serve index.html for /api/* too.
 run_worker_first = ["/api/*", "/sitemap.xml"]
 
-# Secrets and vars are provided via the Cloudflare dashboard in production and
-# via .dev.vars locally (see .env.example). Do not commit real secrets here.
+# Non-secret runtime variables. These live here (not the dashboard) on purpose:
+# Workers Builds runs `wrangler deploy` on every push, and a deploy resets
+# plaintext vars to exactly what this config declares — so dashboard-set plaintext
+# vars get wiped. Anything sensitive must be a Secret (dashboard / `wrangler
+# secret put`); secrets are preserved across deploys and must never go here.
+[vars]
+PUBLIC_BASE_URL = "https://cheffinder.oramabo9-b2c.workers.dev"
+# Placeholder-checkout mode: instant click-through reservation, no real provider.
+# Remove this (and add the GROW_* secrets) when wiring real payments.
+MOCK_PAYMENTS = "true"
+
+# Sensitive values (SUPABASE_*, TURNSTILE_SECRET, TG_*, WA_*, ADMIN_TOKEN,
+# GROW_*) are Secrets, set in the Cloudflare dashboard (or `wrangler secret put`)
+# and via .dev.vars locally (see .env.example). Do not commit real secrets here.

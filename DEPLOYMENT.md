@@ -37,18 +37,35 @@ payments, deploy with everything real **except** payments:
 
 ## Environment variables
 
-Cloudflare Workers has two kinds of values. **Plaintext variables** are available
-at build *and* runtime — `VITE_*` must be plaintext because Vite inlines them
-into the bundle at build time. **Secrets** are encrypted and available only at
-runtime (used by Functions).
+> ⚠️ **Variables vs Secrets on Workers — important.** Workers Builds runs
+> `wrangler deploy` on every push, and a deploy **resets plaintext Variables to
+> exactly what `wrangler.toml` declares**. So plaintext Variables typed into the
+> dashboard get **wiped on the next build**. Only two kinds of values survive:
+> **Secrets** (encrypted; never touched by a deploy) and plaintext vars declared
+> in `wrangler.toml` under `[vars]`. Put every sensitive value in **Secrets**.
 
-### Plaintext build variables
+There are three places a value can live:
+
+1. **`wrangler.toml [vars]`** — non-secret runtime values, version-controlled.
+   `PUBLIC_BASE_URL` and `MOCK_PAYMENTS` already live here; edit them in the file.
+2. **Secrets** (dashboard → Settings → Variables and Secrets, *Secret* type, or
+   `wrangler secret put NAME`) — all sensitive runtime values. Preserved across
+   deploys.
+3. **Build variables** (Workers Builds → build settings) — the `VITE_*` values,
+   which Vite inlines into the bundle at **build time**. After changing one,
+   trigger a new build so it re-inlines.
+
+### Build variables (set in Workers Builds → build settings)
 | Name | Example / source |
 |---|---|
 | `VITE_TURNSTILE_SITE_KEY` | Turnstile widget site key |
 | `VITE_POSTHOG_KEY` | PostHog project API key |
 | `VITE_POSTHOG_HOST` | `https://eu.i.posthog.com` (or your region) |
 | `VITE_SITE_URL` | `https://<name>.<subdomain>.workers.dev` (for canonical + hreflang) |
+
+### Non-secret runtime vars (in `wrangler.toml` `[vars]`)
+| Name | Notes |
+|---|---|
 | `PUBLIC_BASE_URL` | `https://<name>.<subdomain>.workers.dev` (your live origin) |
 | `MOCK_PAYMENTS` | `true` for the placeholder-checkout test deploy; remove for real payments |
 

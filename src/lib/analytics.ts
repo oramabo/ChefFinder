@@ -1,10 +1,14 @@
 import posthog from "posthog-js";
+import { getConsent } from "./consent.ts";
 
 let initialized = false;
 
-// PostHog is env-gated: with no key it is a no-op, so local/CI runs need nothing.
+// PostHog is gated twice: by env (no key → no-op for local/CI) and by the user's
+// cookie consent (analytics only runs after explicit "granted"). Safe to call
+// repeatedly — it self-guards.
 export function initAnalytics(): void {
   if (initialized || typeof window === "undefined") return;
+  if (getConsent() !== "granted") return;
   const key = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
   if (!key) return;
   posthog.init(key, {

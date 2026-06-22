@@ -2,10 +2,12 @@ import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header.tsx";
 import Footer from "./Footer.tsx";
+import CookieBanner from "./CookieBanner.tsx";
 import { initAnalytics } from "../lib/analytics.ts";
 
 export default function Layout() {
   useEffect(() => {
+    // Self-gated: only initializes if the visitor previously granted consent.
     initAnalytics();
   }, []);
 
@@ -16,6 +18,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <CookieBanner />
     </>
   );
 }

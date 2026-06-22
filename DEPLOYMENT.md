@@ -193,7 +193,7 @@ and disallowed in `robots.txt`.
    - **Build command:** `npm run build`
    - **Deploy command:** `npx wrangler deploy` (the dashboard default — it now
      works because `wrangler.toml` declares a Worker with a `[assets]` directory,
-     not a Pages project). Node 20 is read from `.nvmrc`.
+     not a Pages project). Node 22 is read from `.nvmrc` (required by Wrangler v4).
    - No "build output directory" field — the assets directory comes from
      `wrangler.toml` (`[assets] directory = "./dist"`).
 4. The Worker config in `wrangler.toml` already sets `nodejs_compat`, a recent

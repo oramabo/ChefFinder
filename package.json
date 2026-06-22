@@ -1,0 +1,46 @@
+{
+  "name": "chefleads",
+  "version": "1.0.0",
+  "description": "ChefLeads — private chef lead marketplace (Hebrew-first, RTL)",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev:web": "vite",
+    "dev": "wrangler pages dev",
+    "build": "vite-react-ssg build",
+    "preview": "wrangler pages dev dist",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:db": "node scripts/run-pgtap.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.functions.json --noEmit && tsc -p tsconfig.node.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "posthog-js": "^1.161.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "vite-react-ssg": "^0.9.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240925.0",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@types/node": "^20.16.5",
+    "@types/react": "^18.3.9",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8",
+    "vitest": "^2.1.1",
+    "wrangler": "^3.78.10"
+  }
+}

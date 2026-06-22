@@ -1,0 +1,71 @@
+.leadunlock__card {
+  max-inline-size: 560px;
+}
+
+.leadunlock__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-block-end: var(--space-5);
+}
+
+.leadunlock__details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+  margin-block-end: var(--space-6);
+}
+
+.leadunlock__details dt {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.leadunlock__details dd {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.leadunlock__price {
+  margin-block-end: var(--space-4);
+  color: var(--color-text);
+}
+
+.leadunlock__message {
+  color: var(--color-danger);
+  margin-block-start: var(--space-3);
+}
+
+.leadunlock__reveal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding-block-start: var(--space-4);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.leadunlock__client {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.leadunlock__phone {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.leadunlock__email {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+}
+
+.leadunlock__soldout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}

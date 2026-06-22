@@ -1,0 +1,41 @@
+.findachef__sub {
+  margin-block: var(--space-3) var(--space-6);
+}
+
+.findachef__card {
+  max-inline-size: 640px;
+}
+
+.findachef__check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+  margin-block: var(--space-3);
+}
+
+.findachef__consent {
+  font-size: 0.85rem;
+  margin-block-start: var(--space-3);
+}
+
+.findachef__consent a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.findachef__error {
+  color: var(--color-danger);
+  margin-block-start: var(--space-3);
+}
+
+.findachef__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-block-start: var(--space-6);
+}
+
+.findachef__nav .btn:only-child {
+  margin-inline-start: auto;
+}

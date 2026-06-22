@@ -1,0 +1,6 @@
+# SPA fallback (Cloudflare Pages' documented pattern). Existing static assets —
+# the prerendered SEO pages and hashed bundles — are served first; only otherwise
+# unmatched paths (e.g. /lead/:token) fall back to the app shell. /api/* is owned
+# by Functions. NOTE: `wrangler pages dev` prints a cosmetic "infinite loop"
+# warning for any rule targeting /index.html; the rule is honored in production.
+/*    /index.html    200

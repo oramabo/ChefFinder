@@ -1,21 +1,14 @@
-/* Self-hosted Hebrew display face. Drop woff2 files in public/fonts/ to enable;
-   falls back to system sans until then. */
-@font-face {
-  font-family: "Heebo";
-  font-style: normal;
-  font-weight: 300 800;
-  font-display: swap;
-  src: url("/fonts/heebo-variable.woff2") format("woff2");
-}
-
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Use logical properties everywhere so a future /en/ LTR flip is automatic. */
@@ -32,29 +25,64 @@ body {
 h1,
 h2,
 h3 {
-  line-height: 1.2;
+  font-family: var(--font-display);
+  line-height: 1.12;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
+  color: var(--color-text);
+  text-wrap: balance;
 }
 
 h1 {
-  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 900;
 }
 
 h2 {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+}
+
+h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
 }
 
 p {
   color: var(--color-text-muted);
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .lead-text {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
+  line-height: 1.65;
 }
 
 .accent {
   color: var(--color-accent);
+}
+
+/* Eyebrow: a small olive course-label that sits above headings. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-olive);
+}
+.eyebrow::before {
+  content: "";
+  inline-size: 1.75rem;
+  block-size: 2px;
+  background: var(--color-saffron);
+  border-radius: 2px;
 }
 
 .card {
@@ -62,7 +90,7 @@ p {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-sm);
 }
 
 .grid {
@@ -77,6 +105,12 @@ p {
   .grid-2 {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .visually-hidden {
@@ -97,5 +131,6 @@ p {
   *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

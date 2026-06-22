@@ -143,7 +143,7 @@ export default function FindAChef() {
   return (
     <div className="section container findachef">
       <Seo
-        title="מצאו שף פרטי לאירוע | טופs הזמנה — ChefLeads"
+        title="מצאו שף פרטי לאירוע | טופs הזמנה — Sofré"
         description="מלאו טופס קצר וקבלו עד 3 הצעות משפים פרטיים מקצועיים לאירוע שלכם."
         noindex
       />

@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer__inner">
         <div>
-          <div className="footer__brand">ChefLeads</div>
+          <div className="footer__brand">Sofré</div>
           <p>שף פרטי לאירוע שלכם — מהיר, מקצועי, אמין.</p>
         </div>
         <nav className="footer__links" aria-label="ניווט תחתון">
@@ -23,7 +23,7 @@ export default function Footer() {
         </nav>
       </div>
       <div className="container footer__copy">
-        © {new Date().getFullYear()} ChefLeads. כל הזכויות שמורות.
+        © {new Date().getFullYear()} Sofré. כל הזכויות שמורות.
       </div>
     </footer>
   );

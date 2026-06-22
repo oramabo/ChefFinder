@@ -6,9 +6,8 @@ export default function Header() {
   return (
     <header className="header">
       <div className="container header__inner">
-        <Link to="/" className="header__brand" aria-label="ChefLeads — דף הבית">
-          <span className="header__mark">▲</span>
-          <span>ChefLeads</span>
+        <Link to="/" className="header__brand" aria-label="Sofré — דף הבית">
+          <span className="header__wordmark">Sofré</span>
         </Link>
         <nav className="header__nav" aria-label="ניווט ראשי">
           <Link to="/how-it-works">איך זה עובד</Link>

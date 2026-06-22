@@ -5,7 +5,7 @@ export default function HowItWorks() {
   return (
     <div className="section container">
       <Seo
-        title="איך זה עובד | הזמנת שף פרטי — ChefLeads"
+        title="איך זה עובד | הזמנת שף פרטי — Sofré"
         description="כך מזמינים שף פרטי לאירוע ב-3 שלבים פשוטים: ממלאים טופס, מקבלים הצעות, בוחרים שף."
       />
       <h1>איך זה עובד</h1>

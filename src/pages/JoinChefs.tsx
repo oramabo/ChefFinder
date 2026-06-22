@@ -12,7 +12,7 @@ export default function JoinChefs() {
   return (
     <div className="section container">
       <Seo
-        title="הצטרפות שפים לקבוצת הלידים | ChefLeads"
+        title="הצטרפות שפים לקבוצת הלידים | Sofré"
         description="שפים פרטיים: הצטרפו לקבוצת הוואטסאפ או הטלגרם שלנו וקבלו התראה על כל ליד חדש של לקוח שמחפש שף לאירוע."
         canonicalPath="/chefs/join"
       />

@@ -6,8 +6,8 @@ export default function Privacy() {
   return (
     <div className="section container legal">
       <Seo
-        title="מדיניות פרטיות — ChefLeads"
-        description="כיצד ChefLeads אוספת, משתמשת, משתפת ושומרת את המידע שלכם, וכיצד תוכלו לממש את זכויותיכם."
+        title="מדיניות פרטיות — Sofré"
+        description="כיצד Sofré אוספת, משתמשת, משתפת ושומרת את המידע שלכם, וכיצד תוכלו לממש את זכויותיכם."
         canonicalPath="/privacy"
       />
       <h1>מדיניות פרטיות</h1>

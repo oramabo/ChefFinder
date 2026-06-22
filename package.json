@@ -22,6 +22,8 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@fontsource/assistant": "^5.2.9",
+    "@fontsource/frank-ruhl-libre": "^5.2.8",
     "@supabase/supabase-js": "^2.45.4",
     "posthog-js": "^1.161.6",
     "react": "^18.3.1",

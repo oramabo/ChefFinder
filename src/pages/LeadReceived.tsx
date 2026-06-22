@@ -4,7 +4,7 @@ import { LinkButton } from "../components/Button.tsx";
 export default function LeadReceived() {
   return (
     <div className="section container">
-      <Seo title="הבקשה התקבלה — ChefLeads" noindex />
+      <Seo title="הבקשה התקבלה — Sofré" noindex />
       <div className="card" style={{ maxInlineSize: 640 }}>
         <h1>קיבלנו את הבקשה ✓</h1>
         <p className="lead-text" style={{ marginBlock: "var(--space-4)" }}>

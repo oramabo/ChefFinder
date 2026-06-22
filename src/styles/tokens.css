@@ -1,22 +1,38 @@
 :root {
-  /* Premium dark palette (verified for WCAG AA against text colors below). */
-  --color-bg: #0e0e10; /* near-black base */
-  --color-surface: #17171b; /* charcoal panels */
-  --color-surface-2: #1f1f25;
-  --color-border: #2c2c34;
+  /* ── Sofré — "the Levantine table" ──────────────────────────────────────
+     Warm, light, editorial. Linen field, espresso ink, deep pomegranate as
+     the brand voice, olive as the steady secondary, saffron as the candle-glow
+     accent used sparingly. All text pairings verified for WCAG AA. */
+  --color-bg: #f4efe4; /* warm linen */
+  --color-surface: #fcfaf3; /* warm plate white (cards) */
+  --color-surface-2: #ece4d4; /* sunk wells / inputs */
+  --color-border: #e2d8c3; /* warm sand */
 
-  --color-text: #f4f2ed; /* warm off-white on dark (contrast > 13:1) */
-  --color-text-muted: #b6b2a8; /* muted (contrast > 6:1) */
+  --color-text: #2a211b; /* warm espresso (contrast > 11:1 on linen) */
+  --color-text-muted: #6f6256; /* taupe (contrast > 4.7:1) */
 
-  --color-accent: #c9a227; /* brushed gold */
-  --color-accent-strong: #e0bb45;
-  --color-accent-contrast: #0e0e10; /* text on gold */
+  /* Pomegranate — the brand primary (buttons, links, emphasis). */
+  --color-accent: #8c2233;
+  --color-accent-strong: #a62a40;
+  --color-accent-contrast: #fdf3ec; /* warm white on pomegranate */
 
-  --color-success: #4caf76;
-  --color-danger: #e06a5a;
+  /* Olive — steady secondary (eyebrows, tags, quiet structure). */
+  --color-olive: #586a36;
+  --color-olive-soft: #7c8a5b;
 
-  /* Typography */
-  --font-sans: "Heebo", "Assistant", system-ui, -apple-system, "Segoe UI", Arial,
+  /* Saffron — the candle-glow accent. Used with restraint. */
+  --color-saffron: #d99a2b;
+  --color-saffron-soft: #e7c98a;
+
+  /* Back-compat alias used by a couple of components. */
+  --color-primary: var(--color-accent);
+
+  --color-success: #4f7a4f;
+  --color-danger: #b23b2e;
+
+  /* Typography — Hebrew literary serif display + humanist sans body. */
+  --font-display: "Frank Ruhl Libre", "Assistant", Georgia, serif;
+  --font-sans: "Assistant", "Heebo", system-ui, -apple-system, "Segoe UI", Arial,
     sans-serif;
 
   /* Spacing scale */
@@ -30,9 +46,13 @@
   --space-10: 4rem;
   --space-12: 6rem;
 
-  --radius: 12px;
-  --radius-lg: 20px;
-  --shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  --radius: 10px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
 
-  --maxw: 1100px;
+  /* Warm, soft shadows (brown-tinted, not neutral grey). */
+  --shadow: 0 18px 44px -24px rgba(74, 47, 30, 0.45);
+  --shadow-sm: 0 4px 16px -8px rgba(74, 47, 30, 0.35);
+
+  --maxw: 1120px;
 }

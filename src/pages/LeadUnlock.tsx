@@ -143,7 +143,7 @@ export default function LeadUnlock() {
   if (notFound || !lead) {
     return (
       <div className="section container">
-        <Seo title="הליד לא נמצא — ChefLeads" noindex />
+        <Seo title="הליד לא נמצא — Sofré" noindex />
         <div className="card">
           <h1>הליד לא נמצא</h1>
           <p>ייתכן שהקישור שגוי או שפג תוקפו.</p>

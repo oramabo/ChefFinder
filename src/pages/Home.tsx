@@ -1,11 +1,18 @@
 import Seo from "../components/Seo.tsx";
 import { LinkButton } from "../components/Button.tsx";
+import { DEFAULT_CAP } from "@shared/constants.ts";
 import "./Home.css";
 
 const STEPS = [
   { title: "ממלאים טופס קצר", body: "פרטי האירוע: תאריך, מיקום, מספר אורחים ותקציב." },
-  { title: "שפים פונים אליכם", body: "עד 3 שפים מקצועיים יחזרו אליכם עם הצעה מותאמת." },
-  { title: "בוחרים ונהנים", body: "משווים הצעות, בוחרים שף — וחווים ארוחה בלתי נשכחת." },
+  { title: "שפים פונים אליכם", body: "עד שלושה שפים מקצועיים חוזרים אליכם עם הצעה מותאמת." },
+  { title: "בוחרים ומארחים", body: "משווים הצעות, בוחרים שף, ומגישים ארוחה בלתי נשכחת." },
+];
+
+const REASONS = [
+  "שפים מקצועיים בלבד — אתם מדברים ישירות איתם, לא עם מתווך.",
+  `פנייה ממוקדת: עד ${DEFAULT_CAP} הצעות לכל בקשה, בלי הצפה.`,
+  "שירות בכל הארץ, בהתאמה אישית לאופי האירוע ולתקציב.",
 ];
 
 const faqJsonLd = {
@@ -35,21 +42,23 @@ export default function Home() {
   return (
     <>
       <Seo
-        title="שף פרטי לאירוע | הזמנת שף פרטי עד הבית — ChefLeads"
+        title="שף פרטי לאירוע | הזמנת שף פרטי עד הבית — Sofré"
         description="מחפשים שף פרטי לאירוע? מלאו טופס קצר ועד 3 שפים מקצועיים יחזרו אליכם עם הצעה מותאמת. חוויה קולינרית פרימיום עד הבית."
         jsonLd={faqJsonLd}
         canonicalPath="/"
       />
 
       <section className="hero">
+        <span className="hero__glow" aria-hidden="true" />
+        <span className="hero__plate" aria-hidden="true" />
         <div className="container hero__inner">
-          <p className="hero__eyebrow accent">חוויה קולינרית עד הבית</p>
-          <h1>
-            שף פרטי לאירוע <span className="accent">הבא שלכם</span>
+          <p className="eyebrow hero__eyebrow">שף פרטי · עד הבית</p>
+          <h1 className="hero__title">
+            השף הפרטי שמגיע <span className="accent">לשולחן שלכם</span>
           </h1>
           <p className="hero__sub lead-text">
-            מלאו טופס קצר ועד שלושה שפים מקצועיים יחזרו אליכם עם הצעה מותאמת
-            לאירוע — ארוחה זוגית, חגיגה משפחתית או אירוע עסקי.
+            מלאו טופס קצר ועד שלושה שפים מקצועיים יחזרו אליכם עם הצעה מותאמת —
+            לארוחה זוגית, לחגיגה משפחתית או לאירוע עסקי.
           </p>
           <div className="hero__cta">
             <LinkButton to="/find-a-chef" variant="primary">
@@ -59,30 +68,39 @@ export default function Home() {
               איך זה עובד
             </LinkButton>
           </div>
+          <p className="hero__trust">
+            עד שלושה שפים לכל פנייה · שירות בכל הארץ · בלי דמי תיווך
+          </p>
         </div>
       </section>
 
       <section className="section container">
-        <h2>איך זה עובד</h2>
-        <div className="grid grid-3 home__steps">
+        <p className="eyebrow">התהליך</p>
+        <h2 className="home__h2">מהבקשה ועד הסועדים — בשלושה צעדים</h2>
+        <ol className="home__steps">
           {STEPS.map((s, i) => (
-            <div className="card" key={s.title}>
-              <div className="home__step-num accent">{i + 1}</div>
-              <h3>{s.title}</h3>
-              <p>{s.body}</p>
-            </div>
+            <li className="home__step" key={s.title}>
+              <span className="home__step-num">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </section>
 
       <section className="section container">
         <div className="card home__trust">
-          <h2>למה ChefLeads</h2>
-          <ul className="home__list">
-            <li>שפים מקצועיים בלבד — לא מתווכים.</li>
-            <li>פנייה מהירה: עד 3 הצעות, בלי הצפה.</li>
-            <li>שירות בכל הארץ, בהתאמה אישית לאירוע.</li>
-          </ul>
+          <div>
+            <p className="eyebrow">למה Sofré</p>
+            <h2 className="home__h2">שולחן אחד, תשומת לב מלאה</h2>
+            <ul className="home__list">
+              {REASONS.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+          </div>
           <LinkButton to="/find-a-chef" variant="primary">
             התחילו עכשיו
           </LinkButton>

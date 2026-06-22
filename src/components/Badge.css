@@ -11,19 +11,19 @@
 }
 
 .badge--accent {
-  background: rgba(201, 162, 39, 0.12);
-  color: var(--color-accent-strong);
-  border-color: rgba(201, 162, 39, 0.4);
+  background: rgba(140, 34, 51, 0.1);
+  color: var(--color-accent);
+  border-color: rgba(140, 34, 51, 0.3);
 }
 
 .badge--success {
-  background: rgba(76, 175, 118, 0.12);
+  background: rgba(79, 122, 79, 0.12);
   color: var(--color-success);
-  border-color: rgba(76, 175, 118, 0.4);
+  border-color: rgba(79, 122, 79, 0.4);
 }
 
 .badge--danger {
-  background: rgba(224, 106, 90, 0.12);
+  background: rgba(178, 59, 46, 0.12);
   color: var(--color-danger);
-  border-color: rgba(224, 106, 90, 0.4);
+  border-color: rgba(178, 59, 46, 0.4);
 }

@@ -11,6 +11,9 @@ import Privacy from "./pages/Privacy.tsx";
 import Terms from "./pages/Terms.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Admin from "./pages/Admin.tsx";
+import ChefAuth from "./pages/ChefAuth.tsx";
+import ChefDashboard from "./pages/ChefDashboard.tsx";
+import ChefMarketplace from "./pages/ChefMarketplace.tsx";
 import ProgrammaticPage from "./pages/programmatic/ProgrammaticPage.tsx";
 import { allSeoPages } from "@shared/seo/pages.ts";
 
@@ -36,6 +39,10 @@ export const routes: RouteRecord[] = [
       { path: "terms", Component: Terms },
       // Client-only: not prerendered (no static paths), served via SPA fallback.
       { path: "lead/:token", Component: LeadUnlock, getStaticPaths: () => [] },
+      // Chef portal (prepaid lead bank). Client-only + noindex; auth-gated client-side.
+      { path: "chef/login", Component: ChefAuth, getStaticPaths: () => [] },
+      { path: "chef", Component: ChefDashboard, getStaticPaths: () => [] },
+      { path: "chef/leads", Component: ChefMarketplace, getStaticPaths: () => [] },
       // Prerenders only the (data-less) token prompt; data is fetched client-side
       // and gated server-side. noindex + robots-disallowed.
       { path: "admin", Component: Admin },

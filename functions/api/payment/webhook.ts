@@ -16,22 +16,37 @@ export const onRequestPost: Handler = async ({ request, env }) => {
   }
 
   const purchase = await db.getPurchase(result.purchaseId);
-  if (!purchase) {
-    console.error("webhook: unknown purchase", result.purchaseId);
-    return json({ ok: false, reason: "unknown_purchase" }, 404);
+  if (purchase) {
+    if (result.status === "paid") {
+      const invoiceRef = await payments.issueInvoice({
+        purchaseId: purchase.id,
+        provider_ref: result.provider_ref,
+        amount: purchase.amount,
+      });
+      const transitioned = await db.completePurchase(purchase.id, invoiceRef);
+      return json({ ok: true, status: "paid", transitioned });
+    }
+    // failed: reopen the held slot.
+    const released = await db.releasePurchase(purchase.id, "failed");
+    return json({ ok: true, status: "failed", released });
   }
 
-  if (result.status === "paid") {
-    const invoiceRef = await payments.issueInvoice({
-      purchaseId: purchase.id,
-      provider_ref: result.provider_ref,
-      amount: purchase.amount,
-    });
-    const transitioned = await db.completePurchase(purchase.id, invoiceRef);
-    return json({ ok: true, status: "paid", transitioned });
+  // Not a lead purchase — maybe an online credit-package order (the lead bank).
+  const order = await db.getCreditOrder(result.purchaseId);
+  if (order) {
+    if (result.status === "paid") {
+      const invoiceRef = await payments.issueInvoice({
+        purchaseId: order.id,
+        provider_ref: result.provider_ref,
+        amount: order.amount,
+      });
+      const { credited } = await db.completeCreditOrder(order.id, invoiceRef);
+      return json({ ok: true, status: "paid", kind: "credits", credited });
+    }
+    const released = await db.failCreditOrder(order.id);
+    return json({ ok: true, status: "failed", kind: "credits", released });
   }
 
-  // failed: reopen the held slot.
-  const released = await db.releasePurchase(purchase.id, "failed");
-  return json({ ok: true, status: "failed", released });
+  console.error("webhook: unknown purchase/order", result.purchaseId);
+  return json({ ok: false, reason: "unknown_purchase" }, 404);
 };

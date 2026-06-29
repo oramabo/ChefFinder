@@ -4,7 +4,10 @@ export interface CreatePaymentInput {
   purchaseId: string;
   amount: number;
   chefPhone: string;
-  lead: LeadSummary;
+  // Present for a lead unlock; absent for a credit-package order.
+  lead?: LeadSummary;
+  // Optional override for the checkout description (used by credit packages).
+  description?: string;
   // URL to send the chef back to after payment.
   returnUrl: string;
   // URL the provider posts the payment result to.

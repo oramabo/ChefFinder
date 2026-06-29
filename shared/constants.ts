@@ -60,3 +60,46 @@ export const CUISINES = [
   { slug: "vegan", he: "טבעוני / צמחוני" },
   { slug: "chefs-choice", he: "בחירת השף" },
 ] as const;
+
+// ── Prepaid lead bank ───────────────────────────────────────────────────────
+// Credit packages a chef can buy online (1 credit = 1 lead unlock). Owner-tunable.
+export const CREDIT_PACKAGES = [
+  { id: "starter", credits: 10, price: 250 },
+  { id: "pro", credits: 25, price: 550 },
+  { id: "max", credits: 50, price: 1000 },
+] as const;
+export type CreditPackageId = (typeof CREDIT_PACKAGES)[number]["id"];
+
+export const CHEF_STATUS = {
+  active: "active",
+  disabled: "disabled",
+} as const;
+export type ChefStatus = (typeof CHEF_STATUS)[keyof typeof CHEF_STATUS];
+
+export const CREDIT_ORDER_STATUS = {
+  pending: "pending",
+  paid: "paid",
+  failed: "failed",
+} as const;
+export type CreditOrderStatus =
+  (typeof CREDIT_ORDER_STATUS)[keyof typeof CREDIT_ORDER_STATUS];
+
+// Ledger reasons (must match the chef_credit_ledger_reason_chk constraint).
+export const CREDIT_REASON = {
+  package: "package",
+  admin_adjust: "admin_adjust",
+  lead_unlock: "lead_unlock",
+  refund: "refund",
+} as const;
+export type CreditReason = (typeof CREDIT_REASON)[keyof typeof CREDIT_REASON];
+
+// Outcomes of a credit-based unlock (mirrors chef_unlock_lead's reason values).
+export const UNLOCK_REASON = {
+  unlocked: "unlocked",
+  inactive: "inactive",
+  insufficient_credits: "insufficient_credits",
+  already_purchased: "already_purchased",
+  sold_out: "sold_out",
+  not_found: "not_found",
+} as const;
+export type UnlockReason = (typeof UNLOCK_REASON)[keyof typeof UNLOCK_REASON];

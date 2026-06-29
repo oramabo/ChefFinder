@@ -25,6 +25,22 @@ import { onRequestGet as adminLeads } from "../functions/api/admin/leads.ts";
 import { onRequestPost as adminNotify } from "../functions/api/admin/notify.ts";
 import { onRequestPost as adminConfirm } from "../functions/api/admin/confirm.ts";
 import { onRequestGet as adminPending } from "../functions/api/admin/pending.ts";
+// Prepaid lead bank — chef portal.
+import { onRequestPost as chefRegister } from "../functions/api/chef/register.ts";
+import { onRequestPost as chefLogin } from "../functions/api/chef/login.ts";
+import { onRequestGet as chefMe } from "../functions/api/chef/me.ts";
+import { onRequestGet as chefLeads } from "../functions/api/chef/leads.ts";
+import { onRequestPost as chefOpen } from "../functions/api/chef/open.ts";
+import { onRequestGet as chefPurchases } from "../functions/api/chef/purchases.ts";
+import { onRequestGet as chefLedger } from "../functions/api/chef/ledger.ts";
+import { onRequestPost as chefCheckout } from "../functions/api/chef/checkout.ts";
+// Prepaid lead bank — admin management.
+import { onRequestGet as adminChefs } from "../functions/api/admin/chefs.ts";
+import { onRequestPost as adminChefCreate } from "../functions/api/admin/chefCreate.ts";
+import { onRequestGet as adminChefDetail } from "../functions/api/admin/chefDetail.ts";
+import { onRequestPost as adminChefCredits } from "../functions/api/admin/chefCredits.ts";
+import { onRequestPost as adminChefPassword } from "../functions/api/admin/chefPassword.ts";
+import { onRequestPost as adminChefStatus } from "../functions/api/admin/chefStatus.ts";
 import { onRequestGet as sitemap } from "../functions/sitemap.xml.ts";
 
 // Minimal local typings for the Workers runtime, so this file typechecks under
@@ -60,6 +76,25 @@ const routes: Route[] = [
   { method: "POST", pattern: "/api/admin/lead/:token/notify", handler: adminNotify },
   { method: "POST", pattern: "/api/admin/purchase/:ref/confirm", handler: adminConfirm },
   { method: "GET", pattern: "/api/admin/pending", handler: adminPending },
+
+  // Prepaid lead bank — chef portal.
+  { method: "POST", pattern: "/api/chef/register", handler: chefRegister },
+  { method: "POST", pattern: "/api/chef/login", handler: chefLogin },
+  { method: "GET", pattern: "/api/chef/me", handler: chefMe },
+  { method: "GET", pattern: "/api/chef/leads", handler: chefLeads },
+  { method: "POST", pattern: "/api/chef/leads/:token/open", handler: chefOpen },
+  { method: "GET", pattern: "/api/chef/purchases", handler: chefPurchases },
+  { method: "GET", pattern: "/api/chef/ledger", handler: chefLedger },
+  { method: "POST", pattern: "/api/chef/credits/checkout", handler: chefCheckout },
+
+  // Prepaid lead bank — admin management.
+  { method: "GET", pattern: "/api/admin/chefs", handler: adminChefs },
+  { method: "POST", pattern: "/api/admin/chefs", handler: adminChefCreate },
+  { method: "GET", pattern: "/api/admin/chefs/:id", handler: adminChefDetail },
+  { method: "POST", pattern: "/api/admin/chefs/:id/credits", handler: adminChefCredits },
+  { method: "POST", pattern: "/api/admin/chefs/:id/password", handler: adminChefPassword },
+  { method: "POST", pattern: "/api/admin/chefs/:id/status", handler: adminChefStatus },
+
   { method: "GET", pattern: "/sitemap.xml", handler: sitemap },
 ];
 

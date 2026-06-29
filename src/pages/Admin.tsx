@@ -12,6 +12,8 @@ import {
   type NotifyChannel,
   type PendingPurchase,
 } from "../lib/api.ts";
+import type { PendingCreditOrder } from "@shared/types.ts";
+import AdminChefs from "./AdminChefs.tsx";
 import { EVENT_TYPES } from "@shared/constants.ts";
 import { formatDate, formatCurrency } from "../lib/format.ts";
 import "./Admin.css";
@@ -36,6 +38,7 @@ export default function Admin() {
   const [busyKey, setBusyKey] = useState<string | null>(null);
   // Manual Bit: pending payments awaiting approval.
   const [pending, setPending] = useState<PendingPurchase[] | null>(null);
+  const [pendingOrders, setPendingOrders] = useState<PendingCreditOrder[]>([]);
   const [pendingMsg, setPendingMsg] = useState("");
   const [approveBusy, setApproveBusy] = useState<string | null>(null);
 
@@ -78,11 +81,31 @@ export default function Admin() {
       if (status === 401) return setPendingMsg("אסימון שגוי או חסר.");
       if (!body.ok) return setPendingMsg(body.error || "שגיאה בטעינת התשלומים.");
       setPending(body.pending ?? []);
+      setPendingOrders(body.pending_credit_orders ?? []);
       setPendingMsg("");
     } catch {
       setPendingMsg("שגיאת רשת.");
     }
   }, []);
+
+  const approveOrder = useCallback(
+    async (o: PendingCreditOrder) => {
+      setApproveBusy(o.id);
+      setPendingMsg("");
+      try {
+        const { status, body } = await confirmPurchase(o.id, token);
+        if (status === 401) return setPendingMsg("אסימון שגוי או חסר.");
+        if (!body.ok) return setPendingMsg(body.error || "האישור נכשל.");
+        setPendingOrders((cur) => cur.filter((x) => x.id !== o.id));
+        setPendingMsg(`אושרה חבילה של ${o.credits} קרדיטים ל-${o.chef_phone} ✓`);
+      } catch {
+        setPendingMsg("שגיאת רשת.");
+      } finally {
+        setApproveBusy(null);
+      }
+    },
+    [token],
+  );
 
   const approve = useCallback(
     async (p: PendingPurchase) => {
@@ -214,6 +237,50 @@ export default function Admin() {
         </div>
       )}
 
+      {pendingOrders.length > 0 && (
+        <div className="admin__bit">
+          <h2>חבילות קרדיטים בביט — ממתינות לאישור</h2>
+          <p className="admin__note">
+            קיבלתם תשלום בביט עבור בנק לידים? אשרו והקרדיטים יתווספו לשף אוטומטית.
+          </p>
+          <div className="admin__tablewrap">
+            <table className="admin__table">
+              <thead>
+                <tr>
+                  <th>זמן</th>
+                  <th>טלפון השף</th>
+                  <th>שם</th>
+                  <th>קרדיטים</th>
+                  <th>סכום</th>
+                  <th>פעולה</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingOrders.map((o) => (
+                  <tr key={o.id}>
+                    <td>{formatDate(o.created_at)}</td>
+                    <td dir="ltr">{o.chef_phone}</td>
+                    <td>{o.chef_name ?? "—"}</td>
+                    <td>{o.credits}</td>
+                    <td>{formatCurrency(o.amount)}</td>
+                    <td>
+                      <Button
+                        type="button"
+                        className="admin__btn"
+                        disabled={approveBusy === o.id}
+                        onClick={() => approveOrder(o)}
+                      >
+                        {approveBusy === o.id ? "מאשר…" : "אישור תשלום"}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {leads && (
         <>
           <p className="admin__count">{leads.length} לידים</p>
@@ -301,6 +368,8 @@ export default function Admin() {
           </div>
         </>
       )}
+
+      {leads && <AdminChefs token={token} />}
     </div>
   );
 }

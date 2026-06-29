@@ -1,4 +1,4 @@
-import type { PublicLead, LeadContact, PendingPurchase } from "@shared/types.ts";
+import type { PublicLead, LeadContact, PendingPurchase, PendingCreditOrder } from "@shared/types.ts";
 import type { LeadInputType } from "@shared/schema.ts";
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
@@ -132,6 +132,8 @@ export type { PendingPurchase } from "@shared/types.ts";
 export interface PendingResponse {
   ok: boolean;
   pending?: PendingPurchase[];
+  // Pending online credit-package orders (the lead bank), awaiting Bit approval.
+  pending_credit_orders?: PendingCreditOrder[];
   error?: string;
 }
 

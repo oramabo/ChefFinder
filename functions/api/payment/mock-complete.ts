@@ -19,18 +19,33 @@ export const onRequestPost: Handler = async ({ request, env }) => {
 
   const { db, payments } = buildContainer(env, request);
   const purchase = await db.getPurchase(purchaseId);
-  if (!purchase) return error("הרכישה לא נמצאה", 404, { reason: "unknown_purchase" });
-
-  if (status === "failed") {
-    const released = await db.releasePurchase(purchaseId, "failed");
-    return json({ ok: true, status: "failed", released });
+  if (purchase) {
+    if (status === "failed") {
+      const released = await db.releasePurchase(purchaseId, "failed");
+      return json({ ok: true, status: "failed", released });
+    }
+    const invoiceRef = await payments.issueInvoice({
+      purchaseId,
+      provider_ref: purchase.provider_ref ?? `mock_${purchaseId}`,
+      amount: purchase.amount,
+    });
+    const transitioned = await db.completePurchase(purchaseId, invoiceRef);
+    return json({ ok: true, status: "paid", transitioned });
   }
 
+  // Maybe a credit-package order (the lead bank).
+  const order = await db.getCreditOrder(purchaseId);
+  if (!order) return error("הרכישה לא נמצאה", 404, { reason: "unknown_purchase" });
+
+  if (status === "failed") {
+    const released = await db.failCreditOrder(order.id);
+    return json({ ok: true, status: "failed", kind: "credits", released });
+  }
   const invoiceRef = await payments.issueInvoice({
-    purchaseId,
-    provider_ref: purchase.provider_ref ?? `mock_${purchaseId}`,
-    amount: purchase.amount,
+    purchaseId: order.id,
+    provider_ref: order.provider_ref ?? `mock_${order.id}`,
+    amount: order.amount,
   });
-  const transitioned = await db.completePurchase(purchaseId, invoiceRef);
-  return json({ ok: true, status: "paid", transitioned });
+  const { credited } = await db.completeCreditOrder(order.id, invoiceRef);
+  return json({ ok: true, status: "paid", kind: "credits", credited });
 };

@@ -8,6 +8,8 @@ import { Field, TextInput } from "../components/Field.tsx";
 import { EVENT_TYPES, CUISINES } from "@shared/constants.ts";
 import type { PublicLead, LeadContact } from "@shared/types.ts";
 import { getLead, reserveLead, getContact, mockComplete, type ManualBit } from "../lib/api.ts";
+import { chefOpenLead } from "../lib/chefApi.ts";
+import { isChefLoggedIn } from "../lib/chefSession.ts";
 import { formatDate, formatCurrency } from "../lib/format.ts";
 import { track, identify } from "../lib/analytics.ts";
 import { sha256Hex } from "../lib/hash.ts";
@@ -32,6 +34,9 @@ export default function LeadUnlock() {
   const [working, setWorking] = useState(false);
   const [message, setMessage] = useState("");
   const [bit, setBit] = useState<ManualBit | null>(null);
+  const [loggedIn] = useState(() => isChefLoggedIn());
+  const [creditWorking, setCreditWorking] = useState(false);
+  const [creditMsg, setCreditMsg] = useState("");
 
   const refreshLead = useCallback(async () => {
     const res = await getLead(token);
@@ -154,6 +159,45 @@ export default function LeadUnlock() {
     }
   }
 
+  // Logged-in chef path: spend one credit instead of paying for this lead.
+  async function creditOpen() {
+    if (creditWorking) return;
+    setCreditWorking(true);
+    setCreditMsg("");
+    try {
+      const res = await chefOpenLead(token);
+      if (res.status === 401) {
+        setCreditMsg("התחברו לאזור השפים כדי לפתוח בקרדיט.");
+        return;
+      }
+      if (res.body.ok && res.body.contact) {
+        setContact(res.body.contact);
+        track("phone_revealed");
+        return;
+      }
+      switch (res.body.reason) {
+        case "insufficient_credits":
+          setCreditMsg("אין מספיק קרדיטים — קנו עוד באזור החשבון.");
+          break;
+        case "already_purchased":
+          setCreditMsg("כבר פתחתם את הליד הזה.");
+          break;
+        case "sold_out":
+          setCreditMsg("הליד נמכר.");
+          break;
+        case "inactive":
+          setCreditMsg("החשבון אינו פעיל.");
+          break;
+        default:
+          setCreditMsg("אירעה שגיאה. נסו שוב.");
+      }
+    } catch {
+      setCreditMsg("אירעה שגיאת רשת. נסו שוב.");
+    } finally {
+      setCreditWorking(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="section container">
@@ -178,7 +222,7 @@ export default function LeadUnlock() {
     <div className="section container leadunlock">
       <Seo title={`ליד: שף ל${eventHe(lead.event_type)} ${lead.city ?? ""}`} noindex />
 
-      <div className="card leadunlock__card">
+      <div className="card card--raised leadunlock__card">
         <div className="leadunlock__head">
           <h1>שף פרטי ל{eventHe(lead.event_type)}</h1>
           <SlotsLeft slots={lead.slots_left} />
@@ -277,6 +321,16 @@ export default function LeadUnlock() {
           </div>
         ) : (
           <div className="leadunlock__buy">
+            {loggedIn && (
+              <div className="leadunlock__credit">
+                <p className="leadunlock__credit-lead">יש לכם בנק לידים? פתחו את הליד בקרדיט אחד.</p>
+                <Button type="button" onClick={creditOpen} disabled={creditWorking} full>
+                  {creditWorking ? "פותח…" : "פתחו עם קרדיט אחד"}
+                </Button>
+                {creditMsg && <p className="leadunlock__message">{creditMsg}</p>}
+                <div className="leadunlock__or">או שלמו עבור הליד</div>
+              </div>
+            )}
             <p className="leadunlock__price">
               פתיחת פרטי הלקוח: <strong className="accent">{formatCurrency(lead.price)}</strong>
             </p>

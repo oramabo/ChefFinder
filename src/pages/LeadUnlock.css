@@ -1,5 +1,6 @@
 .leadunlock__card {
   max-inline-size: 560px;
+  margin-inline: auto;
 }
 
 .leadunlock__head {
@@ -10,67 +11,111 @@
   margin-block-end: var(--space-5);
 }
 
+/* The event facts, set in a soft sunk panel. */
 .leadunlock__details {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-4);
+  gap: var(--space-4) var(--space-5);
   margin-block-end: var(--space-6);
+  padding: var(--space-5);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
 }
 
 .leadunlock__details dt {
   color: var(--color-text-muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .leadunlock__details dd {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.05rem;
+  margin-block-start: 2px;
 }
 
 .leadunlock__price {
   margin-block-end: var(--space-4);
   color: var(--color-text);
+  font-size: 1.1rem;
 }
 
 .leadunlock__message {
   color: var(--color-danger);
   margin-block-start: var(--space-3);
+  font-weight: 600;
 }
 
+.leadunlock__buy {
+  padding: var(--space-5);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Logged-in chef: open with a credit, shown above the pay path. */
+.leadunlock__credit {
+  margin-block-end: var(--space-5);
+  padding-block-end: var(--space-5);
+}
+.leadunlock__credit-lead {
+  margin-block-end: var(--space-3);
+  font-weight: 600;
+  color: var(--color-text);
+}
+.leadunlock__or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-start: var(--space-5);
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+.leadunlock__or::before,
+.leadunlock__or::after {
+  content: "";
+  flex: 1;
+  block-size: 1px;
+  background: var(--color-border);
+}
+
+/* Revealed contact: a warm gold-lit medallion of trust. */
 .leadunlock__reveal {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   align-items: flex-start;
   margin-block-start: var(--space-5);
-  padding: var(--space-5);
-  border: 1px solid var(--color-saffron-soft);
+  padding: var(--space-6);
+  border: 1px solid var(--color-gold-soft);
   border-radius: var(--radius-lg);
-  background: radial-gradient(
-      130% 120% at 100% 0%,
-      rgba(217, 154, 43, 0.16),
-      transparent 60%
-    ),
-    var(--color-surface);
+  background: var(--glow-gold), var(--color-surface);
+  box-shadow: var(--shadow-md);
 }
 
 .leadunlock__client {
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--color-text);
+  margin-block-start: var(--space-1);
 }
 
 .leadunlock__phone {
   font-family: var(--font-display);
-  font-size: 1.9rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 800;
   letter-spacing: 0.02em;
-  color: var(--color-accent);
+  color: var(--color-accent-deep);
 }
 
 .leadunlock__email {
   color: var(--color-text-muted);
   text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .leadunlock__soldout {
@@ -86,22 +131,18 @@
   gap: var(--space-3);
   align-items: flex-start;
   margin-block-start: var(--space-5);
-  padding: var(--space-5);
-  border: 1px solid var(--color-saffron-soft);
+  padding: var(--space-6);
+  border: 1px solid var(--color-gold-soft);
   border-radius: var(--radius-lg);
-  background: radial-gradient(
-      130% 120% at 100% 0%,
-      rgba(217, 154, 43, 0.12),
-      transparent 60%
-    ),
-    var(--color-surface);
+  background: var(--glow-gold), var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .leadunlock__bitphone {
   font-family: var(--font-display);
-  font-size: 1.7rem;
-  font-weight: 700;
-  color: var(--color-accent);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-accent-deep);
 }
 
 .leadunlock__bitref code {

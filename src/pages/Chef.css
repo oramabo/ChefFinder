@@ -1,0 +1,328 @@
+/* ── Chef portal (auth / dashboard / marketplace) ───────────────────────────*/
+
+/* Auth */
+.chefauth__card {
+  max-inline-size: 460px;
+  margin-inline: auto;
+}
+.chefauth__title {
+  margin-block: var(--space-3) var(--space-2);
+}
+.chefauth__sub {
+  color: var(--color-text-muted);
+  margin-block-end: var(--space-5);
+}
+.chefauth__tabs {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-pill);
+  margin-block-end: var(--space-5);
+}
+.chefauth__tab {
+  flex: 1;
+  padding-block: var(--space-2);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background-color var(--duration) var(--ease), color var(--duration) var(--ease);
+}
+.chefauth__tab.is-active {
+  background: var(--color-surface);
+  color: var(--color-accent-strong);
+  box-shadow: var(--shadow-xs);
+}
+.chefauth__error,
+.chefmarket__pagemsg,
+.chefmarket__rowmsg {
+  color: var(--color-danger);
+  font-weight: 600;
+  margin-block: var(--space-3) 0;
+}
+
+/* Dashboard */
+.chefdash__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-block-end: var(--space-5);
+}
+.chefdash__flash {
+  color: var(--color-accent-strong);
+  font-weight: 700;
+  background: var(--color-accent-soft);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  margin-block-end: var(--space-5);
+}
+.chefdash__balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  background-image: var(--glow-gold), var(--gradient-accent);
+  color: #fff;
+  border: none;
+}
+.chefdash__balance-label {
+  display: block;
+  font-weight: 700;
+  opacity: 0.9;
+}
+.chefdash__balance-num {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 7vw, 3.6rem);
+  font-weight: 900;
+  line-height: 1;
+}
+.chefdash__balance-unit {
+  display: block;
+  opacity: 0.9;
+  font-size: 0.95rem;
+}
+.chefdash__balance .btn--ghost {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.chefdash__section {
+  margin-block-start: var(--space-10);
+}
+.chefdash__section h2 {
+  margin-block-end: var(--space-2);
+}
+.chefdash__sub {
+  margin-block-end: var(--space-5);
+}
+.chefdash__empty {
+  color: var(--color-text-muted);
+}
+
+.chefdash__packages {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.chefdash__pkg {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+.chefdash__pkg-credits {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: var(--color-accent-deep);
+  line-height: 1;
+}
+.chefdash__pkg-unit {
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+.chefdash__pkg-price {
+  margin-block-start: var(--space-2);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.chefdash__pkg-each {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-block-end: var(--space-3);
+}
+
+.chefdash__bit {
+  margin-block-start: var(--space-5);
+  border-color: var(--color-gold-soft);
+  background: var(--glow-gold), var(--color-surface);
+}
+.chefdash__bitphone {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-accent-deep);
+}
+.chefdash__bitref {
+  font-size: 0.9rem;
+  margin-block-start: var(--space-3);
+}
+.chefdash__bitref code {
+  background: var(--color-surface-2);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.chefdash__leads {
+  display: grid;
+  gap: var(--space-3);
+  list-style: none;
+}
+.chefdash__lead {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-4) var(--space-5);
+}
+.chefdash__lead-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.chefdash__lead-email {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+.chefdash__lead-meta {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: center;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.chefdash__ledger {
+  list-style: none;
+  display: grid;
+  gap: var(--space-1);
+}
+.chefdash__ledger-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: 0.92rem;
+}
+.chefdash__ledger-delta {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.chefdash__ledger-delta.is-pos {
+  color: var(--color-accent-strong);
+}
+.chefdash__ledger-delta.is-neg {
+  color: var(--color-danger);
+}
+.chefdash__ledger-bal,
+.chefdash__ledger-date {
+  color: var(--color-text-muted);
+}
+.chefdash__foot {
+  margin-block-start: var(--space-8);
+}
+
+/* Marketplace */
+.chefmarket__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-block-end: var(--space-5);
+}
+.chefmarket__balance {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+.chefmarket__balance-num {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--color-accent-deep);
+}
+.chefmarket__filters {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-block-end: var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-tint);
+  border-radius: var(--radius-lg);
+}
+.chefmarket__filters .field {
+  margin-block-end: 0;
+  min-inline-size: 180px;
+}
+.chefmarket__cuisine {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.chefmarket__grid {
+  display: grid;
+  gap: var(--space-5);
+  list-style: none;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+.chefmarket__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.chefmarket__card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.chefmarket__card-head h3 {
+  margin: 0;
+}
+.chefmarket__facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3) var(--space-4);
+  margin: 0;
+}
+.chefmarket__facts dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+.chefmarket__facts dd {
+  margin: 0;
+  font-weight: 700;
+}
+.chefmarket__card .btn {
+  margin-block-start: auto;
+}
+.chefmarket__reveal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-start;
+  padding: var(--space-4);
+  border: 1px solid var(--color-gold-soft);
+  border-radius: var(--radius);
+  background: var(--glow-gold), var(--color-surface);
+}
+.chefmarket__reveal .accent {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--color-accent-deep);
+}

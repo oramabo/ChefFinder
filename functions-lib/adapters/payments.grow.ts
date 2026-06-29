@@ -28,7 +28,9 @@ export function createGrowPayments(env: Env): PaymentsPort {
         userId,
         apiKey,
         sum: String(input.amount),
-        description: `השף שלי lead ${input.lead.lead_token}`,
+        description:
+          input.description ??
+          (input.lead ? `השף שלי ליד ${input.lead.lead_token}` : `השף שלי ${input.purchaseId}`),
         successUrl: input.returnUrl,
         cancelUrl: input.returnUrl,
         notifyUrl: input.webhookUrl,

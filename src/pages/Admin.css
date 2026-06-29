@@ -29,6 +29,7 @@
   overflow-x: auto;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-xs);
 }
 
 .admin__table {
@@ -46,13 +47,20 @@
 }
 
 .admin__table thead th {
+  position: sticky;
+  inset-block-start: 0;
   background: var(--color-surface-2);
   color: var(--color-text-muted);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.admin__table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--color-surface-2) 45%, transparent);
 }
 
 .admin__table tbody tr:hover {
-  background: var(--color-surface);
+  background: var(--color-accent-soft);
 }
 
 .admin__source {
@@ -83,10 +91,11 @@
 
 .admin__bit {
   margin-block: var(--space-6);
-  padding: var(--space-5);
-  border: 1px solid var(--color-border);
+  padding: var(--space-6);
+  border: 1px solid var(--color-gold-soft);
   border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  background: var(--glow-gold), var(--color-surface);
+  box-shadow: var(--shadow-sm);
   max-inline-size: 640px;
 }
 
@@ -99,4 +108,26 @@
   margin-block-start: var(--space-3);
   color: var(--color-text);
   font-weight: 600;
+}
+
+/* Chef-accounts management. */
+.admin__chefcreate {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-block-start: var(--space-4);
+}
+.admin__chefcreate .field {
+  margin-block-end: 0;
+  min-inline-size: 140px;
+}
+.admin__adjust {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+.admin__adjustinput {
+  inline-size: 5rem;
+  padding: var(--space-1) var(--space-2);
 }

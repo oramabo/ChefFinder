@@ -12,6 +12,7 @@ export default function Header() {
         <nav className="header__nav" aria-label="ניווט ראשי">
           <Link to="/how-it-works">איך זה עובד</Link>
           <Link to="/chefs">לשפים</Link>
+          <Link to="/chef/login">אזור שפים</Link>
           <Link to="/faq">שאלות נפוצות</Link>
         </nav>
         <LinkButton to="/find-a-chef" variant="primary">

@@ -18,6 +18,9 @@ export const onRequestGet: Handler = async ({ request, env }) => {
   const limit = Math.min(Math.max(Number(url.searchParams.get("limit") ?? 50), 1), 200);
 
   const { db } = buildContainer(env, request);
-  const pending = await db.listPendingPurchases(limit);
-  return json({ ok: true, pending });
+  const [pending, pending_credit_orders] = await Promise.all([
+    db.listPendingPurchases(limit),
+    db.listPendingCreditOrders(limit),
+  ]);
+  return json({ ok: true, pending, pending_credit_orders });
 };

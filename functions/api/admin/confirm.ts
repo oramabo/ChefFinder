@@ -19,13 +19,25 @@ export const onRequestPost: Handler = async ({ request, env, params }) => {
   const { db, payments } = buildContainer(env, request);
 
   const purchase = await db.getPurchase(ref);
-  if (!purchase) return error("הרכישה לא נמצאה", 404, { reason: "unknown_purchase" });
+  if (purchase) {
+    const invoiceRef = await payments.issueInvoice({
+      purchaseId: purchase.id,
+      provider_ref: purchase.provider_ref ?? `bit_${purchase.id}`,
+      amount: purchase.amount,
+    });
+    const transitioned = await db.completePurchase(purchase.id, invoiceRef);
+    return json({ ok: true, status: "paid", transitioned });
+  }
+
+  // Maybe a manual-Bit credit-package order (the lead bank).
+  const order = await db.getCreditOrder(ref);
+  if (!order) return error("הרכישה לא נמצאה", 404, { reason: "unknown_purchase" });
 
   const invoiceRef = await payments.issueInvoice({
-    purchaseId: purchase.id,
-    provider_ref: purchase.provider_ref ?? `bit_${purchase.id}`,
-    amount: purchase.amount,
+    purchaseId: order.id,
+    provider_ref: order.provider_ref ?? `bit_${order.id}`,
+    amount: order.amount,
   });
-  const transitioned = await db.completePurchase(purchase.id, invoiceRef);
-  return json({ ok: true, status: "paid", transitioned });
+  const { credited } = await db.completeCreditOrder(order.id, invoiceRef);
+  return json({ ok: true, status: "paid", kind: "credits", credited });
 };

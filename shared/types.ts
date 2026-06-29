@@ -2,6 +2,10 @@ import type {
   LeadStatus,
   PurchaseStatus,
   ReserveReason,
+  ChefStatus,
+  CreditReason,
+  CreditOrderStatus,
+  UnlockReason,
 } from "./constants.ts";
 
 // Full lead row (server-side; contains PII).
@@ -58,6 +62,8 @@ export interface Purchase {
   invoice_ref: string | null;
   reveal_token: string | null;
   status: PurchaseStatus;
+  // True when unlocked by spending a credit from the chef's bank (vs. paying).
+  paid_from_credits: boolean;
   created_at: string;
 }
 
@@ -119,4 +125,96 @@ export function toLeadSummary(lead: Lead): LeadSummary {
     kosher: lead.kosher,
     price: lead.price,
   };
+}
+
+// ── Prepaid lead bank ───────────────────────────────────────────────────────
+
+// Full chef account row (server-side; includes the password hash).
+export interface Chef {
+  id: string;
+  phone: string;
+  name: string | null;
+  email: string | null;
+  password_hash: string;
+  credits: number;
+  status: ChefStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+// Chef account without secrets — safe to return to the chef or admin UI.
+export interface ChefPublic {
+  id: string;
+  phone: string;
+  name: string | null;
+  email: string | null;
+  credits: number;
+  status: ChefStatus;
+  created_at: string;
+}
+
+export function toChefPublic(c: Chef): ChefPublic {
+  return {
+    id: c.id,
+    phone: c.phone,
+    name: c.name,
+    email: c.email,
+    credits: c.credits,
+    status: c.status,
+    created_at: c.created_at,
+  };
+}
+
+export interface CreditLedgerEntry {
+  id: string;
+  chef_id: string;
+  delta: number;
+  reason: CreditReason;
+  balance_after: number;
+  ref: string | null;
+  note: string | null;
+  created_at: string;
+}
+
+export interface CreditOrder {
+  id: string;
+  chef_id: string;
+  credits: number;
+  amount: number;
+  provider_ref: string | null;
+  invoice_ref: string | null;
+  status: CreditOrderStatus;
+  created_at: string;
+}
+
+// Result of a credit-based unlock (mirrors the chef_unlock_lead RPC).
+export interface ChefUnlockResult {
+  ok: boolean;
+  reason: UnlockReason;
+  purchase_id: string | null;
+}
+
+// A lead the chef has unlocked, with its (now-accessible) contact. Used by the
+// chef's "my leads" view.
+export interface ChefLeadPurchase {
+  purchase_id: string;
+  lead_token: string;
+  event_type: string | null;
+  event_date: string | null;
+  city: string | null;
+  created_at: string;
+  paid_from_credits: boolean;
+  contact: LeadContact;
+}
+
+// A pending online credit-package order awaiting manual (Bit) confirmation,
+// joined with the chef for the operator's pending view.
+export interface PendingCreditOrder {
+  id: string;
+  chef_id: string;
+  chef_phone: string;
+  chef_name: string | null;
+  credits: number;
+  amount: number;
+  created_at: string;
 }

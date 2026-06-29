@@ -6,6 +6,8 @@ export interface Env {
   USE_STUBS?: string;
   // Shared secret protecting the read-only operator/admin view (it returns PII).
   ADMIN_TOKEN?: string;
+  // Secret used to sign chef session tokens (HMAC). Derived/stubbed when unset.
+  CHEF_SESSION_SECRET?: string;
   // Placeholder-payments mode: use the mock checkout (no real provider) while
   // every other service runs for real. Lets the full lead → link → unlock flow
   // be tested end-to-end before Grow is wired.

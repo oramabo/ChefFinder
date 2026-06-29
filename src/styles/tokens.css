@@ -1,24 +1,24 @@
 :root {
-  /* ── השף שלי — "fresh & green" ────────────────────────────────────────────
-     Light, airy and happy. White/mint field, a fresh elegant green as the brand
-     voice, a deeper leaf-green secondary, and a warm gold accent used sparingly
+  /* ── השף שלי — "warm & deep red" ──────────────────────────────────────────
+     Warm and confident. White/blush field, a deep elegant red as the brand
+     voice, a richer crimson secondary, and a warm gold accent used sparingly
      for a celebratory touch. All text pairings verified for WCAG AA. */
-  --color-bg: #f4faf5; /* soft mint white */
+  --color-bg: #fcf5f5; /* soft blush white */
   --color-surface: #ffffff; /* clean white (cards) */
-  --color-surface-2: #e9f4ec; /* sunk wells / inputs */
-  --color-border: #d6e7da; /* soft green-grey */
+  --color-surface-2: #f6e8e8; /* sunk wells / inputs */
+  --color-border: #e7d3d3; /* soft red-grey */
 
-  --color-text: #15271c; /* deep green-charcoal (contrast > 12:1) */
-  --color-text-muted: #51655a; /* muted green-grey (contrast > 4.6:1) */
+  --color-text: #2a1414; /* deep red-charcoal (contrast > 12:1) */
+  --color-text-muted: #6a5151; /* muted red-grey (contrast > 4.6:1) */
 
-  /* Fresh green — the brand primary (buttons, links, emphasis). */
-  --color-accent: #1f9254;
-  --color-accent-strong: #16753f; /* darker for hover */
-  --color-accent-contrast: #ffffff; /* white on green */
+  /* Deep red — the brand primary (buttons, links, emphasis). */
+  --color-accent: #a81f2b;
+  --color-accent-strong: #82131d; /* darker for hover */
+  --color-accent-contrast: #ffffff; /* white on red */
 
-  /* Leaf green — steady secondary (eyebrows, tags, quiet structure). */
-  --color-olive: #3f7350;
-  --color-olive-soft: #7da588;
+  /* Rich crimson — steady secondary (eyebrows, tags, quiet structure). */
+  --color-olive: #7a2a30;
+  --color-olive-soft: #b07a7e;
 
   /* Warm gold — the celebratory accent. Used with restraint. */
   --color-saffron: #d9a52b;
@@ -49,9 +49,9 @@
   --radius-lg: 18px;
   --radius-pill: 999px;
 
-  /* Soft green-tinted shadows. */
-  --shadow: 0 18px 44px -24px rgba(20, 60, 38, 0.4);
-  --shadow-sm: 0 4px 16px -8px rgba(20, 60, 38, 0.28);
+  /* Soft red-tinted shadows. */
+  --shadow: 0 18px 44px -24px rgba(80, 20, 26, 0.4);
+  --shadow-sm: 0 4px 16px -8px rgba(80, 20, 26, 0.28);
 
   --maxw: 1120px;
 }

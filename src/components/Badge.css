@@ -2,28 +2,35 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding-block: 0.2rem;
-  padding-inline: 0.6rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding-block: 0.28rem;
+  padding-inline: 0.7rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   border: 1px solid var(--color-border);
 }
 
 .badge--accent {
-  background: rgba(31, 146, 84, 0.1);
-  color: var(--color-accent);
-  border-color: rgba(31, 146, 84, 0.3);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
 
 .badge--success {
-  background: rgba(79, 122, 79, 0.12);
-  color: var(--color-success);
-  border-color: rgba(79, 122, 79, 0.4);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  border-color: color-mix(in srgb, var(--color-success) 35%, transparent);
+}
+
+.badge--gold {
+  background: color-mix(in srgb, var(--color-gold) 16%, white);
+  color: #8a6410;
+  border-color: color-mix(in srgb, var(--color-gold) 45%, transparent);
 }
 
 .badge--danger {
-  background: rgba(178, 59, 46, 0.12);
+  background: color-mix(in srgb, var(--color-danger) 12%, white);
   color: var(--color-danger);
-  border-color: rgba(178, 59, 46, 0.4);
+  border-color: color-mix(in srgb, var(--color-danger) 40%, transparent);
 }

@@ -1,8 +1,20 @@
 .footer {
-  border-block-start: 1px solid var(--color-border);
+  position: relative;
   margin-block-start: var(--space-12);
-  padding-block: var(--space-8);
+  padding-block: var(--space-10) var(--space-8);
   background: var(--color-surface);
+  border-block-start: 1px solid var(--color-border);
+}
+
+/* A slim gradient hairline across the top edge. */
+.footer::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -1px;
+  inset-inline: 0;
+  block-size: 3px;
+  background: var(--gradient-accent);
+  opacity: 0.85;
 }
 
 .footer__inner {
@@ -22,12 +34,19 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--space-3) var(--space-5);
+  gap: var(--space-3) var(--space-6);
   color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.footer__links a,
+.footer__linkbtn {
+  position: relative;
+  transition: color var(--duration) var(--ease);
 }
 
 .footer__links a:hover {
-  color: var(--color-text);
+  color: var(--color-accent-strong);
 }
 
 /* "Cookie settings" rendered as a link-styled button. */
@@ -42,11 +61,11 @@
 }
 
 .footer__linkbtn:hover {
-  color: var(--color-text);
+  color: var(--color-accent-strong);
 }
 
 .footer__copy {
-  margin-block-start: var(--space-6);
+  margin-block-start: var(--space-5);
   text-align: center;
   color: var(--color-text-muted);
   font-size: 0.85rem;

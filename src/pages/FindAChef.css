@@ -1,10 +1,37 @@
+.findachef {
+  max-inline-size: 720px;
+}
+
 .findachef__sub {
   margin-block: var(--space-3) var(--space-6);
   font-size: 1.1rem;
+  max-inline-size: 46ch;
 }
 
 .findachef__card {
   max-inline-size: 640px;
+}
+
+/* Each step fades + rises in as it becomes active. */
+.findachef__step {
+  animation: findachef-step 0.32s var(--ease-out) both;
+}
+
+@keyframes findachef-step {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .findachef__step {
+    animation: none;
+  }
 }
 
 /* The kosher toggle, set as a quiet selectable chip rather than a bare box. */
@@ -13,17 +40,22 @@
   align-items: center;
   gap: var(--space-2);
   color: var(--color-text);
+  font-weight: 600;
   margin-block: var(--space-4) var(--space-1);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius);
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color var(--duration) var(--ease), background-color var(--duration) var(--ease);
+}
+
+.findachef__check:hover {
+  border-color: var(--color-accent);
 }
 
 .findachef__check:has(input:checked) {
   border-color: var(--color-accent);
-  background: rgba(31, 146, 84, 0.06);
+  background: var(--color-accent-soft);
 }
 
 .findachef__check input {
@@ -39,8 +71,9 @@
 }
 
 .findachef__consent a {
-  color: var(--color-accent);
+  color: var(--color-accent-strong);
   text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .findachef__error {

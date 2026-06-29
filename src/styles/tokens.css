@@ -1,19 +1,26 @@
 :root {
-  /* ── השף שלי — "fresh & green" ────────────────────────────────────────────
-     Light, airy and happy. White/mint field, a fresh elegant green as the brand
-     voice, a deeper leaf-green secondary, and a warm gold accent used sparingly
-     for a celebratory touch. All text pairings verified for WCAG AA. */
-  --color-bg: #f4faf5; /* soft mint white */
+  /* ── השף שלי — "fresh & green, enriched" ──────────────────────────────────
+     Light, airy and happy, with more depth than before. A white/mint field
+     layered with raised white surfaces, a fresh elegant green as the brand
+     voice (now with a deeper green for gradients & emphasis), a leaf-green
+     secondary, and a warm gold accent used for celebratory touches.
+     All text pairings verified for WCAG AA. */
+  --color-bg: #f3faf4; /* soft mint white */
+  --color-tint: #e7f4ea; /* gentle banding tint for alternating sections */
   --color-surface: #ffffff; /* clean white (cards) */
-  --color-surface-2: #e9f4ec; /* sunk wells / inputs */
-  --color-border: #d6e7da; /* soft green-grey */
+  --color-surface-raised: #ffffff; /* raised white, paired with --shadow-md */
+  --color-surface-2: #eaf5ed; /* sunk wells / inputs */
+  --color-border: #d4e7d9; /* soft green-grey */
+  --color-border-strong: #bcd8c4; /* a touch firmer, for emphasis */
 
-  --color-text: #15271c; /* deep green-charcoal (contrast > 12:1) */
-  --color-text-muted: #51655a; /* muted green-grey (contrast > 4.6:1) */
+  --color-text: #122017; /* deep green-charcoal (contrast > 13:1) */
+  --color-text-muted: #4d6157; /* muted green-grey (contrast > 4.8:1) */
 
   /* Fresh green — the brand primary (buttons, links, emphasis). */
   --color-accent: #1f9254;
   --color-accent-strong: #16753f; /* darker for hover */
+  --color-accent-deep: #0f5c34; /* deepest — gradient end + rich emphasis */
+  --color-accent-soft: #d9efe1; /* tinted fill for chips / soft states */
   --color-accent-contrast: #ffffff; /* white on green */
 
   /* Leaf green — steady secondary (eyebrows, tags, quiet structure). */
@@ -21,14 +28,23 @@
   --color-olive-soft: #7da588;
 
   /* Warm gold — the celebratory accent. Used with restraint. */
-  --color-saffron: #d9a52b;
-  --color-saffron-soft: #ecd6a0;
+  --color-gold: #d29a23; /* slightly richer than before */
+  --color-gold-soft: #ecd6a0;
+  /* Back-compat aliases (older components reference --color-saffron*). */
+  --color-saffron: var(--color-gold);
+  --color-saffron-soft: var(--color-gold-soft);
 
   /* Back-compat alias used by a couple of components. */
   --color-primary: var(--color-accent);
 
   --color-success: #1f9254;
   --color-danger: #c0392b;
+
+  /* Brand gradients — fresh→deep green for primary actions, soft gold glow. */
+  --gradient-accent: linear-gradient(135deg, #28a05e 0%, #16753f 55%, #0f5c34 100%);
+  --gradient-accent-hover: linear-gradient(135deg, #239256 0%, #126638 55%, #0c4f2d 100%);
+  --gradient-gold: linear-gradient(135deg, #e6b94e 0%, #d29a23 100%);
+  --glow-gold: radial-gradient(130% 120% at 100% 0%, rgba(210, 154, 35, 0.18), transparent 60%);
 
   /* Typography — Hebrew literary serif display + Open Sans (Latin + Hebrew) body. */
   --font-display: "Frank Ruhl Libre", "Open Sans", Georgia, serif;
@@ -45,13 +61,26 @@
   --space-10: 4rem;
   --space-12: 6rem;
 
-  --radius: 10px;
-  --radius-lg: 18px;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 20px;
   --radius-pill: 999px;
 
-  /* Soft green-tinted shadows. */
-  --shadow: 0 18px 44px -24px rgba(20, 60, 38, 0.4);
+  /* Layered, green-tinted shadow scale. */
+  --shadow-xs: 0 1px 2px rgba(18, 44, 30, 0.06), 0 2px 6px -2px rgba(18, 44, 30, 0.1);
   --shadow-sm: 0 4px 16px -8px rgba(20, 60, 38, 0.28);
+  --shadow-md: 0 10px 30px -16px rgba(18, 60, 38, 0.4), 0 2px 8px -4px rgba(18, 60, 38, 0.18);
+  --shadow-lg: 0 30px 60px -30px rgba(15, 70, 42, 0.5), 0 8px 20px -12px rgba(15, 70, 42, 0.22);
+  --shadow: var(--shadow-md); /* back-compat default */
+
+  /* Motion — consistent easing + durations across components. */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 0.14s;
+  --duration: 0.22s;
+
+  /* Accessible focus ring. */
+  --ring: 0 0 0 3px rgba(31, 146, 84, 0.35);
 
   --maxw: 1120px;
 }

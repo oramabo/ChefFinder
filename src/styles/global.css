@@ -1,5 +1,6 @@
 html {
   color-scheme: light;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -9,6 +10,7 @@ body {
   font-size: 1.0625rem;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* Use logical properties everywhere so a future /en/ LTR flip is automatic. */
@@ -22,28 +24,35 @@ body {
   padding-block: var(--space-10);
 }
 
+/* Alternating soft-tint band, for vertical rhythm between sections. */
+.section--tint {
+  background: var(--color-tint);
+}
+
 h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  line-height: 1.12;
+  line-height: 1.1;
   font-weight: 700;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.012em;
   color: var(--color-text);
   text-wrap: balance;
 }
 
 h1 {
-  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-size: clamp(2.6rem, 6.2vw, 4.25rem);
   font-weight: 900;
+  letter-spacing: -0.02em;
 }
 
 h2 {
-  font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+  font-size: clamp(1.8rem, 3.6vw, 2.65rem);
+  font-weight: 800;
 }
 
 h3 {
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   font-weight: 700;
 }
 
@@ -57,12 +66,43 @@ a {
 }
 
 .lead-text {
-  font-size: 1.2rem;
+  font-size: clamp(1.1rem, 1.6vw, 1.25rem);
   line-height: 1.65;
 }
 
 .accent {
   color: var(--color-accent);
+}
+
+/* A gold-underscored word, for a celebratory highlight in headings. */
+.accent-gold {
+  position: relative;
+  color: var(--color-accent-deep);
+  white-space: nowrap;
+}
+.accent-gold::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -0.08em;
+  block-size: 0.18em;
+  background: var(--gradient-gold);
+  border-radius: var(--radius-pill);
+  opacity: 0.55;
+}
+
+/* In-flow text links inside prose get a clear hover affordance. */
+.prose a,
+.link {
+  color: var(--color-accent-strong);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  text-underline-offset: 0.18em;
+  transition: text-decoration-color var(--duration) var(--ease);
+}
+.prose a:hover,
+.link:hover {
+  text-decoration-color: var(--color-accent);
 }
 
 /* Eyebrow: a small olive course-label that sits above headings. */
@@ -72,25 +112,38 @@ a {
   gap: var(--space-2);
   font-family: var(--font-sans);
   font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 800;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-olive);
 }
 .eyebrow::before {
   content: "";
   inline-size: 1.75rem;
-  block-size: 2px;
-  background: var(--color-saffron);
-  border-radius: 2px;
+  block-size: 3px;
+  background: var(--gradient-gold);
+  border-radius: var(--radius-pill);
 }
 
 .card {
+  position: relative;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   box-shadow: var(--shadow-sm);
+  transition: transform var(--duration) var(--ease-out),
+    box-shadow var(--duration) var(--ease-out), border-color var(--duration) var(--ease);
+}
+
+/* Raised, interactive card: lifts on hover. */
+.card--raised {
+  box-shadow: var(--shadow-md);
+}
+.card--hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-border-strong);
 }
 
 /* A full-width rounded photo banner used at the top of content pages. */
@@ -100,7 +153,7 @@ a {
   aspect-ratio: 16 / 7;
   object-fit: cover;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   margin-block: var(--space-5) var(--space-8);
 }
 
@@ -118,7 +171,7 @@ a {
   }
 }
 
-:where(a, button, input, [tabindex]):focus-visible {
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: 4px;
@@ -136,12 +189,37 @@ a {
   border: 0;
 }
 
+/* ── Scroll reveal ──────────────────────────────────────────────────────────
+   Elements wrapped in <Reveal> start hidden+shifted and ease in once when
+   scrolled into view. SSG-safe: server output has .is-visible so content is
+   never hidden without JS, and the hide only applies after hydration marks
+   the document <html data-reveal-ready>. */
+[data-reveal-ready] .reveal:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.reveal {
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+  [data-reveal-ready] .reveal:not(.is-visible) {
+    opacity: 1;
+    transform: none;
   }
 }

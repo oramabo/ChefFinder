@@ -16,10 +16,10 @@ export default function Chefs() {
         canonicalPath="/chefs"
       />
       <p className="eyebrow">לשפים</p>
-      <h1>לשפים: איך קונים ליד</h1>
+      <h1>לידים אמיתיים, ישירות אליכם</h1>
       <p className="lead-text" style={{ marginBlock: "var(--space-4)" }}>
-        אנחנו מביאים לכם לקוחות אמיתיים שמחפשים שף פרטי לאירוע — אתם משלמים רק על
-        ליד שמעניין אתכם.
+        אנחנו מביאים לכם לקוחות אמיתיים שמחפשים שף פרטי לאירוע — ואתם משלמים רק על
+        לידים שבאמת מעניינים אתכם.
       </p>
       <img
         className="page-banner"
@@ -31,18 +31,18 @@ export default function Chefs() {
       />
 
       <div className="grid grid-3" style={{ marginBlockStart: "var(--space-6)" }}>
-        <div className="card">
+        <div className="card card--raised card--hover">
           <h3>לידים בקבוצה</h3>
           <p>סיכום כל ליד חדש נשלח לקבוצת הוואטסאפ והטלגרם — ללא פרטי הלקוח.</p>
         </div>
-        <div className="card">
+        <div className="card card--raised card--hover">
           <h3>תשלום וחשיפה</h3>
           <p>
             פותחים את הקישור, משלמים {formatCurrency(DEFAULT_PRICE)} ב-Bit או
             בכרטיס, ומקבלים מיד את מספר הטלפון של הלקוח.
           </p>
         </div>
-        <div className="card">
+        <div className="card card--raised card--hover">
           <h3>הוגן לשפים</h3>
           <p>כל ליד נמכר לעד {DEFAULT_CAP} שפים בלבד — סיכוי הוגן לסגור את העבודה.</p>
         </div>
@@ -66,7 +66,7 @@ export default function Chefs() {
       />
 
       <div className="grid grid-2">
-        <div className="card join__card">
+        <div className="card card--raised join__card">
           <h3>וואטסאפ</h3>
           <p>קבוצת הוואטסאפ שלנו — סיכום של כל ליד חדש מיד עם פרסומו.</p>
           {WHATSAPP_URL ? (
@@ -84,7 +84,7 @@ export default function Chefs() {
           )}
         </div>
 
-        <div className="card join__card">
+        <div className="card card--raised join__card">
           <h3>טלגרם</h3>
           <p>ערוץ/קבוצת הטלגרם שלנו — אותם לידים, בערוץ שנוח לכם.</p>
           {TELEGRAM_URL ? (

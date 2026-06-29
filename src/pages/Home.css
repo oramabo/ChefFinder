@@ -1,4 +1,4 @@
-/* ── Hero: asymmetric, illustration-led. No gradients — the drawing carries it. */
+/* ── Hero: asymmetric, illustration-led, with a soft green glow behind. ────── */
 .hero {
   padding-block: clamp(var(--space-8), 9vw, var(--space-12));
 }
@@ -25,11 +25,11 @@
 }
 
 .hero__title {
-  font-size: clamp(2.5rem, 6.4vw, 4.2rem);
+  font-size: clamp(2.6rem, 6.6vw, 4.4rem);
 }
 
 .hero__sub {
-  max-inline-size: 40ch;
+  max-inline-size: 42ch;
   margin-block-end: var(--space-6);
 }
 
@@ -42,8 +42,23 @@
 .hero__trust {
   margin-block-start: var(--space-6);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text-muted);
+}
+
+.hero__media {
+  position: relative;
+  isolation: isolate;
+}
+
+/* A soft green halo that sits behind the photo. */
+.hero__glow {
+  position: absolute;
+  inset: -8% -6% -12% -6%;
+  z-index: -1;
+  background: radial-gradient(60% 60% at 70% 30%, rgba(31, 146, 84, 0.22), transparent 70%),
+    radial-gradient(50% 50% at 20% 90%, rgba(210, 154, 35, 0.16), transparent 70%);
+  filter: blur(8px);
 }
 
 .hero__photo {
@@ -52,7 +67,7 @@
   aspect-ratio: 3 / 2;
   object-fit: cover;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
 }
 
 /* ── Editorial divider ────────────────────────────────────────────────────── */
@@ -69,10 +84,19 @@
 .rule__line {
   flex: 1;
   block-size: 1px;
-  background: var(--color-border);
+  background: linear-gradient(
+    to var(--rule-dir, right),
+    transparent,
+    var(--color-border) 50%,
+    transparent
+  );
 }
 
-/* ── Process: real numbered sequence, each course with its own line mark. ──── */
+.rule__mark {
+  color: var(--color-gold);
+}
+
+/* ── Process: numbered course cards, each lifting on hover. ────────────────── */
 .home__h2 {
   margin-block: var(--space-3) var(--space-8);
   max-inline-size: 26ch;
@@ -80,7 +104,7 @@
 
 .home__steps {
   display: grid;
-  gap: var(--space-8);
+  gap: var(--space-5);
   list-style: none;
 }
 
@@ -110,17 +134,17 @@
   inline-size: 3rem;
   block-size: 3rem;
   border-radius: 50%;
-  color: var(--color-accent);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  color: var(--color-accent-strong);
+  background: var(--color-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 22%, transparent);
   flex-shrink: 0;
 }
 
 .home__step-num {
   font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--color-olive);
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--color-olive-soft);
   font-feature-settings: "tnum";
   line-height: 1;
 }
@@ -143,14 +167,14 @@
 }
 
 .home__trust-copy {
-  padding: var(--space-6);
+  padding: clamp(var(--space-6), 4vw, var(--space-8));
 }
 
 .home__trust-img {
   display: none;
   inline-size: 100%;
   block-size: 100%;
-  min-block-size: 320px;
+  min-block-size: 340px;
   object-fit: cover;
 }
 
@@ -175,21 +199,23 @@
   gap: var(--space-3);
   align-items: flex-start;
   color: var(--color-text);
+  font-weight: 500;
 }
 
 .home__list-icon {
   flex-shrink: 0;
-  color: var(--color-olive);
+  color: var(--color-accent);
   margin-block-start: 0.1em;
 }
 
 /* ── Closing band: a candlelit table photo with a warm overlay + CTA. ──────── */
 .closing {
+  position: relative;
   margin-block-start: var(--space-10);
   background-image: linear-gradient(
       to bottom,
-      rgba(18, 44, 30, 0.55),
-      rgba(18, 44, 30, 0.7)
+      rgba(12, 38, 24, 0.62),
+      rgba(12, 38, 24, 0.78)
     ),
     url("/images/og.png");
   background-size: cover;
@@ -200,15 +226,23 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-5);
+  gap: var(--space-4);
   padding-block: clamp(var(--space-10), 12vw, var(--space-12));
 }
 
 .closing__eyebrow {
-  color: var(--color-saffron-soft);
+  color: var(--color-gold-soft);
 }
 
 .closing__title {
-  color: #fdf3ec;
+  color: #ffffff;
   max-inline-size: 18ch;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+}
+
+.closing__sub {
+  color: rgba(255, 255, 255, 0.9);
+  max-inline-size: 40ch;
+  margin-block-end: var(--space-2);
+  font-size: 1.1rem;
 }

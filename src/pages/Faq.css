@@ -1,0 +1,76 @@
+.faq__sub {
+  margin-block: var(--space-4) var(--space-8);
+}
+
+.faq__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-inline-size: 760px;
+}
+
+.faq__item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+}
+
+.faq__item[open] {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.faq__q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-text);
+  list-style: none;
+}
+
+/* Hide the native disclosure triangle. */
+.faq__q::-webkit-details-marker {
+  display: none;
+}
+
+/* A drawn +/− toggle. */
+.faq__icon {
+  position: relative;
+  flex-shrink: 0;
+  inline-size: 1.4rem;
+  block-size: 1.4rem;
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+}
+.faq__icon::before,
+.faq__icon::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 0.7rem;
+  block-size: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-strong);
+  transform: translate(-50%, -50%);
+  transition: transform var(--duration) var(--ease);
+}
+.faq__icon::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+.faq__item[open] .faq__icon::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.faq__a {
+  margin-block-start: var(--space-3);
+  line-height: 1.7;
+}

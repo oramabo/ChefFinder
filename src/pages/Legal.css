@@ -13,8 +13,22 @@
 }
 
 .legal h2 {
-  margin-block: var(--space-6) var(--space-3);
-  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block: var(--space-8) var(--space-3);
+  font-size: 1.3rem;
+  color: var(--color-text);
+}
+
+/* A short gradient tick before each section heading. */
+.legal h2::before {
+  content: "";
+  inline-size: 0.7rem;
+  block-size: 1.25rem;
+  border-radius: var(--radius-pill);
+  background-image: var(--gradient-accent);
+  flex-shrink: 0;
 }
 
 .legal p {
@@ -33,6 +47,7 @@
 }
 
 .legal a {
-  color: var(--color-primary, inherit);
+  color: var(--color-accent-strong);
   text-decoration: underline;
+  text-underline-offset: 0.15em;
 }

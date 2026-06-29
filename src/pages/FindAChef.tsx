@@ -149,11 +149,14 @@ export default function FindAChef() {
       />
       <p className="eyebrow">בקשת שף</p>
       <h1>בואו נמצא לכם שף</h1>
-      <p className="findachef__sub">כמה פרטים קצרים — ועד שלושה שפים יחזרו אליכם עם הצעה.</p>
+      <p className="findachef__sub">
+        רק כמה פרטים — ותוך זמן קצר עד שלושה שפים יחזרו אליכם עם הצעה אישית.
+      </p>
 
-      <div className="card findachef__card">
+      <div className="card card--raised findachef__card">
         <Stepper steps={STEP_LABELS} current={step} />
 
+        <div className="findachef__step" key={step}>
         {step === 0 && (
           <Field label="סוג האירוע">
             <OptionGroup
@@ -230,7 +233,7 @@ export default function FindAChef() {
                 checked={form.kosher}
                 onChange={(e) => set("kosher", e.target.checked)}
               />
-              <span>נדרש מטבח כשר</span>
+              <span>האירוע דורש מטבח כשר</span>
             </label>
           </>
         )}
@@ -270,6 +273,7 @@ export default function FindAChef() {
             </p>
           </>
         )}
+        </div>
 
         {error && <p className="findachef__error">{error}</p>}
 

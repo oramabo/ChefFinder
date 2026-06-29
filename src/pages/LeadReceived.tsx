@@ -1,24 +1,29 @@
 import Seo from "../components/Seo.tsx";
 import { LinkButton } from "../components/Button.tsx";
+import "./LeadReceived.css";
 
 export default function LeadReceived() {
   return (
     <div className="section container">
       <Seo title="הבקשה התקבלה — השף שלי" noindex />
-      <div className="card" style={{ maxInlineSize: 640 }}>
-        <h1>קיבלנו את הבקשה ✓</h1>
-        <p className="lead-text" style={{ marginBlock: "var(--space-4)" }}>
-          עד <strong className="accent">3 שפים מקצועיים</strong> יחזרו אליכם בקרוב
-          עם הצעה מותאמת לאירוע. שמרו על הטלפון בהישג יד.
+      <div className="card card--raised leadreceived">
+        <span className="leadreceived__medallion" aria-hidden="true">
+          ✓
+        </span>
+        <p className="eyebrow leadreceived__eyebrow">הבקשה נשלחה</p>
+        <h1 className="leadreceived__title">קיבלנו את הבקשה!</h1>
+        <p className="lead-text leadreceived__lead">
+          עד <strong className="accent">3 שפים מקצועיים</strong> יחזרו אליכם בקרוב עם
+          הצעה אישית לאירוע. שווה לשמור את הטלפון בהישג יד.
         </p>
-        <p style={{ marginBlock: "var(--space-4)" }}>
-          בינתיים תוכלו לקרוא עוד על איך השירות עובד.
+        <p className="leadreceived__note">
+          בינתיים, אתם מוזמנים לקרוא איך השירות עובד ולמה כדאי.
         </p>
-        <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
-          <LinkButton to="/how-it-works" variant="primary">
+        <div className="leadreceived__cta">
+          <LinkButton to="/how-it-works" variant="primary" size="lg">
             איך זה עובד
           </LinkButton>
-          <LinkButton to="/" variant="ghost">
+          <LinkButton to="/" variant="ghost" size="lg">
             לדף הבית
           </LinkButton>
         </div>

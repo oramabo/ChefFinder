@@ -1,4 +1,5 @@
 import Seo from "../components/Seo.tsx";
+import "./Faq.css";
 
 const FAQS = [
   {
@@ -34,18 +35,23 @@ export default function Faq() {
     })),
   };
   return (
-    <div className="section container">
+    <div className="section container faq">
       <Seo
         title="שאלות נפוצות | שף פרטי לאירוע — השף שלי"
         description="כל מה שצריך לדעת על הזמנת שף פרטי לאירוע: מחירים, זמני מענה, כשרות ועוד."
         jsonLd={jsonLd}
       />
+      <p className="eyebrow">שאלות ותשובות</p>
       <h1>שאלות נפוצות</h1>
-      <div style={{ marginBlockStart: "var(--space-6)", maxInlineSize: 760 }}>
+      <p className="lead-text faq__sub">כל מה שכדאי לדעת לפני שמזמינים שף פרטי.</p>
+      <div className="faq__list">
         {FAQS.map((f) => (
-          <details className="card" key={f.q} style={{ marginBlockEnd: "var(--space-3)" }}>
-            <summary style={{ fontWeight: 700, cursor: "pointer" }}>{f.q}</summary>
-            <p style={{ marginBlockStart: "var(--space-3)" }}>{f.a}</p>
+          <details className="faq__item" key={f.q}>
+            <summary className="faq__q">
+              <span>{f.q}</span>
+              <span className="faq__icon" aria-hidden="true" />
+            </summary>
+            <p className="faq__a">{f.a}</p>
           </details>
         ))}
       </div>

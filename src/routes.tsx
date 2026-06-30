@@ -22,7 +22,11 @@ const seoRoutes: RouteRecord[] = allSeoPages().map((p) => ({
   Component: ProgrammaticPage,
 }));
 
-export const routes: RouteRecord[] = [
+// The chef marketplace site. This is the full route tree, prerendered at build
+// time and served on the chef host (chefs.ezfind.app) and the *.workers.dev URL.
+// The umbrella "/join" landing is included here too so it is prerendered to
+// dist/join.html — the Worker serves that file at the ezfind.app apex.
+const chefRoutes: RouteRecord[] = [
   {
     path: "/",
     element: <Layout />,
@@ -45,6 +49,21 @@ export const routes: RouteRecord[] = [
     ],
   },
   // The ezfind umbrella "join the network" landing — a top-level route with its
-  // own chrome (no chef Header/Footer), intended for the ezfind.app apex.
+  // own chrome (no chef Header/Footer). Prerendered to dist/join.html.
   { path: "join", Component: EzfindJoin },
 ];
+
+// On the ezfind.app apex host, the site IS the join landing. We render it at the
+// root so it hydrates cleanly against the dist/join.html that the Worker serves
+// there. (Prerendering runs without a window, so the build always uses
+// chefRoutes and emits every chef page + join.html as before.)
+const EZFIND_APEX_HOSTS = new Set(["ezfind.app", "www.ezfind.app"]);
+const isEzfindApex =
+  typeof window !== "undefined" && EZFIND_APEX_HOSTS.has(window.location.hostname);
+
+const ezfindRoutes: RouteRecord[] = [
+  { path: "/", Component: EzfindJoin },
+  { path: "*", Component: EzfindJoin },
+];
+
+export const routes: RouteRecord[] = isEzfindApex ? ezfindRoutes : chefRoutes;

@@ -188,8 +188,8 @@
   margin-block-start: var(--space-10);
   background-image: linear-gradient(
       to bottom,
-      rgba(58, 18, 22, 0.55),
-      rgba(58, 18, 22, 0.7)
+      rgba(40, 24, 70, 0.55),
+      rgba(40, 24, 70, 0.7)
     ),
     url("/images/og.png");
   background-size: cover;

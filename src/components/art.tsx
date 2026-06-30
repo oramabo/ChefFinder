@@ -105,11 +105,11 @@ export function HeroPlate(props: IconProps) {
 
       {/* served bite: olive sprig, pomegranate berries, a saffron seed */}
       <g strokeLinecap="round">
-        <path d="M180 224V168" stroke="#7a2a30" strokeWidth="2.6" />
-        <path d="M180 188c8-2 14-8 17-16M180 202c-8-2-14-8-17-16" stroke="#7a2a30" strokeWidth="2.6" />
-        <circle cx="164" cy="172" r="6.5" fill="#8c2233" />
-        <circle cx="196" cy="172" r="6.5" fill="#8c2233" />
-        <circle cx="180" cy="154" r="6.5" fill="#8c2233" />
+        <path d="M180 224V168" stroke="#6d3f9c" strokeWidth="2.6" />
+        <path d="M180 188c8-2 14-8 17-16M180 202c-8-2-14-8-17-16" stroke="#6d3f9c" strokeWidth="2.6" />
+        <circle cx="164" cy="172" r="6.5" fill="#9b2d8a" />
+        <circle cx="196" cy="172" r="6.5" fill="#9b2d8a" />
+        <circle cx="180" cy="154" r="6.5" fill="#9b2d8a" />
         <circle cx="180" cy="214" r="3.6" fill="#d99a2b" />
       </g>
     </svg>

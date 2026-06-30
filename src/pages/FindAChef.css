@@ -23,7 +23,7 @@
 
 .findachef__check:has(input:checked) {
   border-color: var(--color-accent);
-  background: rgba(168, 31, 43, 0.06);
+  background: rgba(124, 58, 237, 0.06);
 }
 
 .findachef__check input {

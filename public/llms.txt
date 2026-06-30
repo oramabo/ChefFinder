@@ -1,0 +1,28 @@
+# ezfind
+
+> ezfind is a Hebrew-first local-services marketplace in Israel that connects customers with top local professionals. It has two entry points: customers find vetted private chefs for events, and professionals join the network to receive real customer leads. Using ezfind is free, with no commitment. ezfind מחברת בין לקוחות בישראל לבעלי מקצוע מובילים.
+
+ezfind operates across all of Israel (בכל רחבי ישראל) and serves users in Hebrew. There is no signup fee for either customers or professionals.
+
+## Services
+
+- [Find a private chef — ezfind שפים](https://chefs.ezfind.app/): Customers looking to hire a private chef (שף פרטי) for an event describe the event — type, date, city, and number of guests — and ezfind matches them with suitable private chefs in their area. Free, no commitment. Covers private events, family meals, and celebrations across Israel.
+- [Join the network — for professionals](https://ezfind.app/): Service professionals (private chefs, caterers, photographers, DJs/musicians, event planners, beauty, cleaning, and more) sign up to receive real, relevant customer leads in their area. Free registration.
+
+## How it works
+
+- A customer fills a short request form with their event details.
+- ezfind matches the request to relevant professionals nearby and sends it to them.
+- The customer is contacted by suitable professionals and chooses who to hire.
+
+## Key facts
+
+- Area served: all of Israel (כל רחבי ישראל).
+- Language: Hebrew.
+- Cost: free for customers to request, and free for professionals to join.
+- Primary service highlighted: hiring a private chef for events.
+
+## Notes for crawlers
+
+- Public, indexable pages: the two landings above.
+- Excluded (private): /admin (operator panel), /api/ (endpoints), and /lead/ (per-lead pages).

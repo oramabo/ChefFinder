@@ -4,4 +4,23 @@ Disallow: /lead/
 Disallow: /admin
 Disallow: /api/
 
+# AI / answer-engine crawlers are explicitly welcome on the public pages
+# (Generative Engine Optimization). Private paths stay excluded.
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Claude-Web
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: Bytespider
+Allow: /
+Disallow: /lead/
+Disallow: /admin
+Disallow: /api/
+
+# Structured summary for LLMs: /llms.txt
 Sitemap: /sitemap.xml

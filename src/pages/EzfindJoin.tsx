@@ -13,11 +13,13 @@ const config: LandingConfig = {
     {
       "@context": "https://schema.org",
       "@type": "Organization",
+      "@id": "https://ezfind.app/#organization",
       name: "ezfind",
       url: "https://ezfind.app",
       logo: "https://ezfind.app/favicon.svg",
       description: "ezfind מחברת לקוחות עם בעלי מקצוע מובילים בישראל.",
       areaServed: { "@type": "Country", name: "Israel" },
+      knowsAbout: ["שף פרטי", "קייטרינג", "צילום אירועים", "הפקת אירועים"],
     },
     {
       "@context": "https://schema.org",

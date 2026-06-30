@@ -18,8 +18,10 @@ const config: LandingConfig = {
     name: "מציאת שף פרטי לאירוע",
     description:
       "שירות התאמת שפים פרטיים לאירועים פרטיים, ארוחות וחגיגות בכל רחבי ישראל.",
+    inLanguage: "he",
     provider: {
       "@type": "Organization",
+      "@id": "https://ezfind.app/#organization",
       name: "ezfind",
       url: "https://ezfind.app",
       logo: "https://ezfind.app/favicon.svg",

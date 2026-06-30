@@ -4,7 +4,7 @@ import LandingPage, { type LandingConfig } from "../components/LandingPage.tsx";
 // scoped to chefs. Served at the chefs.ezfind.app root. Submissions flow into
 // the same join intake (category "chef") and appear in the admin applicants.
 const config: LandingConfig = {
-  brandSuffix: "שפים",
+  // Same "ezfind" wordmark as the main page (no suffix).
   seoTitle: "ezfind שפים — קבלו לקוחות חדשים למטבח שלכם",
   seoDescription:
     "ezfind שפים מחברת שפים פרטיים עם לקוחות שמחפשים שף לאירוע. הצטרפו וקבלו פניות אמיתיות מהאזור שלכם — הרשמה חינם, בלי התחייבות.",

@@ -2,7 +2,24 @@ import type {
   LeadStatus,
   PurchaseStatus,
   ReserveReason,
+  JoinStatus,
 } from "./constants.ts";
+
+// A professional/business who applied to join the ezfind network via the
+// umbrella landing form. Managed by an operator in the admin panel.
+export interface JoinApplication {
+  id: string;
+  full_name: string;
+  business_name: string | null;
+  category: string;
+  city: string;
+  phone: string;
+  email: string | null;
+  message: string | null;
+  source: string | null;
+  status: JoinStatus;
+  created_at: string;
+}
 
 // Full lead row (server-side; contains PII).
 export interface Lead {

@@ -11,9 +11,16 @@ directory = "./dist"
 binding = "ASSETS"
 # Unmatched paths (e.g. /lead/:token) serve the SPA shell (index.html, 200).
 not_found_handling = "single-page-application"
-# Force these paths to the Worker even though no static file matches them —
-# otherwise `not_found_handling` would serve index.html for /api/* too.
-run_worker_first = ["/api/*", "/sitemap.xml"]
+# Run the Worker for EVERY request. This is required for host-based routing:
+# the Worker serves a different prerendered page per hostname (ezfind.app ->
+# the landing, admin.ezfind.app -> the admin panel) and falls back to the
+# static assets (via the ASSETS binding) for the chef host and all asset
+# requests. With the previous path-scoped form, navigation requests like "/"
+# matched a static file and were served WITHOUT invoking the Worker, so the
+# per-host logic never ran. `true` puts the Worker in front of everything; it
+# still serves assets through `env.ASSETS.fetch`, so SPA fallback and
+# `_headers` continue to work.
+run_worker_first = true
 
 # Non-secret runtime variables. These live here (not the dashboard) on purpose:
 # Workers Builds runs `wrangler deploy` on every push, and a deploy resets

@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import Seo from "../components/Seo.tsx";
-import Badge from "../components/Badge.tsx";
-import { Button } from "../components/Button.tsx";
-import { Field, TextInput } from "../components/Field.tsx";
+import Badge from "../../components/Badge.tsx";
+import { Button } from "../../components/Button.tsx";
 import {
   listRecentLeads,
   resendNotify,
@@ -11,30 +9,29 @@ import {
   type AdminLead,
   type NotifyChannel,
   type PendingPurchase,
-} from "../lib/api.ts";
+} from "../../lib/api.ts";
 import { EVENT_TYPES } from "@shared/constants.ts";
-import { formatDate, formatCurrency } from "../lib/format.ts";
-import "./Admin.css";
+import { formatDate, formatCurrency } from "../../lib/format.ts";
 
 const eventHe = (slug: string | null) =>
   EVENT_TYPES.find((e) => e.slug === slug)?.he ?? slug ?? "—";
-
-const tokenKey = "admin_token";
 
 function leadLink(token: string): string {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   return `${origin}/lead/${token}`;
 }
 
-export default function Admin() {
-  const [token, setToken] = useState("");
+interface Props {
+  token: string;
+  onUnauthorized: () => void;
+}
+
+export default function LeadsSection({ token, onUnauthorized }: Props) {
   const [leads, setLeads] = useState<AdminLead[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  // Per-lead transient action feedback (re-send / copy), keyed by lead_token.
   const [rowMsg, setRowMsg] = useState<Record<string, string>>({});
   const [busyKey, setBusyKey] = useState<string | null>(null);
-  // Manual Bit: pending payments awaiting approval.
   const [pending, setPending] = useState<PendingPurchase[] | null>(null);
   const [pendingMsg, setPendingMsg] = useState("");
   const [approveBusy, setApproveBusy] = useState<string | null>(null);
@@ -67,7 +64,6 @@ export default function Admin() {
       await navigator.clipboard.writeText(link);
       setMsg(leadToken, "הקישור הועתק ✓");
     } catch {
-      // Clipboard API unavailable (e.g. insecure context) — surface the link.
       setMsg(leadToken, link);
     }
   }, []);
@@ -112,6 +108,7 @@ export default function Admin() {
         if (status === 401) {
           setError("אסימון שגוי או חסר.");
           setLeads(null);
+          onUnauthorized();
           return;
         }
         if (!body.ok || !body.leads) {
@@ -119,7 +116,6 @@ export default function Admin() {
           return;
         }
         setLeads(body.leads);
-        if (typeof window !== "undefined") localStorage.setItem(tokenKey, t);
         void loadPending(t);
       } catch {
         setError("שגיאת רשת.");
@@ -127,36 +123,19 @@ export default function Admin() {
         setLoading(false);
       }
     },
-    [loadPending],
+    [loadPending, onUnauthorized],
   );
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const saved = localStorage.getItem(tokenKey);
-    if (saved) {
-      setToken(saved);
-      void load(saved);
-    }
-  }, [load]);
+    if (token) void load(token);
+  }, [token, load]);
 
   return (
-    <div className="section container admin">
-      <Seo title="ניהול — לידים אחרונים" noindex />
-      <h1>לידים אחרונים</h1>
-      <p className="admin__note">תצוגת מנהל לקריאה בלבד. דורש אסימון גישה.</p>
-
-      <div className="admin__bar">
-        <Field label="אסימון מנהל" htmlFor="admin_token">
-          <TextInput
-            id="admin_token"
-            type="password"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            placeholder="ADMIN_TOKEN"
-          />
-        </Field>
-        <Button type="button" onClick={() => load(token)} disabled={loading}>
-          {loading ? "טוען…" : "טעינה"}
+    <div className="admin">
+      <div className="admin__head">
+        <h1>לידים אחרונים</h1>
+        <Button type="button" variant="ghost" onClick={() => load(token)} disabled={loading}>
+          {loading ? "טוען…" : "רענון"}
         </Button>
       </div>
 

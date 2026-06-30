@@ -25,6 +25,8 @@ import { onRequestGet as adminLeads } from "../functions/api/admin/leads.ts";
 import { onRequestPost as adminNotify } from "../functions/api/admin/notify.ts";
 import { onRequestPost as adminConfirm } from "../functions/api/admin/confirm.ts";
 import { onRequestGet as adminPending } from "../functions/api/admin/pending.ts";
+import { onRequestGet as adminJoinApps } from "../functions/api/admin/joinApplications.ts";
+import { onRequestPost as adminJoinAppStatus } from "../functions/api/admin/joinApplicationStatus.ts";
 import { onRequestPost as submitJoin } from "../functions/api/join.ts";
 import { onRequestGet as sitemap } from "../functions/sitemap.xml.ts";
 
@@ -62,6 +64,8 @@ const routes: Route[] = [
   { method: "POST", pattern: "/api/admin/lead/:token/notify", handler: adminNotify },
   { method: "POST", pattern: "/api/admin/purchase/:ref/confirm", handler: adminConfirm },
   { method: "GET", pattern: "/api/admin/pending", handler: adminPending },
+  { method: "GET", pattern: "/api/admin/join-applications", handler: adminJoinApps },
+  { method: "POST", pattern: "/api/admin/join-application/:id/status", handler: adminJoinAppStatus },
   { method: "GET", pattern: "/sitemap.xml", handler: sitemap },
 ];
 
@@ -69,10 +73,18 @@ const routes: Route[] = [
 // Worker-generated API/XML responses carry the same hardening that static and
 // HTML responses get from the assets layer. CSP is intentionally omitted here —
 // it is meaningful only for HTML, which this Worker never serves.
-// Hosts whose apex serves the ezfind "join the network" landing instead of the
-// chef site. Both custom domains point at this one Worker; it differentiates by
+// Per-host root: which prerendered page a hostname's apex serves instead of the
+// chef site. All custom domains point at this one Worker; it differentiates by
 // hostname. Keep in sync with the client routing in `src/routes.tsx`.
-const EZFIND_APEX_HOSTS = new Set(["ezfind.app", "www.ezfind.app"]);
+//   ezfind.app        → the "join the network" landing
+//   admin.ezfind.app  → the operator admin panel
+// The chef host (chefs.ezfind.app) and *.workers.dev are not listed and serve
+// the chef site as before.
+const HOST_ROOT: Record<string, string> = {
+  "ezfind.app": "/join",
+  "www.ezfind.app": "/join",
+  "admin.ezfind.app": "/admin",
+};
 
 const SECURITY_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
@@ -149,15 +161,15 @@ export default {
       return runWithMiddleware(matched.route.handler, fnCtx);
     }
 
-    // Host-based serving for the ezfind umbrella apex (ezfind.app): the site is
-    // the "join the network" landing, so navigation requests are served the
-    // prerendered dist/join.html. Static assets (anything with a file extension:
-    // .js/.css/.svg/.woff2/…) pass straight through so the page's JS/CSS/fonts
-    // still load. The chef host (chefs.ezfind.app) and *.workers.dev are
-    // untouched and serve the chef site as before.
-    if (EZFIND_APEX_HOSTS.has(url.hostname) && !/\.[a-z0-9]+$/i.test(path)) {
-      const landing = new URL("/join", url.origin);
-      return env.ASSETS.fetch(new Request(landing.toString(), request));
+    // Host-based serving for the umbrella custom domains: a navigation request
+    // is served that host's prerendered root page (ezfind.app → the landing,
+    // admin.ezfind.app → the admin panel). Static assets (anything with a file
+    // extension: .js/.css/.svg/.woff2/…) pass straight through so the page's
+    // JS/CSS/fonts still load. The chef host and *.workers.dev are untouched.
+    const hostRoot = HOST_ROOT[url.hostname];
+    if (hostRoot && !/\.[a-z0-9]+$/i.test(path)) {
+      const rootPage = new URL(hostRoot, url.origin);
+      return env.ASSETS.fetch(new Request(rootPage.toString(), request));
     }
 
     // Not an API/sitemap route. With `run_worker_first` scoped to those paths

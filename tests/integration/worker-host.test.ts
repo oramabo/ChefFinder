@@ -34,6 +34,15 @@ describe("Worker host-based serving", () => {
     expect(await (await get("https://ezfind.app/favicon.svg")).text()).toBe("/favicon.svg");
   });
 
+  it("serves the admin panel at the admin.ezfind.app apex", async () => {
+    expect(await (await get("https://admin.ezfind.app/")).text()).toBe("/admin");
+    expect(await (await get("https://admin.ezfind.app/anything")).text()).toBe("/admin");
+    // Assets still pass through on the admin host.
+    expect(await (await get("https://admin.ezfind.app/assets/app-abc.js")).text()).toBe(
+      "/assets/app-abc.js",
+    );
+  });
+
   it("serves the chef site untouched on the chef host and workers.dev", async () => {
     expect(await (await get("https://chefs.ezfind.app/")).text()).toBe("/");
     expect(await (await get("https://cheffinder.example.workers.dev/")).text()).toBe("/");

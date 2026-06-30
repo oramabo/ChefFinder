@@ -1,3 +1,74 @@
+/* ── Admin panel shell (standalone, served at admin.ezfind.app) ───────────── */
+.adminshell {
+  min-block-size: 100%;
+}
+.adminshell__bar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 10;
+  background: rgba(248, 245, 252, 0.85);
+  backdrop-filter: blur(10px) saturate(1.3);
+  border-block-end: 1px solid var(--color-border);
+}
+.adminshell__bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-3);
+}
+.adminshell__brand {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+.adminshell__brand-accent {
+  color: var(--color-accent);
+}
+.adminshell__logout {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: var(--space-1) var(--space-2);
+}
+.adminshell__logout:hover {
+  color: var(--color-accent);
+}
+.adminshell__login {
+  max-inline-size: 420px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.adminshell__tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-block-end: var(--space-6);
+  border-block-end: 1px solid var(--color-border);
+}
+.adminshell__tab {
+  padding: var(--space-3) var(--space-4);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-block-end: 2px solid transparent;
+  margin-block-end: -1px;
+}
+.adminshell__tab:hover {
+  color: var(--color-text);
+}
+.adminshell__tab.is-active {
+  color: var(--color-accent);
+  border-block-end-color: var(--color-accent);
+}
+.admin__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-block-end: var(--space-2);
+}
+
 .admin__note {
   margin-block: var(--space-3) var(--space-5);
 }

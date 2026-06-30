@@ -51,6 +51,15 @@ export const BUDGET_BANDS = [
   { value: 12000, he: "₪8,000 ומעלה" },
 ] as const;
 
+// Lifecycle status of a join application, managed by an operator in the admin.
+export const JOIN_STATUS = {
+  new: "new",
+  contacted: "contacted",
+  approved: "approved",
+  rejected: "rejected",
+} as const;
+export type JoinStatus = (typeof JOIN_STATUS)[keyof typeof JOIN_STATUS];
+
 // Service categories offered across the ezfind network. Used by the umbrella
 // "join the service" landing form (slug + Hebrew label).
 export const JOIN_CATEGORIES = [

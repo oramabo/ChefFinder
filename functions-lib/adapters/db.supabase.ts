@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { Lead, Purchase, ReserveResult } from "@shared/types.ts";
-import { RESERVE_REASON } from "@shared/constants.ts";
-import type { DbPort, InsertLeadInput } from "../ports/db.ts";
+import type { Lead, Purchase, ReserveResult, JoinApplication } from "@shared/types.ts";
+import { RESERVE_REASON, type JoinStatus } from "@shared/constants.ts";
+import type { DbPort, InsertLeadInput, InsertJoinApplicationInput } from "../ports/db.ts";
 
 export function createSupabaseDb(url: string, serviceKey: string): DbPort {
   const sb: SupabaseClient = createClient(url, serviceKey, {
@@ -139,6 +139,36 @@ export function createSupabaseDb(url: string, serviceKey: string): DbPort {
       });
       if (error) throw new Error(`sweepStale: ${error.message}`);
       return Number(data ?? 0);
+    },
+
+    async insertJoinApplication(input: InsertJoinApplicationInput): Promise<JoinApplication> {
+      const { data, error } = await sb
+        .from("join_applications")
+        .insert(input)
+        .select("*")
+        .single();
+      if (error) throw new Error(`insertJoinApplication: ${error.message}`);
+      return data as JoinApplication;
+    },
+
+    async listJoinApplications(limit: number): Promise<JoinApplication[]> {
+      const { data, error } = await sb
+        .from("join_applications")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (error) throw new Error(`listJoinApplications: ${error.message}`);
+      return (data as JoinApplication[]) ?? [];
+    },
+
+    async updateJoinApplicationStatus(id: string, status: JoinStatus): Promise<boolean> {
+      const { data, error } = await sb
+        .from("join_applications")
+        .update({ status })
+        .eq("id", id)
+        .select("id");
+      if (error) throw new Error(`updateJoinApplicationStatus: ${error.message}`);
+      return (data?.length ?? 0) > 0;
     },
   };
 }

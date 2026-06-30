@@ -51,6 +51,19 @@ export const BUDGET_BANDS = [
   { value: 12000, he: "₪8,000 ומעלה" },
 ] as const;
 
+// Service categories offered across the ezfind network. Used by the umbrella
+// "join the service" landing form (slug + Hebrew label).
+export const JOIN_CATEGORIES = [
+  { slug: "chef", he: "שף פרטי" },
+  { slug: "catering", he: "קייטרינג" },
+  { slug: "photography", he: "צילום" },
+  { slug: "music-dj", he: "מוזיקה / דיג'יי" },
+  { slug: "events", he: "הפקת אירועים" },
+  { slug: "beauty", he: "יופי ואיפור" },
+  { slug: "cleaning", he: "ניקיון" },
+  { slug: "other", he: "אחר" },
+] as const;
+
 export const CUISINES = [
   { slug: "italian", he: "איטלקי" },
   { slug: "mediterranean", he: "ים תיכוני" },

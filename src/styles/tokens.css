@@ -1,26 +1,26 @@
 :root {
-  /* ── השף שלי — "warm & deep red" ──────────────────────────────────────────
-     Warm and confident. White/blush field, a deep elegant red as the brand
-     voice, a richer crimson secondary, and a warm gold accent used sparingly
-     for a celebratory touch. All text pairings verified for WCAG AA. */
-  --color-bg: #fcf5f5; /* soft blush white */
+  /* ── השף שלי — "bright & summer violet" ───────────────────────────────────
+     Happy, sunny and light. White/lilac field, a vivid joyful violet as the
+     brand voice, a plum secondary, and a warm sunny gold accent used as a
+     cheerful pop. All text pairings verified for WCAG AA. */
+  --color-bg: #f8f5fc; /* soft lilac white */
   --color-surface: #ffffff; /* clean white (cards) */
-  --color-surface-2: #f6e8e8; /* sunk wells / inputs */
-  --color-border: #e7d3d3; /* soft red-grey */
+  --color-surface-2: #efe9f8; /* sunk wells / inputs */
+  --color-border: #e0d6f0; /* soft violet-grey */
 
-  --color-text: #2a1414; /* deep red-charcoal (contrast > 12:1) */
-  --color-text-muted: #6a5151; /* muted red-grey (contrast > 4.6:1) */
+  --color-text: #211433; /* deep violet-charcoal (contrast > 12:1) */
+  --color-text-muted: #5f5577; /* muted violet-grey (contrast > 4.6:1) */
 
-  /* Deep red — the brand primary (buttons, links, emphasis). */
-  --color-accent: #a81f2b;
-  --color-accent-strong: #82131d; /* darker for hover */
-  --color-accent-contrast: #ffffff; /* white on red */
+  /* Vivid violet — the brand primary (buttons, links, emphasis). */
+  --color-accent: #7c3aed;
+  --color-accent-strong: #6d28d9; /* darker for hover */
+  --color-accent-contrast: #ffffff; /* white on violet */
 
-  /* Rich crimson — steady secondary (eyebrows, tags, quiet structure). */
-  --color-olive: #7a2a30;
-  --color-olive-soft: #b07a7e;
+  /* Plum — steady secondary (eyebrows, tags, quiet structure). */
+  --color-olive: #6d3f9c;
+  --color-olive-soft: #b79ad6;
 
-  /* Warm gold — the celebratory accent. Used with restraint. */
+  /* Warm sunny gold — the celebratory accent. Used with restraint. */
   --color-saffron: #d9a52b;
   --color-saffron-soft: #ecd6a0;
 
@@ -49,9 +49,9 @@
   --radius-lg: 18px;
   --radius-pill: 999px;
 
-  /* Soft red-tinted shadows. */
-  --shadow: 0 18px 44px -24px rgba(80, 20, 26, 0.4);
-  --shadow-sm: 0 4px 16px -8px rgba(80, 20, 26, 0.28);
+  /* Soft violet-tinted shadows. */
+  --shadow: 0 18px 44px -24px rgba(70, 40, 130, 0.4);
+  --shadow-sm: 0 4px 16px -8px rgba(70, 40, 130, 0.28);
 
   --maxw: 1120px;
 }

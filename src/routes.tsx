@@ -1,6 +1,5 @@
 import type { RouteRecord } from "vite-react-ssg";
 import Layout from "./components/Layout.tsx";
-import Home from "./pages/Home.tsx";
 import FindAChef from "./pages/FindAChef.tsx";
 import LeadReceived from "./pages/LeadReceived.tsx";
 import LeadUnlock from "./pages/LeadUnlock.tsx";
@@ -12,6 +11,7 @@ import Terms from "./pages/Terms.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AdminPanel from "./pages/AdminPanel.tsx";
 import EzfindJoin from "./pages/EzfindJoin.tsx";
+import EzfindChefs from "./pages/EzfindChefs.tsx";
 import ProgrammaticPage from "./pages/programmatic/ProgrammaticPage.tsx";
 import { allSeoPages } from "@shared/seo/pages.ts";
 
@@ -22,16 +22,20 @@ const seoRoutes: RouteRecord[] = allSeoPages().map((p) => ({
   Component: ProgrammaticPage,
 }));
 
-// The chef marketplace site. This is the full route tree, prerendered at build
-// time and served on the chef host (chefs.ezfind.app) and the *.workers.dev URL.
-// The umbrella "/join" landing is included here too so it is prerendered to
-// dist/join.html — the Worker serves that file at the ezfind.app apex.
+// The chef host (chefs.ezfind.app) and *.workers.dev. The front page ("/") is
+// the ezfind שפים landing — a simple standalone page mirroring the umbrella
+// ezfind.app landing. The marketplace's functional pages (find-a-chef, lead
+// unlock, info pages, programmatic SEO) keep the chef Header/Footer and remain
+// reachable beneath it. All are prerendered at build time.
 const chefRoutes: RouteRecord[] = [
+  // Front page: the ezfind שפים landing, standalone (its own chrome). Prerendered
+  // to dist/index.html and served at the chefs.ezfind.app root.
+  { path: "/", Component: EzfindChefs },
+  // Marketplace pages — a pathless layout route so they nest under the chef
+  // Header/Footer without owning "/".
   {
-    path: "/",
     element: <Layout />,
     children: [
-      { index: true, Component: Home },
       { path: "find-a-chef", Component: FindAChef },
       { path: "lead-received", Component: LeadReceived },
       { path: "chefs", Component: Chefs },
@@ -45,8 +49,8 @@ const chefRoutes: RouteRecord[] = [
       { path: "*", Component: NotFound },
     ],
   },
-  // The ezfind umbrella "join the network" landing — a top-level route with its
-  // own chrome (no chef Header/Footer). Prerendered to dist/join.html.
+  // The ezfind umbrella "join the network" landing — its own chrome. Prerendered
+  // to dist/join.html; the Worker serves it at the ezfind.app apex.
   { path: "join", Component: EzfindJoin },
   // The operator admin panel — its own chrome, token-gated, noindex. Prerendered
   // to dist/admin.html; the Worker serves it at the admin.ezfind.app apex.

@@ -1,37 +1,35 @@
 import LandingPage, { type LandingConfig } from "../components/LandingPage.tsx";
+import LeadRequestForm from "../components/landing/LeadRequestForm.tsx";
 
-// The ezfind שפים landing — identical template/branding to the umbrella page,
-// scoped to chefs. Served at the chefs.ezfind.app root. Submissions flow into
-// the same join intake (category "chef") and appear in the admin applicants.
+// The chefs.ezfind.app landing — same template/branding as the umbrella page,
+// but for CLIENTS looking to hire a private chef. The form creates a lead (the
+// same pipeline that distributes requests to chefs).
 const config: LandingConfig = {
-  // Same "ezfind" wordmark as the main page (no suffix).
-  seoTitle: "ezfind שפים — קבלו לקוחות חדשים למטבח שלכם",
+  seoTitle: "ezfind — מצאו שף פרטי לאירוע שלכם",
   seoDescription:
-    "ezfind שפים מחברת שפים פרטיים עם לקוחות שמחפשים שף לאירוע. הצטרפו וקבלו פניות אמיתיות מהאזור שלכם — הרשמה חינם, בלי התחייבות.",
+    "מחפשים שף פרטי לאירוע? ezfind מחברת אתכם לשפים פרטיים מובילים באזור שלכם. ספרו לנו על האירוע ונמצא לכם שף — בלי עלות, בלי התחייבות.",
   canonicalPath: "/",
-  heroEyebrow: "לשפים פרטיים",
+  heroEyebrow: "מחפשים שף פרטי?",
   heroTitle: (
     <>
-      לקוחות חדשים למטבח שלכם — <span className="accent">בלי לרדוף אחריהם</span>
+      השף הפרטי המושלם לאירוע שלכם — <span className="accent">במרחק טופס אחד</span>
     </>
   ),
   heroSub:
-    "ezfind שפים מחברת בין שפים פרטיים לבין לקוחות שמחפשים שף לאירוע באזור. הצטרפו וקבלו פניות אמיתיות ישירות אליכם — הרשמה חינם, בלי התחייבות.",
-  heroCta: "אני רוצה להצטרף",
+    "ספרו לנו על האירוע ונחבר אתכם לשפים פרטיים מובילים מהאזור שלכם. בלי עלות, בלי התחייבות — אתם בוחרים את השף שהכי מתאים לכם.",
+  heroCta: "מצאו לי שף",
   steps: [
-    { title: "ממלאים פרטים", body: "משאירים פרטים על המטבח והאזור שלכם. פחות מדקה." },
-    { title: "מקבלים פניות", body: "אנחנו שולחים אליכם לקוחות שמחפשים שף באזור שלכם." },
-    { title: "סוגרים אירועים", body: "יוצרים קשר ישיר עם הלקוח וסוגרים — אתם בשליטה." },
+    { title: "מספרים על האירוע", body: "סוג האירוע, מספר אורחים ותאריך. פחות מדקה." },
+    { title: "מקבלים שפים מתאימים", body: "אנחנו מחברים אתכם לשפים פרטיים מהאזור שלכם." },
+    { title: "בוחרים ונהנים", body: "משווים, בוחרים את השף המתאים — ונהנים מארוחה מושלמת." },
   ],
-  formEyebrow: "הצטרפות שפים",
-  formTitle: "בואו נתחיל",
-  formSub: "מלאו את הפרטים ונחזור אליכם. השדות המסומנים הם חובה.",
-  showCategory: false,
-  fixedCategory: "chef",
-  source: "ezfind-chefs-landing",
-  footerText: "© 2026 ezfind שפים · מחברים שפים עם לקוחות",
+  footerText: "© 2026 ezfind · מוצאים לכם את השף הפרטי המושלם",
 };
 
 export default function EzfindChefs() {
-  return <LandingPage config={config} />;
+  return (
+    <LandingPage config={config}>
+      <LeadRequestForm source="ezfind-chefs-landing" />
+    </LandingPage>
+  );
 }

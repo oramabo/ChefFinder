@@ -27,6 +27,7 @@
     "@fontsource/heebo": "^5.2.8",
     "@fontsource/open-sans": "^5.2.7",
     "@fontsource/roboto": "^5.2.10",
+    "@fontsource/varela-round": "^5.2.8",
     "@supabase/supabase-js": "^2.45.4",
     "posthog-js": "^1.161.6",
     "react": "^18.3.1",

@@ -69,6 +69,11 @@ const routes: Route[] = [
 // Worker-generated API/XML responses carry the same hardening that static and
 // HTML responses get from the assets layer. CSP is intentionally omitted here —
 // it is meaningful only for HTML, which this Worker never serves.
+// Hosts whose apex serves the ezfind "join the network" landing instead of the
+// chef site. Both custom domains point at this one Worker; it differentiates by
+// hostname. Keep in sync with the client routing in `src/routes.tsx`.
+const EZFIND_APEX_HOSTS = new Set(["ezfind.app", "www.ezfind.app"]);
+
 const SECURITY_HEADERS: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
@@ -142,6 +147,17 @@ export default {
         next: () => env.ASSETS.fetch(request),
       };
       return runWithMiddleware(matched.route.handler, fnCtx);
+    }
+
+    // Host-based serving for the ezfind umbrella apex (ezfind.app): the site is
+    // the "join the network" landing, so navigation requests are served the
+    // prerendered dist/join.html. Static assets (anything with a file extension:
+    // .js/.css/.svg/.woff2/…) pass straight through so the page's JS/CSS/fonts
+    // still load. The chef host (chefs.ezfind.app) and *.workers.dev are
+    // untouched and serve the chef site as before.
+    if (EZFIND_APEX_HOSTS.has(url.hostname) && !/\.[a-z0-9]+$/i.test(path)) {
+      const landing = new URL("/join", url.origin);
+      return env.ASSETS.fetch(new Request(landing.toString(), request));
     }
 
     // Not an API/sitemap route. With `run_worker_first` scoped to those paths

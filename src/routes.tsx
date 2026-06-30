@@ -10,7 +10,7 @@ import Faq from "./pages/Faq.tsx";
 import Privacy from "./pages/Privacy.tsx";
 import Terms from "./pages/Terms.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import Admin from "./pages/Admin.tsx";
+import AdminPanel from "./pages/AdminPanel.tsx";
 import EzfindJoin from "./pages/EzfindJoin.tsx";
 import ProgrammaticPage from "./pages/programmatic/ProgrammaticPage.tsx";
 import { allSeoPages } from "@shared/seo/pages.ts";
@@ -41,9 +41,6 @@ const chefRoutes: RouteRecord[] = [
       { path: "terms", Component: Terms },
       // Client-only: not prerendered (no static paths), served via SPA fallback.
       { path: "lead/:token", Component: LeadUnlock, getStaticPaths: () => [] },
-      // Prerenders only the (data-less) token prompt; data is fetched client-side
-      // and gated server-side. noindex + robots-disallowed.
-      { path: "admin", Component: Admin },
       ...seoRoutes,
       { path: "*", Component: NotFound },
     ],
@@ -51,19 +48,27 @@ const chefRoutes: RouteRecord[] = [
   // The ezfind umbrella "join the network" landing — a top-level route with its
   // own chrome (no chef Header/Footer). Prerendered to dist/join.html.
   { path: "join", Component: EzfindJoin },
+  // The operator admin panel — its own chrome, token-gated, noindex. Prerendered
+  // to dist/admin.html; the Worker serves it at the admin.ezfind.app apex.
+  { path: "admin", Component: AdminPanel },
 ];
 
-// On the ezfind.app apex host, the site IS the join landing. We render it at the
-// root so it hydrates cleanly against the dist/join.html that the Worker serves
-// there. (Prerendering runs without a window, so the build always uses
-// chefRoutes and emits every chef page + join.html as before.)
+// On the umbrella custom-domain hosts, the site IS a single standalone page,
+// rendered at the root so it hydrates cleanly against the prerendered HTML the
+// Worker serves there (join.html / admin.html). Prerendering runs without a
+// window, so the build always uses chefRoutes and emits every chef page plus
+// join.html and admin.html as before. Keep hosts in sync with `worker/index.ts`.
+const host = typeof window !== "undefined" ? window.location.hostname : "";
 const EZFIND_APEX_HOSTS = new Set(["ezfind.app", "www.ezfind.app"]);
-const isEzfindApex =
-  typeof window !== "undefined" && EZFIND_APEX_HOSTS.has(window.location.hostname);
+const ADMIN_HOSTS = new Set(["admin.ezfind.app"]);
 
-const ezfindRoutes: RouteRecord[] = [
-  { path: "/", Component: EzfindJoin },
-  { path: "*", Component: EzfindJoin },
+const single = (Component: RouteRecord["Component"]): RouteRecord[] => [
+  { path: "/", Component },
+  { path: "*", Component },
 ];
 
-export const routes: RouteRecord[] = isEzfindApex ? ezfindRoutes : chefRoutes;
+export const routes: RouteRecord[] = EZFIND_APEX_HOSTS.has(host)
+  ? single(EzfindJoin)
+  : ADMIN_HOSTS.has(host)
+    ? single(AdminPanel)
+    : chefRoutes;

@@ -1,6 +1,12 @@
-import type { Lead, Purchase, ReserveResult } from "@shared/types.ts";
-import { LEAD_STATUS, PURCHASE_STATUS, RESERVE_REASON } from "@shared/constants.ts";
-import type { DbPort, InsertLeadInput } from "../ports/db.ts";
+import type { Lead, Purchase, ReserveResult, JoinApplication } from "@shared/types.ts";
+import {
+  LEAD_STATUS,
+  PURCHASE_STATUS,
+  RESERVE_REASON,
+  JOIN_STATUS,
+  type JoinStatus,
+} from "@shared/constants.ts";
+import type { DbPort, InsertLeadInput, InsertJoinApplicationInput } from "../ports/db.ts";
 
 // In-memory DbPort with semantics identical to the SQL RPCs. Used under
 // USE_STUBS and in tests. A module-level store keeps data across requests in a
@@ -9,10 +15,16 @@ export interface MockStore {
   leads: Map<string, Lead>; // keyed by id
   purchases: Map<string, Purchase>; // keyed by id
   tokenIndex: Map<string, string>; // lead_token -> lead id
+  joinApplications: Map<string, JoinApplication>; // keyed by id
 }
 
 export function createMockStore(): MockStore {
-  return { leads: new Map(), purchases: new Map(), tokenIndex: new Map() };
+  return {
+    leads: new Map(),
+    purchases: new Map(),
+    tokenIndex: new Map(),
+    joinApplications: new Map(),
+  };
 }
 
 const globalStore = createMockStore();
@@ -179,6 +191,39 @@ export function createMockDb(store: MockStore = globalStore): DbPort {
         }
       }
       return released;
+    },
+
+    async insertJoinApplication(input: InsertJoinApplicationInput): Promise<JoinApplication> {
+      const id = uid("join");
+      const app: JoinApplication = {
+        id,
+        full_name: input.full_name,
+        business_name: input.business_name ?? null,
+        category: input.category,
+        city: input.city,
+        phone: input.phone,
+        email: input.email ?? null,
+        message: input.message ?? null,
+        source: input.source ?? null,
+        status: JOIN_STATUS.new,
+        created_at: new Date().toISOString(),
+      };
+      store.joinApplications.set(id, app);
+      return structuredClone(app);
+    },
+
+    async listJoinApplications(limit: number): Promise<JoinApplication[]> {
+      return [...store.joinApplications.values()]
+        .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
+        .slice(0, limit)
+        .map((a) => structuredClone(a));
+    },
+
+    async updateJoinApplicationStatus(id: string, status: JoinStatus): Promise<boolean> {
+      const app = store.joinApplications.get(id);
+      if (!app) return false;
+      app.status = status;
+      return true;
     },
   };
 }

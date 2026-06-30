@@ -1,5 +1,6 @@
-import type { PublicLead, LeadContact, PendingPurchase } from "@shared/types.ts";
+import type { PublicLead, LeadContact, PendingPurchase, JoinApplication } from "@shared/types.ts";
 import type { LeadInputType, JoinInputType } from "@shared/schema.ts";
+import type { JoinStatus } from "@shared/constants.ts";
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, {
@@ -29,6 +30,48 @@ export interface JoinResponse {
   ok: boolean;
   error?: string;
   issues?: { path: string; message: string }[];
+}
+
+export type { JoinApplication } from "@shared/types.ts";
+
+export interface JoinApplicationsResponse {
+  ok: boolean;
+  applications?: JoinApplication[];
+  error?: string;
+  reason?: string;
+}
+
+// Operator view (admin-gated): ezfind join applications, newest first.
+export async function listJoinApplications(
+  token: string,
+): Promise<{ status: number; body: JoinApplicationsResponse }> {
+  const res = await fetch("/api/admin/join-applications?limit=200", {
+    headers: token ? { "x-admin-token": token } : {},
+  });
+  return { status: res.status, body: (await res.json()) as JoinApplicationsResponse };
+}
+
+// Operator action (admin-gated): set an application's lifecycle status.
+export async function setJoinApplicationStatus(
+  id: string,
+  status: JoinStatus,
+  token: string,
+): Promise<{ status: number; body: { ok: boolean; updated?: boolean; error?: string } }> {
+  const res = await fetch(
+    `/api/admin/join-application/${encodeURIComponent(id)}/status`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(token ? { "x-admin-token": token } : {}),
+      },
+      body: JSON.stringify({ status }),
+    },
+  );
+  return {
+    status: res.status,
+    body: (await res.json()) as { ok: boolean; updated?: boolean; error?: string },
+  };
 }
 
 // Submit a "join the ezfind network" application from the umbrella landing page.

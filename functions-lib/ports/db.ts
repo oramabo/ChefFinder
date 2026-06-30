@@ -1,4 +1,22 @@
-import type { Lead, Purchase, PendingPurchase, ReserveResult } from "@shared/types.ts";
+import type {
+  Lead,
+  Purchase,
+  PendingPurchase,
+  ReserveResult,
+  JoinApplication,
+} from "@shared/types.ts";
+import type { JoinStatus } from "@shared/constants.ts";
+
+export interface InsertJoinApplicationInput {
+  full_name: string;
+  business_name?: string | null;
+  category: string;
+  city: string;
+  phone: string;
+  email?: string | null;
+  message?: string | null;
+  source?: string | null;
+}
 
 export interface InsertLeadInput {
   lead_token: string;
@@ -43,4 +61,10 @@ export interface DbPort {
   // pending -> failed|expired, decrement buyers_count (idempotent). true if released.
   releasePurchase(id: string, status: "failed" | "expired"): Promise<boolean>;
   sweepStale(ttlMinutes: number): Promise<number>;
+  // ── Join applications (ezfind "join the network" intake) ─────────────────
+  insertJoinApplication(input: InsertJoinApplicationInput): Promise<JoinApplication>;
+  // Operator view: most-recent applications first (admin-gated callers only).
+  listJoinApplications(limit: number): Promise<JoinApplication[]>;
+  // Update an application's lifecycle status. true if a row was updated.
+  updateJoinApplicationStatus(id: string, status: JoinStatus): Promise<boolean>;
 }

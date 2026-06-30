@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Seo from "./Seo.tsx";
+import Seo, { type GeoMeta } from "./Seo.tsx";
 import "./LandingPage.css";
 
 export interface LandingStep {
@@ -12,7 +12,16 @@ export interface LandingConfig {
   brandSuffix?: string;
   seoTitle: string;
   seoDescription: string;
-  canonicalPath: string;
+  // Absolute canonical URL for this landing's host (e.g. https://ezfind.app/).
+  canonicalUrl: string;
+  // Geographic targeting (local SEO).
+  geo?: GeoMeta;
+  // JSON-LD structured data (Organization / Service …). A FAQPage block is
+  // generated automatically from `faq` below — don't duplicate it here.
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  // Visible FAQ. Rendered on the page AND emitted as FAQPage structured data
+  // (Google requires the marked-up Q&A to be visible to users).
+  faq?: { q: string; a: string }[];
   heroEyebrow: string;
   heroTitle: ReactNode;
   heroSub: string;
@@ -41,12 +50,36 @@ export default function LandingPage({
   config: LandingConfig;
   children: ReactNode;
 }) {
+  // Combine the page's structured data with an auto-generated FAQPage (kept in
+  // sync with the visible FAQ rendered below).
+  const baseJsonLd = config.jsonLd
+    ? Array.isArray(config.jsonLd)
+      ? config.jsonLd
+      : [config.jsonLd]
+    : [];
+  const jsonLd = config.faq?.length
+    ? [
+        ...baseJsonLd,
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: config.faq.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        },
+      ]
+    : baseJsonLd;
+
   return (
     <div className="ez">
       <Seo
         title={config.seoTitle}
         description={config.seoDescription}
-        canonicalPath={config.canonicalPath}
+        canonicalUrl={config.canonicalUrl}
+        geo={config.geo}
+        jsonLd={jsonLd}
       />
 
       <header className="ez__bar">
@@ -85,6 +118,20 @@ export default function LandingPage({
         <section id="join" className="container section">
           <div className="card ez__form-card">{children}</div>
         </section>
+
+        {config.faq?.length ? (
+          <section className="container section ez__faq">
+            <h2 className="ez__faq-title">שאלות נפוצות</h2>
+            <div className="ez__faq-list">
+              {config.faq.map((f, i) => (
+                <details className="card ez__faq-item" key={i}>
+                  <summary>{f.q}</summary>
+                  <p>{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </main>
 
       <footer className="ez__footer">

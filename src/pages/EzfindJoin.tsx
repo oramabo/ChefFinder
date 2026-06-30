@@ -4,10 +4,29 @@ import JoinForm from "../components/landing/JoinForm.tsx";
 // The umbrella ezfind.app landing — for professionals of any trade who want to
 // join the network and receive leads.
 const config: LandingConfig = {
-  seoTitle: "ezfind — הצטרפו לרשת בעלי המקצוע",
+  seoTitle: "ezfind — הצטרפו לרשת בעלי המקצוע בישראל",
   seoDescription:
-    "ezfind מחברת לקוחות עם בעלי מקצוע מובילים. הצטרפו כדי לקבל פניות אמיתיות מלקוחות באזור שלכם — הרשמה חינם, בלי התחייבות.",
-  canonicalPath: "/join",
+    "ezfind מחברת לקוחות עם בעלי מקצוע מובילים בישראל. הצטרפו כדי לקבל פניות אמיתיות מלקוחות באזור שלכם — הרשמה חינם, בלי התחייבות.",
+  canonicalUrl: "https://ezfind.app/",
+  geo: { region: "IL", placename: "ישראל", position: "31.5,34.75" },
+  jsonLd: [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "ezfind",
+      url: "https://ezfind.app",
+      logo: "https://ezfind.app/favicon.svg",
+      description: "ezfind מחברת לקוחות עם בעלי מקצוע מובילים בישראל.",
+      areaServed: { "@type": "Country", name: "Israel" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "ezfind",
+      url: "https://ezfind.app",
+      inLanguage: "he",
+    },
+  ],
   heroEyebrow: "לבעלי מקצוע",
   heroTitle: (
     <>

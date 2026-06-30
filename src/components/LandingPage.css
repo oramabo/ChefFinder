@@ -155,3 +155,36 @@
   color: var(--color-text);
   font-weight: 700;
 }
+
+/* ── FAQ (visible Q&A, mirrors the FAQPage structured data) ───────────────── */
+.ez__faq-title {
+  margin-block-end: var(--space-5);
+  text-align: center;
+}
+.ez__faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-inline-size: 760px;
+  margin-inline: auto;
+}
+.ez__faq-item summary {
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+.ez__faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.ez__faq-item summary::after {
+  content: "+";
+  float: inline-end;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+.ez__faq-item[open] summary::after {
+  content: "–";
+}
+.ez__faq-item p {
+  margin-block-start: var(--space-3);
+}

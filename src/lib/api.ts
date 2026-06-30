@@ -1,5 +1,5 @@
 import type { PublicLead, LeadContact, PendingPurchase } from "@shared/types.ts";
-import type { LeadInputType } from "@shared/schema.ts";
+import type { LeadInputType, JoinInputType } from "@shared/schema.ts";
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, {
@@ -23,6 +23,17 @@ export interface CreateLeadResponse {
 
 export function createLead(input: LeadInputType): Promise<CreateLeadResponse> {
   return postJson<CreateLeadResponse>("/api/lead", input);
+}
+
+export interface JoinResponse {
+  ok: boolean;
+  error?: string;
+  issues?: { path: string; message: string }[];
+}
+
+// Submit a "join the ezfind network" application from the umbrella landing page.
+export function submitJoin(input: JoinInputType): Promise<JoinResponse> {
+  return postJson<JoinResponse>("/api/join", input);
 }
 
 export interface GetLeadResponse {

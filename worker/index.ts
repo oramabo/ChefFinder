@@ -25,6 +25,7 @@ import { onRequestGet as adminLeads } from "../functions/api/admin/leads.ts";
 import { onRequestPost as adminNotify } from "../functions/api/admin/notify.ts";
 import { onRequestPost as adminConfirm } from "../functions/api/admin/confirm.ts";
 import { onRequestGet as adminPending } from "../functions/api/admin/pending.ts";
+import { onRequestPost as submitJoin } from "../functions/api/join.ts";
 import { onRequestGet as sitemap } from "../functions/sitemap.xml.ts";
 
 // Minimal local typings for the Workers runtime, so this file typechecks under
@@ -51,6 +52,7 @@ interface Route {
 
 const routes: Route[] = [
   { method: "POST", pattern: "/api/lead", handler: createLead },
+  { method: "POST", pattern: "/api/join", handler: submitJoin },
   { method: "GET", pattern: "/api/lead/:token", handler: getLead },
   { method: "GET", pattern: "/api/lead/:token/contact", handler: getContact },
   { method: "POST", pattern: "/api/lead/:token/reserve", handler: reserveLead },

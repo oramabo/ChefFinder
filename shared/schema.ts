@@ -32,6 +32,20 @@ export const ReserveInput = z.object({
 });
 export type ReserveInputType = z.infer<typeof ReserveInput>;
 
+// A professional/business applying to join the ezfind network via the umbrella
+// landing page. Email, business name and message are optional; the rest required.
+export const JoinInput = z.object({
+  full_name: z.string().trim().min(1).max(80),
+  business_name: z.string().trim().max(120).optional().or(z.literal("")),
+  category: z.string().trim().min(1).max(40),
+  city: z.string().trim().min(1).max(60),
+  phone: phone,
+  email: z.string().trim().email().max(120).optional().or(z.literal("")),
+  message: z.string().trim().max(1000).optional().or(z.literal("")),
+  source: z.string().trim().max(200).optional(),
+});
+export type JoinInputType = z.infer<typeof JoinInput>;
+
 // Generic webhook envelope. Provider-specific fields are validated loosely here
 // and interpreted by the payments adapter's verifyWebhook().
 export const WebhookPayload = z.object({

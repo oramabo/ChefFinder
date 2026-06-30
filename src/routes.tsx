@@ -11,6 +11,7 @@ import Privacy from "./pages/Privacy.tsx";
 import Terms from "./pages/Terms.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Admin from "./pages/Admin.tsx";
+import EzfindJoin from "./pages/EzfindJoin.tsx";
 import ProgrammaticPage from "./pages/programmatic/ProgrammaticPage.tsx";
 import { allSeoPages } from "@shared/seo/pages.ts";
 
@@ -43,4 +44,7 @@ export const routes: RouteRecord[] = [
       { path: "*", Component: NotFound },
     ],
   },
+  // The ezfind umbrella "join the network" landing — a top-level route with its
+  // own chrome (no chef Header/Footer), intended for the ezfind.app apex.
+  { path: "join", Component: EzfindJoin },
 ];

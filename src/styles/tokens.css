@@ -30,9 +30,10 @@
   --color-success: #1f9254;
   --color-danger: #c0392b;
 
-  /* Typography — Hebrew literary serif display + Open Sans (Latin + Hebrew) body. */
-  --font-display: "Frank Ruhl Libre", "Open Sans", Georgia, serif;
-  --font-sans: "Open Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  /* Typography — Varela Round (Latin + Hebrew), a friendly rounded face used
+     for both display and body to give the site a happy, summery personality. */
+  --font-display: "Varela Round", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --font-sans: "Varela Round", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 
   /* Spacing scale */
   --space-1: 0.25rem;

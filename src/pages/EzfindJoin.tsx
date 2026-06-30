@@ -1,6 +1,8 @@
 import LandingPage, { type LandingConfig } from "../components/LandingPage.tsx";
+import JoinForm from "../components/landing/JoinForm.tsx";
 
-// The umbrella ezfind.app landing — for professionals of any trade.
+// The umbrella ezfind.app landing — for professionals of any trade who want to
+// join the network and receive leads.
 const config: LandingConfig = {
   seoTitle: "ezfind — הצטרפו לרשת בעלי המקצוע",
   seoDescription:
@@ -20,14 +22,13 @@ const config: LandingConfig = {
     { title: "מקבלים פניות", body: "אנחנו שולחים אליכם לקוחות רלוונטיים מהאזור שלכם." },
     { title: "סוגרים עבודות", body: "יוצרים קשר ישיר עם הלקוח וסוגרים — אתם בשליטה." },
   ],
-  formEyebrow: "הצטרפות",
-  formTitle: "בואו נתחיל",
-  formSub: "מלאו את הפרטים ונחזור אליכם. השדות המסומנים הם חובה.",
-  showCategory: true,
-  source: "ezfind-landing",
   footerText: "© 2026 ezfind · מחברים לקוחות עם בעלי מקצוע",
 };
 
 export default function EzfindJoin() {
-  return <LandingPage config={config} />;
+  return (
+    <LandingPage config={config}>
+      <JoinForm source="ezfind-landing" />
+    </LandingPage>
+  );
 }

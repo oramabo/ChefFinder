@@ -188,3 +188,7 @@
 .ez__faq-item p {
   margin-block-start: var(--space-3);
 }
+
+.ez__turnstile {
+  margin-block: var(--space-4) var(--space-2);
+}

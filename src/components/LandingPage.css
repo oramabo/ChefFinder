@@ -149,3 +149,9 @@
   color: var(--color-text-muted);
   font-size: 0.85rem;
 }
+
+/* Brand suffix, e.g. "ezfind שפים" for the chef landing. */
+.ez__wordmark-suffix {
+  color: var(--color-text);
+  font-weight: 700;
+}

@@ -13,3 +13,10 @@
 
 /kosher-private-chef/*
   Cache-Control: public, max-age=3600
+
+# Hebrew canonical paths (/שף-פרטי/* and /שף-פרטי-כשר/*), percent-encoded.
+/%D7%A9%D7%A3-%D7%A4%D7%A8%D7%98%D7%99/*
+  Cache-Control: public, max-age=3600
+
+/%D7%A9%D7%A3-%D7%A4%D7%A8%D7%98%D7%99-%D7%9B%D7%A9%D7%A8/*
+  Cache-Control: public, max-age=3600

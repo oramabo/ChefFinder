@@ -151,7 +151,11 @@ export function pageJsonLd(page: SeoPage, baseUrl?: string): Record<string, unkn
   const content = pageContent(page);
   if (!content) return [];
   const { city, event, kosher, priceFrom, priceTo } = content;
-  const abs = (path: string) => (baseUrl ? `${baseUrl}${path}` : path);
+  // Canonical URLs use the Hebrew path, percent-encoded so they're valid.
+  const abs = (path: string) => {
+    const enc = encodeURI(path);
+    return baseUrl ? `${baseUrl}${enc}` : enc;
+  };
 
   const name = event
     ? `שף פרטי ל${event.heFor} ב${city.he}`
@@ -171,7 +175,7 @@ export function pageJsonLd(page: SeoPage, baseUrl?: string): Record<string, unkn
       addressRegion: city.region,
       addressCountry: "IL",
     },
-    url: abs(page.path),
+    url: abs(page.hePath),
   };
 
   const service = {
@@ -196,7 +200,7 @@ export function pageJsonLd(page: SeoPage, baseUrl?: string): Record<string, unkn
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "דף הבית", item: abs("/") },
       { "@type": "ListItem", position: 2, name: "שף פרטי", item: abs("/find-a-chef") },
-      { "@type": "ListItem", position: 3, name, item: abs(page.path) },
+      { "@type": "ListItem", position: 3, name, item: abs(page.hePath) },
     ],
   };
 

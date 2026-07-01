@@ -5,7 +5,9 @@ import type { Handler } from "../functions-lib/handler.ts";
 export const onRequestGet: Handler = async ({ request }) => {
   const origin = new URL(request.url).origin;
   const staticPaths = ["/", "/find-a-chef", "/how-it-works", "/chefs", "/faq"];
-  const seoPaths = allSeoPages().map((p) => p.path);
+  // List the Hebrew (canonical) path for each programmatic page, percent-encoded
+  // so the <loc> is a valid URL. The English paths canonicalise to these.
+  const seoPaths = allSeoPages().map((p) => encodeURI(p.hePath));
   const all = [...staticPaths, ...seoPaths];
 
   const urls = all

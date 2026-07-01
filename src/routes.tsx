@@ -16,11 +16,16 @@ import ProgrammaticPage from "./pages/programmatic/ProgrammaticPage.tsx";
 import { allSeoPages } from "@shared/seo/pages.ts";
 
 // Every programmatic SEO page is emitted as a concrete child route so
-// vite-react-ssg prerenders each to static HTML at build time.
-const seoRoutes: RouteRecord[] = allSeoPages().map((p) => ({
-  path: p.path.replace(/^\//, ""),
-  Component: ProgrammaticPage,
-}));
+// vite-react-ssg prerenders each to static HTML at build time. Each page gets
+// both its English path and its Hebrew (canonical) path. The Hebrew path is
+// registered decoded (raw Hebrew) — React Router decodes the location before
+// matching, so a decoded route path matches on both prerender and hydration;
+// an encoded one would fall through to the 404 route. Both routes render
+// ProgrammaticPage and the English page canonicalises to the Hebrew URL.
+const seoRoutes: RouteRecord[] = allSeoPages().flatMap((p) => [
+  { path: p.path.replace(/^\//, ""), Component: ProgrammaticPage },
+  { path: p.hePath.replace(/^\//, ""), Component: ProgrammaticPage },
+]);
 
 // The chef host (chefs.ezfind.app) and *.workers.dev. The front page ("/") is
 // the ezfind שפים landing — a simple standalone page mirroring the umbrella

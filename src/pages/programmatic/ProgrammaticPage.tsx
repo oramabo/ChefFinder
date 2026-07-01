@@ -33,7 +33,7 @@ export default function ProgrammaticPage() {
         title={page.title}
         description={page.description}
         jsonLd={pageJsonLd(page, SITE_URL)}
-        canonicalPath={page.path}
+        canonicalPath={page.hePath}
       />
       <section className="section container programmatic">
         <h1>{page.h1}</h1>

@@ -18,6 +18,20 @@ describe("programmatic SEO pages", () => {
     expect(paths.size).toBe(pages.length);
   });
 
+  it("has a unique Hebrew canonical path per page", () => {
+    const hePaths = pages.map((p) => p.hePath);
+    expect(new Set(hePaths).size).toBe(pages.length);
+    for (const p of pages) {
+      expect(p.hePath.startsWith("/שף-פרטי")).toBe(true);
+    }
+  });
+
+  it("resolves a page by its Hebrew path, encoded or decoded", () => {
+    const sample = pages.find((p) => p.kind === "city")!;
+    expect(seoPageByPath(sample.hePath)?.path).toBe(sample.path);
+    expect(seoPageByPath(encodeURI(sample.hePath))?.path).toBe(sample.path);
+  });
+
   it("every page has a title, h1 and description", () => {
     for (const p of pages) {
       expect(p.title.length).toBeGreaterThan(0);
@@ -90,5 +104,13 @@ describe("programmatic page content", () => {
     };
     expect(crumb.itemListElement[0].item).toBe("https://chefs.ezfind.app/");
     expect(crumb.itemListElement[2].item.startsWith("https://chefs.ezfind.app/")).toBe(true);
+  });
+
+  it("uses the Hebrew canonical path (percent-encoded) in schema URLs", () => {
+    const ld = pageJsonLd(pages[0], "https://chefs.ezfind.app");
+    const biz = ld.find((b) => b["@type"] === "LocalBusiness") as { url: string };
+    expect(biz.url).toBe(`https://chefs.ezfind.app${encodeURI(pages[0].hePath)}`);
+    // Encoded, so no raw Hebrew bytes leak into the URL.
+    expect(biz.url).toContain("%D7");
   });
 });

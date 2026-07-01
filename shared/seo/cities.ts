@@ -7,6 +7,7 @@
 // (thin content Google buries); the page body and FAQ are built from these.
 export interface City {
   slug: string;
+  heSlug: string; // Hebrew URL segment, e.g. תל-אביב (used for the Hebrew canonical path)
   he: string; // Hebrew display name
   region: string; // Hebrew region name
   cuisines: string[]; // cuisine styles that sell locally (Hebrew)
@@ -18,6 +19,7 @@ export interface City {
 export const CITIES: City[] = [
   {
     slug: "tel-aviv",
+    heSlug: "תל-אביב",
     he: "תל אביב",
     region: "מרכז",
     cuisines: ["ים-תיכונית", "אסייתית", "טבעונית", "תפריט טעימות של שף"],
@@ -28,6 +30,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "jerusalem",
+    heSlug: "ירושלים",
     he: "ירושלים",
     region: "ירושלים",
     cuisines: ["ירושלמית", "מזרחית", "כשרה", "מנות שבת וחג"],
@@ -38,6 +41,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "haifa",
+    heSlug: "חיפה",
     he: "חיפה",
     region: "צפון",
     cuisines: ["ערבית-גלילית", "דגים ופירות ים", "ים-תיכונית", "על האש"],
@@ -48,6 +52,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "rishon-lezion",
+    heSlug: "ראשון-לציון",
     he: "ראשון לציון",
     region: "מרכז",
     cuisines: ["ביתית משודרגת", "בשרים על האש", "איטלקית"],
@@ -58,6 +63,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "petah-tikva",
+    heSlug: "פתח-תקווה",
     he: "פתח תקווה",
     region: "מרכז",
     cuisines: ["ביתית", "מזרחית", "כשרה"],
@@ -68,6 +74,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "netanya",
+    heSlug: "נתניה",
     he: "נתניה",
     region: "שרון",
     cuisines: ["צרפתית", "ים-תיכונית", "דגים", "מאפים וקינוחים"],
@@ -78,6 +85,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "beer-sheva",
+    heSlug: "באר-שבע",
     he: "באר שבע",
     region: "דרום",
     cuisines: ["מזרחית", "בשרים על האש", "ביתית"],
@@ -88,6 +96,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "herzliya",
+    heSlug: "הרצליה",
     he: "הרצליה",
     region: "שרון",
     cuisines: ["פיין-דיינינג", "תפריט טעימות של שף", "אסייתית", "גורמה"],
@@ -98,6 +107,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "ramat-gan",
+    heSlug: "רמת-גן",
     he: "רמת גן",
     region: "מרכז",
     cuisines: ["איטלקית", "בשרים", "ים-תיכונית"],
@@ -108,6 +118,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "raanana",
+    heSlug: "רעננה",
     he: "רעננה",
     region: "שרון",
     cuisines: ["אמריקאית", "ביתית משודרגת", "אנגלו-סקסית"],
@@ -118,6 +129,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "kfar-saba",
+    heSlug: "כפר-סבא",
     he: "כפר סבא",
     region: "שרון",
     cuisines: ["ביתית משודרגת", "מטבח בריא", "ים-תיכונית"],
@@ -128,6 +140,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "ashdod",
+    heSlug: "אשדוד",
     he: "אשדוד",
     region: "דרום",
     cuisines: ["מרוקאית", "דגים", "מזרחית", "כשרה"],
@@ -138,6 +151,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "modiin",
+    heSlug: "מודיעין",
     he: "מודיעין",
     region: "מרכז",
     cuisines: ["ביתית", "כשרה", "אירוח משפחתי"],
@@ -148,6 +162,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "eilat",
+    heSlug: "אילת",
     he: "אילת",
     region: "דרום",
     cuisines: ["דגים ופירות ים", "ים-תיכונית", "אירוח נופש בווילה"],
@@ -158,6 +173,7 @@ export const CITIES: City[] = [
   },
   {
     slug: "caesarea",
+    heSlug: "קיסריה",
     he: "קיסריה",
     region: "שרון",
     cuisines: ["פיין-דיינינג", "גורמה", "יין ואוכל", "תפריט טעימות של שף"],

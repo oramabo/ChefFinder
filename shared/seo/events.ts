@@ -5,6 +5,7 @@
 // content is genuinely distinct per event × city.
 export interface SeoEvent {
   slug: string;
+  heSlug: string; // Hebrew URL segment, e.g. יום-הולדת (used for the Hebrew canonical path)
   he: string; // Hebrew display name (noun phrase)
   heFor: string; // Hebrew phrasing used after "שף פרטי ל..."
   blurb: string; // why hire a chef for this occasion
@@ -14,6 +15,7 @@ export interface SeoEvent {
 export const SEO_EVENTS: SeoEvent[] = [
   {
     slug: "birthday",
+    heSlug: "יום-הולדת",
     he: "יום הולדת",
     heFor: "יום הולדת",
     blurb:
@@ -22,6 +24,7 @@ export const SEO_EVENTS: SeoEvent[] = [
   },
   {
     slug: "anniversary",
+    heSlug: "יום-נישואין",
     he: "יום נישואין",
     heFor: "יום נישואין",
     blurb:
@@ -30,6 +33,7 @@ export const SEO_EVENTS: SeoEvent[] = [
   },
   {
     slug: "romantic-dinner",
+    heSlug: "ארוחה-זוגית",
     he: "ארוחה זוגית",
     heFor: "ארוחה זוגית",
     blurb:
@@ -38,6 +42,7 @@ export const SEO_EVENTS: SeoEvent[] = [
   },
   {
     slug: "business-event",
+    heSlug: "אירוע-עסקי",
     he: "אירוע עסקי",
     heFor: "אירוע עסקי",
     blurb:
@@ -46,6 +51,7 @@ export const SEO_EVENTS: SeoEvent[] = [
   },
   {
     slug: "family-gathering",
+    heSlug: "ארוחה-משפחתית",
     he: "ארוחה משפחתית",
     heFor: "ארוחה משפחתית",
     blurb:

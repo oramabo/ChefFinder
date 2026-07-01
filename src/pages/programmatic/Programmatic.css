@@ -2,6 +2,55 @@
   max-inline-size: 18ch;
 }
 
+.programmatic__intro {
+  margin-block: var(--space-4);
+  max-inline-size: 60ch;
+  color: var(--color-text-muted, inherit);
+  line-height: 1.7;
+}
+
+.programmatic__cuisines {
+  list-style: none;
+  padding: 0;
+  margin-block: var(--space-5) 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.programmatic__chip {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border, #e2e2e2);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.programmatic__cards {
+  margin-block-start: var(--space-8);
+}
+
+.programmatic__menu {
+  margin-block-start: var(--space-6);
+}
+
+.programmatic__menu ul {
+  margin-block-start: var(--space-3);
+  padding-inline-start: var(--space-5);
+}
+
+.programmatic__menu li {
+  margin-block: var(--space-1);
+}
+
+.programmatic__faq {
+  margin-block-start: var(--space-6);
+}
+
+.programmatic__faq details {
+  margin-block-start: var(--space-3);
+}
+
 .programmatic__faq summary {
   font-weight: 600;
   cursor: pointer;

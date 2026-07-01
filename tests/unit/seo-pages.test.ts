@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { allSeoPages, seoPageByPath } from "@shared/seo/pages.ts";
 import { CITIES } from "@shared/seo/cities.ts";
 import { SEO_EVENTS } from "@shared/seo/events.ts";
+import { pageContent, pageJsonLd } from "@shared/seo/content.ts";
 
 describe("programmatic SEO pages", () => {
   const pages = allSeoPages();
@@ -29,5 +30,65 @@ describe("programmatic SEO pages", () => {
     const sample = pages[0];
     expect(seoPageByPath(sample.path)?.h1).toBe(sample.h1);
     expect(seoPageByPath("/does-not-exist")).toBeUndefined();
+  });
+});
+
+describe("programmatic page content", () => {
+  const pages = allSeoPages();
+
+  it("resolves content for every page", () => {
+    for (const p of pages) {
+      const c = pageContent(p);
+      expect(c, p.path).not.toBeNull();
+      expect(c!.intro.length).toBeGreaterThan(20);
+      expect(c!.highlights.length).toBe(3);
+      expect(c!.faq.length).toBeGreaterThanOrEqual(4);
+      expect(c!.priceTo).toBeGreaterThan(c!.priceFrom);
+    }
+  });
+
+  it("differentiates intro text across cities (not a renamed template)", () => {
+    const intros = new Set(pages.map((p) => pageContent(p)!.intro));
+    // Far more than one distinct intro — every city/event/kosher combo differs.
+    expect(intros.size).toBeGreaterThan(pages.length * 0.9);
+  });
+
+  it("gives event pages a menu and an event-specific FAQ", () => {
+    const eventPage = pages.find((p) => p.kind === "event-city")!;
+    const c = pageContent(eventPage)!;
+    expect(c.menu?.length).toBeGreaterThan(0);
+    expect(c.faq.some((f) => f.q.includes("תפריט"))).toBe(true);
+  });
+
+  it("gives kosher pages a kashrut FAQ and no menu", () => {
+    const kosherPage = pages.find((p) => p.kind === "kosher-city")!;
+    const c = pageContent(kosherPage)!;
+    expect(c.menu).toBeUndefined();
+    expect(c.faq.some((f) => f.q.includes("כשר"))).toBe(true);
+  });
+
+  it("emits LocalBusiness, Service, BreadcrumbList and FAQPage schema", () => {
+    const ld = pageJsonLd(pages[0], "https://chefs.ezfind.app");
+    const types = ld.map((b) => b["@type"]);
+    expect(types).toContain("LocalBusiness");
+    expect(types).toContain("Service");
+    expect(types).toContain("BreadcrumbList");
+    expect(types).toContain("FAQPage");
+    // FAQPage questions match the on-page FAQ.
+    const faqBlock = ld.find((b) => b["@type"] === "FAQPage") as {
+      mainEntity: { name: string }[];
+    };
+    expect(faqBlock.mainEntity.length).toBeGreaterThanOrEqual(4);
+    // AggregateRating stays out until real reviews exist.
+    expect(types).not.toContain("AggregateRating");
+  });
+
+  it("makes breadcrumb URLs absolute when a base URL is given", () => {
+    const ld = pageJsonLd(pages[0], "https://chefs.ezfind.app");
+    const crumb = ld.find((b) => b["@type"] === "BreadcrumbList") as {
+      itemListElement: { item: string }[];
+    };
+    expect(crumb.itemListElement[0].item).toBe("https://chefs.ezfind.app/");
+    expect(crumb.itemListElement[2].item.startsWith("https://chefs.ezfind.app/")).toBe(true);
   });
 });

@@ -8,6 +8,13 @@
 import type { SeoPage } from "./pages.ts";
 import { cityBySlug, type City } from "./cities.ts";
 import { eventBySlug, type SeoEvent } from "./events.ts";
+import {
+  REVIEWS_ARE_REAL,
+  aggregateRating,
+  reviewsForCity,
+  type Aggregate,
+  type Review,
+} from "./reviews.ts";
 
 // Brand name kept local to `shared/` so this module stays isomorphic (no import
 // from `src/`). Mirror of BRAND.he in src/lib/brand.ts.
@@ -34,6 +41,10 @@ export interface PageContent {
   highlights: Highlight[];
   menu?: string[]; // event menu ideas, when applicable
   faq: Faq[];
+  // Populated only when REVIEWS_ARE_REAL — otherwise empty / null so no rating
+  // UI or schema is emitted (see shared/seo/reviews.ts).
+  reviews: Review[];
+  rating: Aggregate | null;
 }
 
 export function priceBand(from: number, to: number): string {
@@ -97,6 +108,8 @@ export function pageContent(page: SeoPage): PageContent | null {
     highlights,
     menu: event?.menu,
     faq: faqFor(city, event, kosher),
+    reviews: REVIEWS_ARE_REAL ? reviewsForCity(city.slug) : [],
+    rating: REVIEWS_ARE_REAL ? aggregateRating() : null,
   };
 }
 
@@ -214,8 +227,27 @@ export function pageJsonLd(page: SeoPage, baseUrl?: string): Record<string, unkn
     })),
   };
 
-  // AggregateRating is intentionally omitted until real reviews exist — fake or
-  // empty ratings are a manual-action risk. Wire it in once the chef WhatsApp
-  // group supplies verified reviews (SEO strategy item #6).
+  // AggregateRating + Review are attached ONLY when the reviews are real (i.e.
+  // REVIEWS_ARE_REAL is true, so content.rating is non-null). Emitting rating
+  // schema for seed/fake reviews is a manual-action risk that can strip all rich
+  // results — the gate lives in shared/seo/reviews.ts.
+  if (content.rating) {
+    const aggregateRatingLd = {
+      "@type": "AggregateRating",
+      ratingValue: content.rating.ratingValue,
+      reviewCount: content.rating.reviewCount,
+      bestRating: content.rating.bestRating,
+    };
+    const reviewLd = content.reviews.map((r) => ({
+      "@type": "Review",
+      author: { "@type": "Person", name: r.author },
+      reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
+      reviewBody: r.text,
+    }));
+    (localBusiness as Record<string, unknown>).aggregateRating = aggregateRatingLd;
+    if (reviewLd.length) (localBusiness as Record<string, unknown>).review = reviewLd;
+    (service as Record<string, unknown>).aggregateRating = aggregateRatingLd;
+  }
+
   return [localBusiness, service, breadcrumb, faqPage];
 }

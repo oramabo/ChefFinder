@@ -43,6 +43,37 @@
   margin-block: var(--space-1);
 }
 
+.programmatic__reviews {
+  margin-block-start: var(--space-8);
+}
+
+.programmatic__rating {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-block-end: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.programmatic__stars {
+  color: #f5a623;
+  letter-spacing: 2px;
+}
+
+.programmatic__review {
+  margin: 0;
+}
+
+.programmatic__review p {
+  margin-block: var(--space-2);
+  line-height: 1.6;
+}
+
+.programmatic__review footer {
+  font-size: 0.9rem;
+  color: var(--color-text-muted, inherit);
+}
+
 .programmatic__faq {
   margin-block-start: var(--space-6);
 }

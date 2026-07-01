@@ -3,6 +3,12 @@ import { allSeoPages, seoPageByPath } from "@shared/seo/pages.ts";
 import { CITIES } from "@shared/seo/cities.ts";
 import { SEO_EVENTS } from "@shared/seo/events.ts";
 import { pageContent, pageJsonLd } from "@shared/seo/content.ts";
+import {
+  REVIEWS,
+  REVIEWS_ARE_REAL,
+  aggregateRating,
+  reviewsForCity,
+} from "@shared/seo/reviews.ts";
 
 describe("programmatic SEO pages", () => {
   const pages = allSeoPages();
@@ -93,8 +99,6 @@ describe("programmatic page content", () => {
       mainEntity: { name: string }[];
     };
     expect(faqBlock.mainEntity.length).toBeGreaterThanOrEqual(4);
-    // AggregateRating stays out until real reviews exist.
-    expect(types).not.toContain("AggregateRating");
   });
 
   it("makes breadcrumb URLs absolute when a base URL is given", () => {
@@ -112,5 +116,51 @@ describe("programmatic page content", () => {
     expect(biz.url).toBe(`https://chefs.ezfind.app${encodeURI(pages[0].hePath)}`);
     // Encoded, so no raw Hebrew bytes leak into the URL.
     expect(biz.url).toContain("%D7");
+  });
+});
+
+describe("reviews + ratings", () => {
+  it("computes the aggregate rating over a set of reviews", () => {
+    const agg = aggregateRating([
+      { author: "א", rating: 5, text: "x", monthYear: "מרץ 2026" },
+      { author: "ב", rating: 4, text: "y", monthYear: "מרץ 2026" },
+    ]);
+    expect(agg).toEqual({ ratingValue: 4.5, reviewCount: 2, bestRating: 5 });
+    expect(aggregateRating([])).toBeNull();
+  });
+
+  it("keeps every review rating within 1..5", () => {
+    for (const r of REVIEWS) {
+      expect(r.rating).toBeGreaterThanOrEqual(1);
+      expect(r.rating).toBeLessThanOrEqual(5);
+    }
+  });
+
+  it("surfaces a city's own reviews first, capped", () => {
+    const list = reviewsForCity("tel-aviv", 3);
+    expect(list.length).toBe(3);
+    expect(list[0].citySlug).toBe("tel-aviv");
+  });
+
+  it("gates rating UI + schema on REVIEWS_ARE_REAL", () => {
+    // The gate flips ratings on/off together (content + JSON-LD), so seed data
+    // can never leak rating schema while the flag is off. AggregateRating and
+    // Review are nested inside the LocalBusiness block, not top-level @types.
+    const page = allSeoPages()[0];
+    const c = pageContent(page)!;
+    const biz = pageJsonLd(page, "https://chefs.ezfind.app").find(
+      (b) => b["@type"] === "LocalBusiness",
+    ) as { aggregateRating?: unknown; review?: unknown[] };
+    if (REVIEWS_ARE_REAL) {
+      expect(c.reviews.length).toBeGreaterThan(0);
+      expect(c.rating).not.toBeNull();
+      expect(biz.aggregateRating).toBeDefined();
+      expect(biz.review?.length).toBeGreaterThan(0);
+    } else {
+      expect(c.reviews).toEqual([]);
+      expect(c.rating).toBeNull();
+      expect(biz.aggregateRating).toBeUndefined();
+      expect(biz.review).toBeUndefined();
+    }
   });
 });

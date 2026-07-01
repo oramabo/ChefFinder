@@ -25,7 +25,10 @@ export default function ProgrammaticPage() {
     );
   }
 
-  const { event, cuisines, highlights, menu, faq } = content;
+  const { event, cuisines, highlights, menu, faq, reviews, rating } = content;
+
+  // Rounded 5-star row for a given rating (whole + empty stars).
+  const stars = (value: number) => "★★★★★☆☆☆☆☆".slice(5 - Math.round(value), 10 - Math.round(value));
 
   return (
     <>
@@ -67,6 +70,31 @@ export default function ProgrammaticPage() {
                 <li key={m}>{m}</li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {rating && reviews.length > 0 && (
+          <div className="programmatic__reviews">
+            <div className="programmatic__rating">
+              <span className="programmatic__stars" aria-hidden="true">
+                {stars(rating.ratingValue)}
+              </span>
+              <strong>{rating.ratingValue.toFixed(1)}</strong>
+              <span>מתוך {rating.reviewCount} ביקורות</span>
+            </div>
+            <div className="grid grid-3">
+              {reviews.map((r) => (
+                <blockquote key={`${r.author}-${r.text}`} className="card programmatic__review">
+                  <span className="programmatic__stars" aria-label={`${r.rating} מתוך 5`}>
+                    {stars(r.rating)}
+                  </span>
+                  <p>{r.text}</p>
+                  <footer>
+                    {r.author} · {r.monthYear}
+                  </footer>
+                </blockquote>
+              ))}
+            </div>
           </div>
         )}
 

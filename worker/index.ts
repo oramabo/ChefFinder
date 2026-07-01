@@ -73,16 +73,27 @@ const routes: Route[] = [
 // Worker-generated API/XML responses carry the same hardening that static and
 // HTML responses get from the assets layer. CSP is intentionally omitted here —
 // it is meaningful only for HTML, which this Worker never serves.
-// Per-host root: which prerendered page a hostname's apex serves instead of the
-// chef site. All custom domains point at this one Worker; it differentiates by
-// hostname. Keep in sync with the client routing in `src/routes.tsx`.
-//   ezfind.app        → the "join the network" landing
+// Host architecture. All custom domains point at this one Worker; it
+// differentiates by hostname. Keep in sync with the client routing in
+// `src/routes.tsx`.
+//   ezfind.app        → the client marketplace (find a chef) — our primary,
+//                       canonical host, where all the SEO pages live. Chef
+//                       recruitment lives beneath it at /join.
 //   admin.ezfind.app  → the operator admin panel
-// The chef host (chefs.ezfind.app) and *.workers.dev are not listed and serve
-// the chef site as before.
+//   *.workers.dev     → the marketplace (dev/preview), untouched
+//
+// The canonical host for the marketplace. Requests to a REDIRECT_HOST are
+// 301'd here (path + query preserved) so link equity consolidates on one host
+// (subdirectory-style) instead of splitting across a subdomain.
+const CANONICAL_HOST = "ezfind.app";
+// Legacy/alias hosts that permanently redirect to the canonical host. The chef
+// subdomain moved onto the apex; www folds into the bare domain.
+const REDIRECT_HOSTS = new Set(["www.ezfind.app", "chefs.ezfind.app"]);
+
+// Per-host root: a hostname whose apex serves a specific prerendered page
+// instead of the marketplace. Only the admin host remains special; the apex
+// serves the marketplace directly (default asset serving).
 const HOST_ROOT: Record<string, string> = {
-  "ezfind.app": "/join",
-  "www.ezfind.app": "/join",
   "admin.ezfind.app": "/admin",
 };
 
@@ -138,6 +149,18 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    // Permanent redirect of alias hosts (www, the old chef subdomain) to the
+    // canonical apex, preserving path + query. This consolidates SEO authority
+    // on one host. 301 so browsers and Google cache the move.
+    if (REDIRECT_HOSTS.has(url.hostname)) {
+      const target = new URL(url.toString());
+      target.hostname = CANONICAL_HOST;
+      return new Response(null, {
+        status: 301,
+        headers: { location: target.toString(), ...SECURITY_HEADERS },
+      });
+    }
+
     // Find a route matching this path (ignoring method first, so a known path
     // with the wrong method yields 405 rather than falling through to assets).
     const pathMatches = routes
@@ -161,11 +184,11 @@ export default {
       return runWithMiddleware(matched.route.handler, fnCtx);
     }
 
-    // Host-based serving for the umbrella custom domains: a navigation request
-    // is served that host's prerendered root page (ezfind.app → the landing,
-    // admin.ezfind.app → the admin panel). Static assets (anything with a file
-    // extension: .js/.css/.svg/.woff2/…) pass straight through so the page's
-    // JS/CSS/fonts still load. The chef host and *.workers.dev are untouched.
+    // Host-based serving for the admin custom domain: a navigation request is
+    // served that host's prerendered root page (admin.ezfind.app → the admin
+    // panel). Static assets (anything with a file extension: .js/.css/.svg/
+    // .woff2/…) pass straight through so the page's JS/CSS/fonts still load. The
+    // apex (marketplace) and *.workers.dev are untouched.
     const hostRoot = HOST_ROOT[url.hostname];
     if (hostRoot && !/\.[a-z0-9]+$/i.test(path)) {
       const rootPage = new URL(hostRoot, url.origin);

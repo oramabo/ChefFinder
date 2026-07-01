@@ -54,21 +54,22 @@ const chefRoutes: RouteRecord[] = [
       { path: "*", Component: NotFound },
     ],
   },
-  // The ezfind umbrella "join the network" landing — its own chrome. Prerendered
-  // to dist/join.html; the Worker serves it at the ezfind.app apex.
+  // The chef "join the network" recruitment landing — its own chrome.
+  // Prerendered to dist/join.html and served at ezfind.app/join (beneath the
+  // marketplace apex).
   { path: "join", Component: EzfindJoin },
   // The operator admin panel — its own chrome, token-gated, noindex. Prerendered
   // to dist/admin.html; the Worker serves it at the admin.ezfind.app apex.
   { path: "admin", Component: AdminPanel },
 ];
 
-// On the umbrella custom-domain hosts, the site IS a single standalone page,
-// rendered at the root so it hydrates cleanly against the prerendered HTML the
-// Worker serves there (join.html / admin.html). Prerendering runs without a
-// window, so the build always uses chefRoutes and emits every chef page plus
-// join.html and admin.html as before. Keep hosts in sync with `worker/index.ts`.
+// The apex (ezfind.app) now serves the marketplace itself — it uses the full
+// chefRoutes like the chef host, with the recruitment landing beneath it at
+// /join. Only the admin host stays a single standalone page, hydrating against
+// the prerendered admin.html the Worker serves there. Prerendering runs without
+// a window, so the build always uses chefRoutes and emits every chef page plus
+// join.html and admin.html. Keep hosts in sync with `worker/index.ts`.
 const host = typeof window !== "undefined" ? window.location.hostname : "";
-const EZFIND_APEX_HOSTS = new Set(["ezfind.app", "www.ezfind.app"]);
 const ADMIN_HOSTS = new Set(["admin.ezfind.app"]);
 
 const single = (Component: RouteRecord["Component"]): RouteRecord[] => [
@@ -76,8 +77,6 @@ const single = (Component: RouteRecord["Component"]): RouteRecord[] => [
   { path: "*", Component },
 ];
 
-export const routes: RouteRecord[] = EZFIND_APEX_HOSTS.has(host)
-  ? single(EzfindJoin)
-  : ADMIN_HOSTS.has(host)
-    ? single(AdminPanel)
-    : chefRoutes;
+export const routes: RouteRecord[] = ADMIN_HOSTS.has(host)
+  ? single(AdminPanel)
+  : chefRoutes;

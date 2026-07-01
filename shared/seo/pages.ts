@@ -1,9 +1,11 @@
 import { CITIES, type City } from "./cities.ts";
 import { SEO_EVENTS, type SeoEvent } from "./events.ts";
+import { SERVICES, type Service } from "../services/registry.ts";
 
 export type SeoPageKind = "city" | "event-city" | "kosher-city";
 
 export interface SeoPage {
+  serviceSlug: string; // which registered service (vertical) this page belongs to
   kind: SeoPageKind;
   path: string; // English route path, e.g. /private-chef/tel-aviv
   hePath: string; // Hebrew canonical path, e.g. /שף-פרטי/תל-אביב
@@ -14,11 +16,17 @@ export interface SeoPage {
   description: string; // meta description
 }
 
-function cityPage(city: City): SeoPage {
+// ---- private-chef vertical page generators ----
+// URL prefixes derive from the service's slug/heSlug so the vertical owns its
+// URL space (a new vertical reuses this shape with a different slug). Kosher is
+// a "kosher-" / "-כשר" variant of the same base. The paths this produces are
+// byte-identical to the previous hard-coded ones.
+function cityPage(service: Service, city: City): SeoPage {
   return {
+    serviceSlug: service.slug,
     kind: "city",
-    path: `/private-chef/${city.slug}`,
-    hePath: `/שף-פרטי/${city.heSlug}`,
+    path: `/${service.slug}/${city.slug}`,
+    hePath: `/${service.heSlug}/${city.heSlug}`,
     citySlug: city.slug,
     title: `שף פרטי ב${city.he} | הזמנת שף לאירוע`,
     h1: `שף פרטי ב${city.he}`,
@@ -26,11 +34,12 @@ function cityPage(city: City): SeoPage {
   };
 }
 
-function eventCityPage(event: SeoEvent, city: City): SeoPage {
+function eventCityPage(service: Service, event: SeoEvent, city: City): SeoPage {
   return {
+    serviceSlug: service.slug,
     kind: "event-city",
-    path: `/private-chef/${event.slug}-${city.slug}`,
-    hePath: `/שף-פרטי/${event.heSlug}-${city.heSlug}`,
+    path: `/${service.slug}/${event.slug}-${city.slug}`,
+    hePath: `/${service.heSlug}/${event.heSlug}-${city.heSlug}`,
     citySlug: city.slug,
     eventSlug: event.slug,
     title: `שף פרטי ל${event.heFor} ב${city.he} | השף שלי`,
@@ -39,11 +48,12 @@ function eventCityPage(event: SeoEvent, city: City): SeoPage {
   };
 }
 
-function kosherCityPage(city: City): SeoPage {
+function kosherCityPage(service: Service, city: City): SeoPage {
   return {
+    serviceSlug: service.slug,
     kind: "kosher-city",
-    path: `/kosher-private-chef/${city.slug}`,
-    hePath: `/שף-פרטי-כשר/${city.heSlug}`,
+    path: `/kosher-${service.slug}/${city.slug}`,
+    hePath: `/${service.heSlug}-כשר/${city.heSlug}`,
     citySlug: city.slug,
     title: `שף פרטי כשר ב${city.he} | בישול כשר לאירועים`,
     h1: `שף פרטי כשר ב${city.he}`,
@@ -51,17 +61,29 @@ function kosherCityPage(city: City): SeoPage {
   };
 }
 
-// The full cartesian set of programmatic pages.
-export function allSeoPages(): SeoPage[] {
+// The full programmatic page set for the private-chef vertical.
+function privateChefPages(service: Service): SeoPage[] {
   const pages: SeoPage[] = [];
   for (const city of CITIES) {
-    pages.push(cityPage(city));
-    pages.push(kosherCityPage(city));
+    pages.push(cityPage(service, city));
+    pages.push(kosherCityPage(service, city));
     for (const event of SEO_EVENTS) {
-      pages.push(eventCityPage(event, city));
+      pages.push(eventCityPage(service, event, city));
     }
   }
   return pages;
+}
+
+// Each service slug → the builder for its programmatic pages. Adding a vertical
+// means adding a registry entry and (if it has programmatic SEO pages) a builder
+// here; allSeoPages(), the sitemap, routing and prerender all pick it up.
+const PAGE_BUILDERS: Record<string, (service: Service) => SeoPage[]> = {
+  "private-chef": privateChefPages,
+};
+
+// The full cartesian set of programmatic pages, across every registered service.
+export function allSeoPages(): SeoPage[] {
+  return SERVICES.flatMap((service) => PAGE_BUILDERS[service.slug]?.(service) ?? []);
 }
 
 export function seoPagesByKind(kind: SeoPageKind): SeoPage[] {

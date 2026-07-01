@@ -43,7 +43,7 @@ function eventCityPage(service: Service, event: SeoEvent, city: City): SeoPage {
     hePath: `/${service.seo.heSlug}/${event.heSlug}-${city.heSlug}`,
     citySlug: city.slug,
     eventSlug: event.slug,
-    title: `שף פרטי ל${event.heFor} ב${city.he} | השף שלי`,
+    title: `שף פרטי ל${event.heFor} ב${city.he} | ezfind`,
     h1: `שף פרטי ל${event.heFor} ב${city.he}`,
     description: `שף פרטי ל${event.heFor} ב${city.he}. מלאו טופס קצר וקבלו הצעות משפים מקצועיים. תפריט מותאם, חוויה קולינרית בבית.`,
   };

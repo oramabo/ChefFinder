@@ -18,7 +18,7 @@ import {
 
 // Brand name kept local to `shared/` so this module stays isomorphic (no import
 // from `src/`). Mirror of BRAND.he in src/lib/brand.ts.
-export const BRAND_HE = "השף שלי";
+export const BRAND_HE = "ezfind";
 
 export interface Faq {
   q: string;

@@ -1,0 +1,20 @@
+/* The ezfind wordmark — the single brand mark used across every page (landing
+   bars, header, footer). Kept in its own file so any component that renders
+   <Wordmark> gets the styling, regardless of which page it's on. */
+.ez__wordmark {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+.ez__wordmark-accent {
+  color: var(--color-accent);
+}
+.ez__wordmark-suffix {
+  color: var(--color-text);
+  font-weight: 700;
+}
+.ez__wordmark--sm {
+  font-size: 1.3rem;
+}

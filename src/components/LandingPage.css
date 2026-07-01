@@ -30,19 +30,6 @@
   padding-inline: var(--space-4);
 }
 
-.ez__wordmark {
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--color-text);
-}
-.ez__wordmark-accent {
-  color: var(--color-accent);
-}
-.ez__wordmark--sm {
-  font-size: 1.3rem;
-}
-
 /* ── Hero ────────────────────────────────────────────────────────────────── */
 .ez__hero {
   background:
@@ -185,8 +172,3 @@
   font-size: 0.85rem;
 }
 
-/* Brand suffix, e.g. "ezfind שפים" for the chef landing. */
-.ez__wordmark-suffix {
-  color: var(--color-text);
-  font-weight: 700;
-}

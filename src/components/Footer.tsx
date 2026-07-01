@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { reopenConsent } from "../lib/consent.ts";
+import Wordmark from "./Wordmark.tsx";
 import "./Footer.css";
 
 export default function Footer() {
@@ -7,14 +8,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer__inner">
         <div className="footer__brandcol">
-          <img
-            className="footer__logo"
-            src="/images/logo.png"
-            width={170}
-            height={170}
-            alt="השף שלי — מחברים בין טעם לאנשים"
-            loading="lazy"
-          />
+          <Wordmark />
         </div>
         <nav className="footer__links" aria-label="ניווט תחתון">
           <Link to="/how-it-works">איך זה עובד</Link>
@@ -28,7 +22,7 @@ export default function Footer() {
         </nav>
       </div>
       <div className="container footer__copy">
-        © {new Date().getFullYear()} השף שלי. כל הזכויות שמורות.
+        © {new Date().getFullYear()} ezfind. כל הזכויות שמורות.
       </div>
     </footer>
   );

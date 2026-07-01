@@ -43,7 +43,7 @@ export default function Home() {
   return (
     <>
       <Seo
-        title="שף פרטי לאירוע | הזמנת שף פרטי עד הבית — השף שלי"
+        title="שף פרטי לאירוע | הזמנת שף פרטי עד הבית — ezfind"
         description="מחפשים שף פרטי לאירוע? מלאו טופס קצר ועד 3 שפים מקצועיים יחזרו אליכם עם הצעה מותאמת. חוויה קולינרית פרימיום עד הבית."
         jsonLd={faqJsonLd}
         canonicalPath="/"
@@ -107,7 +107,7 @@ export default function Home() {
       <section className="section container">
         <div className="card home__trust">
           <div className="home__trust-copy">
-            <p className="eyebrow">למה השף שלי</p>
+            <p className="eyebrow">למה ezfind</p>
             <h2 className="home__h2">שולחן אחד, תשומת לב מלאה</h2>
             <ul className="home__list">
               {REASONS.map((r) => (

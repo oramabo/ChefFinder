@@ -7,7 +7,7 @@ export default function Terms() {
   return (
     <div className="section container legal">
       <Seo
-        title="תנאי שימוש — השף שלי"
+        title="תנאי שימוש — ezfind"
         description="תנאי השימוש בשירות השף שלי — חיבור בין לקוחות לשפים פרטיים, תשלום פר-ליד, אחריות ודין חל."
         canonicalPath="/terms"
       />

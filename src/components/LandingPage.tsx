@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Seo from "./Seo.tsx";
+import Wordmark from "./Wordmark.tsx";
 import "./LandingPage.css";
 
 export interface LandingStep {
@@ -32,15 +33,6 @@ export interface LandingConfig {
   // umbrella links to each service mini-site; a mini-site links to the umbrella
   // and its key pages). Plain <a> so they're crawlable.
   links?: LandingLink[];
-}
-
-function Wordmark({ suffix, className }: { suffix?: string; className?: string }) {
-  return (
-    <span className={`ez__wordmark ${className ?? ""}`}>
-      ez<span className="ez__wordmark-accent">find</span>
-      {suffix ? <span className="ez__wordmark-suffix"> {suffix}</span> : null}
-    </span>
-  );
 }
 
 // Shared single-page landing template. The visual shell (bar, hero, 3-step

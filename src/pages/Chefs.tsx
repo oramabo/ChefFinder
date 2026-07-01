@@ -11,7 +11,7 @@ export default function Chefs() {
   return (
     <div className="section container">
       <Seo
-        title="לשפים — קבלת לידים והצטרפות לקבוצה | השף שלי"
+        title="לשפים — קבלת לידים והצטרפות לקבוצה | ezfind"
         description="שפים פרטיים: קבלו לידים אמיתיים של לקוחות שמחפשים שף לאירוע, והצטרפו לקבוצת הוואטסאפ או הטלגרם לקבלת התראות. תשלום פר-ליד, חשיפת טלפון מיידית."
         canonicalPath="/chefs"
       />

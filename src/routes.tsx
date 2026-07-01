@@ -27,15 +27,22 @@ const seoRoutes: RouteRecord[] = allSeoPages().flatMap((p) => [
   { path: p.hePath.replace(/^\//, ""), Component: ProgrammaticPage },
 ]);
 
-// The chef host (chefs.ezfind.app) and *.workers.dev. The front page ("/") is
-// the ezfind שפים landing — a simple standalone page mirroring the umbrella
-// ezfind.app landing. The marketplace's functional pages (find-a-chef, lead
-// unlock, info pages, programmatic SEO) keep the chef Header/Footer and remain
-// reachable beneath it. All are prerendered at build time.
+// The platform routes (apex ezfind.app + *.workers.dev). Multi-vertical layout:
+//   /        → provider registration / umbrella (EzfindJoin), prerendered to
+//              index.html — the apex is the registration front door.
+//   /chefs   → the chef mini-site landing (client "find a chef", lead capture),
+//              its own chrome, prerendered to chefs.html. chefs.ezfind.app
+//              301-redirects here.
+// The marketplace's functional pages (find-a-chef, lead unlock, info pages, and
+// the programmatic SEO pages at /private-chef & /שף-פרטי) keep the chef
+// Header/Footer beneath it. All prerendered at build time.
 const chefRoutes: RouteRecord[] = [
-  // Front page: the ezfind שפים landing, standalone (its own chrome). Prerendered
-  // to dist/index.html and served at the chefs.ezfind.app root.
-  { path: "/", Component: EzfindChefs },
+  // Apex front door: provider registration / umbrella, standalone chrome.
+  // Prerendered to dist/index.html and served at the ezfind.app root.
+  { path: "/", Component: EzfindJoin },
+  // The chef mini-site landing (client-facing lead capture), standalone chrome.
+  // Prerendered to dist/chefs.html; chefs.ezfind.app redirects here.
+  { path: "chefs", Component: EzfindChefs },
   // Marketplace pages — a pathless layout route so they nest under the chef
   // Header/Footer without owning "/".
   {
@@ -43,7 +50,9 @@ const chefRoutes: RouteRecord[] = [
     children: [
       { path: "find-a-chef", Component: FindAChef },
       { path: "lead-received", Component: LeadReceived },
-      { path: "chefs", Component: Chefs },
+      // Provider info ("how to buy a lead"), relocated from /chefs now that the
+      // client mini-site owns that path.
+      { path: "for-chefs", Component: Chefs },
       { path: "how-it-works", Component: HowItWorks },
       { path: "faq", Component: Faq },
       { path: "privacy", Component: Privacy },
@@ -54,21 +63,21 @@ const chefRoutes: RouteRecord[] = [
       { path: "*", Component: NotFound },
     ],
   },
-  // The chef "join the network" recruitment landing — its own chrome.
-  // Prerendered to dist/join.html and served at ezfind.app/join (beneath the
-  // marketplace apex).
+  // Provider registration also reachable at /join (alias of the apex front door).
+  // Prerendered to dist/join.html.
   { path: "join", Component: EzfindJoin },
   // The operator admin panel — its own chrome, token-gated, noindex. Prerendered
   // to dist/admin.html; the Worker serves it at the admin.ezfind.app apex.
   { path: "admin", Component: AdminPanel },
 ];
 
-// The apex (ezfind.app) now serves the marketplace itself — it uses the full
-// chefRoutes like the chef host, with the recruitment landing beneath it at
-// /join. Only the admin host stays a single standalone page, hydrating against
-// the prerendered admin.html the Worker serves there. Prerendering runs without
-// a window, so the build always uses chefRoutes and emits every chef page plus
-// join.html and admin.html. Keep hosts in sync with `worker/index.ts`.
+// The apex (ezfind.app) serves these routes: "/" is provider registration, and
+// the chef mini-site + all marketplace/SEO pages live beneath it. Only the admin
+// host stays a single standalone page, hydrating against the prerendered
+// admin.html the Worker serves there. Prerendering runs without a window, so the
+// build always uses chefRoutes and emits index.html (registration), chefs.html
+// (chef mini-site), join.html and admin.html. Keep hosts in sync with
+// `worker/index.ts`.
 const host = typeof window !== "undefined" ? window.location.hostname : "";
 const ADMIN_HOSTS = new Set(["admin.ezfind.app"]);
 

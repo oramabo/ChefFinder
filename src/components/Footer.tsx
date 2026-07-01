@@ -18,7 +18,7 @@ export default function Footer() {
         </div>
         <nav className="footer__links" aria-label="ניווט תחתון">
           <Link to="/how-it-works">איך זה עובד</Link>
-          <Link to="/chefs">לשפים</Link>
+          <Link to="/for-chefs">לשפים</Link>
           <Link to="/faq">שאלות נפוצות</Link>
           <Link to="/privacy">פרטיות</Link>
           <Link to="/terms">תנאים</Link>

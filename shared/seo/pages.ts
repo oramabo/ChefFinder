@@ -17,16 +17,17 @@ export interface SeoPage {
 }
 
 // ---- private-chef vertical page generators ----
-// URL prefixes derive from the service's slug/heSlug so the vertical owns its
-// URL space (a new vertical reuses this shape with a different slug). Kosher is
-// a "kosher-" / "-כשר" variant of the same base. The paths this produces are
-// byte-identical to the previous hard-coded ones.
+// URL prefixes come from the service's SEO slugs (keyword-rich: /private-chef,
+// /שף-פרטי), kept independent of the mini-site hub slug (/chefs) so these pages
+// don't move. Kosher is a "kosher-" / "-כשר" variant of the same base. Pages are
+// tagged with the mini-site slug (serviceSlug). Paths are byte-identical to the
+// previous hard-coded ones.
 function cityPage(service: Service, city: City): SeoPage {
   return {
     serviceSlug: service.slug,
     kind: "city",
-    path: `/${service.slug}/${city.slug}`,
-    hePath: `/${service.heSlug}/${city.heSlug}`,
+    path: `/${service.seo.slug}/${city.slug}`,
+    hePath: `/${service.seo.heSlug}/${city.heSlug}`,
     citySlug: city.slug,
     title: `שף פרטי ב${city.he} | הזמנת שף לאירוע`,
     h1: `שף פרטי ב${city.he}`,
@@ -38,8 +39,8 @@ function eventCityPage(service: Service, event: SeoEvent, city: City): SeoPage {
   return {
     serviceSlug: service.slug,
     kind: "event-city",
-    path: `/${service.slug}/${event.slug}-${city.slug}`,
-    hePath: `/${service.heSlug}/${event.heSlug}-${city.heSlug}`,
+    path: `/${service.seo.slug}/${event.slug}-${city.slug}`,
+    hePath: `/${service.seo.heSlug}/${event.heSlug}-${city.heSlug}`,
     citySlug: city.slug,
     eventSlug: event.slug,
     title: `שף פרטי ל${event.heFor} ב${city.he} | השף שלי`,
@@ -52,8 +53,8 @@ function kosherCityPage(service: Service, city: City): SeoPage {
   return {
     serviceSlug: service.slug,
     kind: "kosher-city",
-    path: `/kosher-${service.slug}/${city.slug}`,
-    hePath: `/${service.heSlug}-כשר/${city.heSlug}`,
+    path: `/kosher-${service.seo.slug}/${city.slug}`,
+    hePath: `/${service.seo.heSlug}-כשר/${city.heSlug}`,
     citySlug: city.slug,
     title: `שף פרטי כשר ב${city.he} | בישול כשר לאירועים`,
     h1: `שף פרטי כשר ב${city.he}`,
@@ -78,7 +79,7 @@ function privateChefPages(service: Service): SeoPage[] {
 // means adding a registry entry and (if it has programmatic SEO pages) a builder
 // here; allSeoPages(), the sitemap, routing and prerender all pick it up.
 const PAGE_BUILDERS: Record<string, (service: Service) => SeoPage[]> = {
-  "private-chef": privateChefPages,
+  chefs: privateChefPages,
 };
 
 // The full cartesian set of programmatic pages, across every registered service.

@@ -29,6 +29,7 @@ import { onRequestGet as adminJoinApps } from "../functions/api/admin/joinApplic
 import { onRequestPost as adminJoinAppStatus } from "../functions/api/admin/joinApplicationStatus.ts";
 import { onRequestPost as submitJoin } from "../functions/api/join.ts";
 import { onRequestGet as sitemap } from "../functions/sitemap.xml.ts";
+import { APEX_HOST, subdomainRedirects } from "@shared/services/registry.ts";
 
 // Minimal local typings for the Workers runtime, so this file typechecks under
 // the existing (node + DOM) tsconfig without pulling in conflicting global
@@ -82,13 +83,17 @@ const routes: Route[] = [
 //   admin.ezfind.app  → the operator admin panel
 //   *.workers.dev     → the marketplace (dev/preview), untouched
 //
-// The canonical host for the marketplace. Requests to a REDIRECT_HOST are
-// 301'd here (path + query preserved) so link equity consolidates on one host
-// (subdirectory-style) instead of splitting across a subdomain.
-const CANONICAL_HOST = "ezfind.app";
-// Legacy/alias hosts that permanently redirect to the canonical host. The chef
-// subdomain moved onto the apex; www folds into the bare domain.
-const REDIRECT_HOSTS = new Set(["www.ezfind.app", "chefs.ezfind.app"]);
+// The canonical host. Requests to an alias host are 301'd here so link equity
+// consolidates on one host (subdirectory-style) instead of splitting across
+// subdomains. Each value is the target for that host's ROOT ("/"); every other
+// path is preserved. From the service registry, so a new service's subdomain
+// (e.g. cleaners.ezfind.app → /cleaners) redirects automatically. www folds
+// into the bare apex.
+const CANONICAL_HOST = APEX_HOST;
+const HOST_REDIRECTS: Record<string, string> = {
+  "www.ezfind.app": "/",
+  ...subdomainRedirects(),
+};
 
 // Per-host root: a hostname whose apex serves a specific prerendered page
 // instead of the marketplace. Only the admin host remains special; the apex
@@ -149,12 +154,15 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // Permanent redirect of alias hosts (www, the old chef subdomain) to the
-    // canonical apex, preserving path + query. This consolidates SEO authority
-    // on one host. 301 so browsers and Google cache the move.
-    if (REDIRECT_HOSTS.has(url.hostname)) {
+    // Permanent redirect of alias hosts (www, service subdomains) to the
+    // canonical apex. The host's root goes to its mapped path (chefs.ezfind.app/
+    // → ezfind.app/chefs); every other path — and the query — is preserved.
+    // 301 so browsers and Google cache the move and authority consolidates.
+    const rootTarget = HOST_REDIRECTS[url.hostname];
+    if (rootTarget !== undefined) {
       const target = new URL(url.toString());
       target.hostname = CANONICAL_HOST;
+      if (path === "/") target.pathname = rootTarget;
       return new Response(null, {
         status: 301,
         headers: { location: target.toString(), ...SECURITY_HEADERS },

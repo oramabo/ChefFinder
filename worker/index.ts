@@ -29,6 +29,7 @@ import { onRequestGet as adminJoinApps } from "../functions/api/admin/joinApplic
 import { onRequestPost as adminJoinAppStatus } from "../functions/api/admin/joinApplicationStatus.ts";
 import { onRequestPost as submitJoin } from "../functions/api/join.ts";
 import { onRequestGet as sitemap } from "../functions/sitemap.xml.ts";
+import { APEX_HOST, subdomainRedirects } from "@shared/services/registry.ts";
 
 // Minimal local typings for the Workers runtime, so this file typechecks under
 // the existing (node + DOM) tsconfig without pulling in conflicting global
@@ -66,23 +67,39 @@ const routes: Route[] = [
   { method: "GET", pattern: "/api/admin/pending", handler: adminPending },
   { method: "GET", pattern: "/api/admin/join-applications", handler: adminJoinApps },
   { method: "POST", pattern: "/api/admin/join-application/:id/status", handler: adminJoinAppStatus },
-  { method: "GET", pattern: "/sitemap.xml", handler: sitemap },
+  // Sitemaps (/sitemap.xml + /sitemap-*.xml) are handled by a dedicated branch
+  // in fetch(), not this table, so the whole family routes to one handler.
 ];
 
 // Baseline security headers mirrored from `dist/_headers` (the `/*` block), so
 // Worker-generated API/XML responses carry the same hardening that static and
 // HTML responses get from the assets layer. CSP is intentionally omitted here —
 // it is meaningful only for HTML, which this Worker never serves.
-// Per-host root: which prerendered page a hostname's apex serves instead of the
-// chef site. All custom domains point at this one Worker; it differentiates by
-// hostname. Keep in sync with the client routing in `src/routes.tsx`.
-//   ezfind.app        → the "join the network" landing
+// Host architecture. All custom domains point at this one Worker; it
+// differentiates by hostname. Keep in sync with the client routing in
+// `src/routes.tsx`.
+//   ezfind.app        → the client marketplace (find a chef) — our primary,
+//                       canonical host, where all the SEO pages live. Chef
+//                       recruitment lives beneath it at /join.
 //   admin.ezfind.app  → the operator admin panel
-// The chef host (chefs.ezfind.app) and *.workers.dev are not listed and serve
-// the chef site as before.
+//   *.workers.dev     → the marketplace (dev/preview), untouched
+//
+// The canonical host. Requests to an alias host are 301'd here so link equity
+// consolidates on one host (subdirectory-style) instead of splitting across
+// subdomains. Each value is the target for that host's ROOT ("/"); every other
+// path is preserved. From the service registry, so a new service's subdomain
+// (e.g. cleaners.ezfind.app → /cleaners) redirects automatically. www folds
+// into the bare apex.
+const CANONICAL_HOST = APEX_HOST;
+const HOST_REDIRECTS: Record<string, string> = {
+  "www.ezfind.app": "/",
+  ...subdomainRedirects(),
+};
+
+// Per-host root: a hostname whose apex serves a specific prerendered page
+// instead of the marketplace. Only the admin host remains special; the apex
+// serves the marketplace directly (default asset serving).
 const HOST_ROOT: Record<string, string> = {
-  "ezfind.app": "/join",
-  "www.ezfind.app": "/join",
   "admin.ezfind.app": "/admin",
 };
 
@@ -133,10 +150,50 @@ async function runWithMiddleware(
   return new Response(res.body, { status: res.status, headers });
 }
 
+// Build the framework-agnostic context leaf handlers expect.
+function makeFnCtx(
+  request: Request,
+  env: WorkerEnv,
+  params: Record<string, string>,
+  ctx: ExecutionContext,
+): FnCtx {
+  return {
+    request,
+    env,
+    params,
+    data: {},
+    waitUntil: (promise) => ctx.waitUntil(promise),
+    // Leaf handlers never call next(); provide a sane fallback regardless.
+    next: () => env.ASSETS.fetch(request),
+  };
+}
+
 export default {
   async fetch(request: Request, env: WorkerEnv, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
+
+    // Permanent redirect of alias hosts (www, service subdomains) to the
+    // canonical apex. The host's root goes to its mapped path (chefs.ezfind.app/
+    // → ezfind.app/chefs); every other path — and the query — is preserved.
+    // 301 so browsers and Google cache the move and authority consolidates.
+    const rootTarget = HOST_REDIRECTS[url.hostname];
+    if (rootTarget !== undefined) {
+      const target = new URL(url.toString());
+      target.hostname = CANONICAL_HOST;
+      if (path === "/") target.pathname = rootTarget;
+      return new Response(null, {
+        status: 301,
+        headers: { location: target.toString(), ...SECURITY_HEADERS },
+      });
+    }
+
+    // The sitemap family (index + per-service children, /sitemap-{service}.xml)
+    // is served by one handler that dispatches on the pathname, so a new
+    // service's child sitemap works without a routing change.
+    if (/^\/sitemap(-[a-z0-9-]+)?\.xml$/.test(path)) {
+      return runWithMiddleware(sitemap, makeFnCtx(request, env, {}, ctx));
+    }
 
     // Find a route matching this path (ignoring method first, so a known path
     // with the wrong method yields 405 rather than falling through to assets).
@@ -149,23 +206,15 @@ export default {
       if (!matched) {
         return error("שיטה לא נתמכת", 405, { reason: "method_not_allowed" });
       }
-      const fnCtx: FnCtx = {
-        request,
-        env,
-        params: matched.params as Record<string, string>,
-        data: {},
-        waitUntil: (promise) => ctx.waitUntil(promise),
-        // Leaf handlers never call next(); provide a sane fallback regardless.
-        next: () => env.ASSETS.fetch(request),
-      };
+      const fnCtx = makeFnCtx(request, env, matched.params as Record<string, string>, ctx);
       return runWithMiddleware(matched.route.handler, fnCtx);
     }
 
-    // Host-based serving for the umbrella custom domains: a navigation request
-    // is served that host's prerendered root page (ezfind.app → the landing,
-    // admin.ezfind.app → the admin panel). Static assets (anything with a file
-    // extension: .js/.css/.svg/.woff2/…) pass straight through so the page's
-    // JS/CSS/fonts still load. The chef host and *.workers.dev are untouched.
+    // Host-based serving for the admin custom domain: a navigation request is
+    // served that host's prerendered root page (admin.ezfind.app → the admin
+    // panel). Static assets (anything with a file extension: .js/.css/.svg/
+    // .woff2/…) pass straight through so the page's JS/CSS/fonts still load. The
+    // apex (marketplace) and *.workers.dev are untouched.
     const hostRoot = HOST_ROOT[url.hostname];
     if (hostRoot && !/\.[a-z0-9]+$/i.test(path)) {
       const rootPage = new URL(hostRoot, url.origin);

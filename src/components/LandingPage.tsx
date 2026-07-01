@@ -7,6 +7,11 @@ export interface LandingStep {
   body: string;
 }
 
+export interface LandingLink {
+  href: string;
+  label: string;
+}
+
 export interface LandingConfig {
   // Wordmark: "ezfind" plus an optional Hebrew suffix, e.g. "שפים" → "ezfind שפים".
   brandSuffix?: string;
@@ -17,8 +22,16 @@ export interface LandingConfig {
   heroTitle: ReactNode;
   heroSub: string;
   heroCta: string;
+  // Optional body paragraph shown between the hero and the 3-step explainer.
+  intro?: ReactNode;
   steps: [LandingStep, LandingStep, LandingStep];
+  // Optional closing line shown just above the form card.
+  formLead?: string;
   footerText: string;
+  // Optional footer nav — used for umbrella↔mini-site internal linking (the
+  // umbrella links to each service mini-site; a mini-site links to the umbrella
+  // and its key pages). Plain <a> so they're crawlable.
+  links?: LandingLink[];
 }
 
 function Wordmark({ suffix, className }: { suffix?: string; className?: string }) {
@@ -70,6 +83,12 @@ export default function LandingPage({
           </div>
         </section>
 
+        {config.intro && (
+          <section className="container section ez__intro">
+            <p className="lead-text">{config.intro}</p>
+          </section>
+        )}
+
         <section className="container section">
           <div className="grid grid-3">
             {config.steps.map((s, i) => (
@@ -83,6 +102,7 @@ export default function LandingPage({
         </section>
 
         <section id="join" className="container section">
+          {config.formLead && <p className="ez__form-lead">{config.formLead}</p>}
           <div className="card ez__form-card">{children}</div>
         </section>
       </main>
@@ -90,6 +110,15 @@ export default function LandingPage({
       <footer className="ez__footer">
         <div className="container">
           <Wordmark suffix={config.brandSuffix} className="ez__wordmark--sm" />
+          {config.links && config.links.length > 0 && (
+            <nav className="ez__footer-links" aria-label="קישורים">
+              {config.links.map((l) => (
+                <a key={l.href} href={l.href}>
+                  {l.label}
+                </a>
+              ))}
+            </nav>
+          )}
           <p className="ez__footer-copy">{config.footerText}</p>
         </div>
       </footer>

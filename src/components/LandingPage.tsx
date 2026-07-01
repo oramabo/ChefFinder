@@ -22,7 +22,11 @@ export interface LandingConfig {
   heroTitle: ReactNode;
   heroSub: string;
   heroCta: string;
+  // Optional body paragraph shown between the hero and the 3-step explainer.
+  intro?: ReactNode;
   steps: [LandingStep, LandingStep, LandingStep];
+  // Optional closing line shown just above the form card.
+  formLead?: string;
   footerText: string;
   // Optional footer nav — used for umbrella↔mini-site internal linking (the
   // umbrella links to each service mini-site; a mini-site links to the umbrella
@@ -79,6 +83,12 @@ export default function LandingPage({
           </div>
         </section>
 
+        {config.intro && (
+          <section className="container section ez__intro">
+            <p className="lead-text">{config.intro}</p>
+          </section>
+        )}
+
         <section className="container section">
           <div className="grid grid-3">
             {config.steps.map((s, i) => (
@@ -92,6 +102,7 @@ export default function LandingPage({
         </section>
 
         <section id="join" className="container section">
+          {config.formLead && <p className="ez__form-lead">{config.formLead}</p>}
           <div className="card ez__form-card">{children}</div>
         </section>
       </main>

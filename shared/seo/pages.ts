@@ -3,6 +3,11 @@ import { SEO_EVENTS, type SeoEvent } from "./events.ts";
 
 export type SeoPageKind = "city" | "event-city" | "kosher-city";
 
+// The two languages each page is published in. `he` is served at the Hebrew
+// path (hePath), `en` at the English path (path); they are separate, indexable,
+// hreflang-linked pages.
+export type Locale = "he" | "en";
+
 export interface SeoPage {
   kind: SeoPageKind;
   path: string; // English route path, e.g. /private-chef/tel-aviv
@@ -78,9 +83,20 @@ function decodePath(path: string): string {
   }
 }
 
-// Resolve a page by either its English or its Hebrew (canonical) path. Both URLs
-// are prerendered and render the same content; the Hebrew one is canonical.
+// Resolve a page by either its English or its Hebrew path. Both URLs are
+// prerendered, each rendering its own language; they are hreflang alternates.
 export function seoPageByPath(path: string): SeoPage | undefined {
   const decoded = decodePath(path);
   return allSeoPages().find((p) => p.path === decoded || p.hePath === decoded);
+}
+
+// Which language a pathname addresses on a resolved page: the Hebrew path → he,
+// the English path → en.
+export function localeForPath(page: SeoPage, path: string): Locale {
+  return decodePath(path) === page.hePath ? "he" : "en";
+}
+
+// The path for a page in a given locale.
+export function pathForLocale(page: SeoPage, locale: Locale): string {
+  return locale === "he" ? page.hePath : page.path;
 }

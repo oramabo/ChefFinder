@@ -10,6 +10,11 @@
 .header__inner {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  /* Logo on the left, CTA on the right (RTL): reverse the row so the first DOM
+     child — the brand — lands at the physical left and the CTA at the right,
+     with the nav centered. Matches the landing bar. */
+  flex-direction: row-reverse;
   gap: var(--space-5);
   padding-block: var(--space-2);
 }
@@ -28,7 +33,6 @@
 .header__nav {
   display: none;
   gap: var(--space-6);
-  margin-inline-start: auto;
   font-weight: 600;
   color: var(--color-text-muted);
 }

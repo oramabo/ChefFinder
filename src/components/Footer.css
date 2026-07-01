@@ -13,9 +13,9 @@
   gap: var(--space-5);
 }
 
-.footer__logo {
-  inline-size: 130px;
-  block-size: auto;
+.footer__brand {
+  text-decoration: none;
+  color: inherit;
 }
 
 .footer__links {

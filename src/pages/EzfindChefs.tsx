@@ -1,6 +1,11 @@
 import LandingPage, { type LandingConfig } from "../components/LandingPage.tsx";
 import LeadRequestForm from "../components/landing/LeadRequestForm.tsx";
 import { seoPagesByKind } from "@shared/seo/pages.ts";
+import { serviceBySlug, servicePath } from "@shared/services/registry.ts";
+
+// This IS the chef service mini-site, so its logo shows "ezfind" over the
+// service name and links back to the mini-site home.
+const CHEF = serviceBySlug("chefs")!;
 
 // The chef mini-site landing (served at ezfind.app/chefs) — same template/
 // branding as the umbrella page, but for CLIENTS looking to hire a private chef.
@@ -17,6 +22,8 @@ const config: LandingConfig = {
   seoDescription:
     "מחפשים שף פרטי לאירוע? ezfind מחברת אתכם לשפים פרטיים מובילים באזור שלכם. ספרו לנו על האירוע ונמצא לכם שף — בלי עלות, בלי התחייבות.",
   canonicalPath: "/chefs",
+  brandSuffix: CHEF.name.he,
+  homeHref: servicePath(CHEF),
   links: [
     { href: "/find-a-chef", label: "מצאו שף" },
     ...topCityLinks,

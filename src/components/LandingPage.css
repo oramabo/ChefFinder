@@ -25,6 +25,10 @@
   gap: var(--space-4);
   padding-block: var(--space-3);
 }
+.ez__bar-brand {
+  text-decoration: none;
+  color: inherit;
+}
 .ez__bar-cta {
   padding-block: 0.5rem;
   padding-inline: var(--space-4);

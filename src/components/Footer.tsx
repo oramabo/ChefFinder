@@ -1,14 +1,20 @@
 import { Link } from "react-router-dom";
 import { reopenConsent } from "../lib/consent.ts";
 import Wordmark from "./Wordmark.tsx";
+import { serviceBySlug, servicePath } from "@shared/services/registry.ts";
 import "./Footer.css";
+
+// Chef mini-site chrome (only vertical for now): two-line logo linking home.
+const CHEF = serviceBySlug("chefs")!;
 
 export default function Footer() {
   return (
     <footer className="footer">
       <div className="container footer__inner">
         <div className="footer__brandcol">
-          <Wordmark />
+          <Link to={servicePath(CHEF)} className="footer__brand" aria-label="דף הבית">
+            <Wordmark suffix={CHEF.name.he} />
+          </Link>
         </div>
         <nav className="footer__links" aria-label="ניווט תחתון">
           <Link to="/how-it-works">איך זה עובד</Link>

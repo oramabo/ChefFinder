@@ -11,10 +11,28 @@
 .ez__wordmark-accent {
   color: var(--color-accent);
 }
-.ez__wordmark-suffix {
-  color: var(--color-text);
-  font-weight: 700;
-}
 .ez__wordmark--sm {
   font-size: 1.3rem;
+}
+
+/* Service mini-site variant: "ezfind" over the service name on two lines. The
+   wordmark is treated as LTR (the brand is Latin) so both lines align to the
+   physical left, with the Hebrew service name still shaped right-to-left. */
+.ez__wordmark--stacked {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  direction: ltr;
+  text-align: left;
+  line-height: 1.02;
+  white-space: normal;
+}
+.ez__wordmark-main {
+  white-space: nowrap;
+}
+.ez__wordmark-suffix {
+  font-size: 0.55em;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--color-text-muted);
 }

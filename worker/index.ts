@@ -67,7 +67,8 @@ const routes: Route[] = [
   { method: "GET", pattern: "/api/admin/pending", handler: adminPending },
   { method: "GET", pattern: "/api/admin/join-applications", handler: adminJoinApps },
   { method: "POST", pattern: "/api/admin/join-application/:id/status", handler: adminJoinAppStatus },
-  { method: "GET", pattern: "/sitemap.xml", handler: sitemap },
+  // Sitemaps (/sitemap.xml + /sitemap-*.xml) are handled by a dedicated branch
+  // in fetch(), not this table, so the whole family routes to one handler.
 ];
 
 // Baseline security headers mirrored from `dist/_headers` (the `/*` block), so
@@ -149,6 +150,24 @@ async function runWithMiddleware(
   return new Response(res.body, { status: res.status, headers });
 }
 
+// Build the framework-agnostic context leaf handlers expect.
+function makeFnCtx(
+  request: Request,
+  env: WorkerEnv,
+  params: Record<string, string>,
+  ctx: ExecutionContext,
+): FnCtx {
+  return {
+    request,
+    env,
+    params,
+    data: {},
+    waitUntil: (promise) => ctx.waitUntil(promise),
+    // Leaf handlers never call next(); provide a sane fallback regardless.
+    next: () => env.ASSETS.fetch(request),
+  };
+}
+
 export default {
   async fetch(request: Request, env: WorkerEnv, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -169,6 +188,13 @@ export default {
       });
     }
 
+    // The sitemap family (index + per-service children, /sitemap-{service}.xml)
+    // is served by one handler that dispatches on the pathname, so a new
+    // service's child sitemap works without a routing change.
+    if (/^\/sitemap(-[a-z0-9-]+)?\.xml$/.test(path)) {
+      return runWithMiddleware(sitemap, makeFnCtx(request, env, {}, ctx));
+    }
+
     // Find a route matching this path (ignoring method first, so a known path
     // with the wrong method yields 405 rather than falling through to assets).
     const pathMatches = routes
@@ -180,15 +206,7 @@ export default {
       if (!matched) {
         return error("שיטה לא נתמכת", 405, { reason: "method_not_allowed" });
       }
-      const fnCtx: FnCtx = {
-        request,
-        env,
-        params: matched.params as Record<string, string>,
-        data: {},
-        waitUntil: (promise) => ctx.waitUntil(promise),
-        // Leaf handlers never call next(); provide a sane fallback regardless.
-        next: () => env.ASSETS.fetch(request),
-      };
+      const fnCtx = makeFnCtx(request, env, matched.params as Record<string, string>, ctx);
       return runWithMiddleware(matched.route.handler, fnCtx);
     }
 

@@ -71,4 +71,13 @@ describe("Worker host-based serving", () => {
     expect(await (await get("https://cheffinder.example.workers.dev/")).text()).toBe("/");
     expect(await (await get("https://cheffinder.example.workers.dev/chefs")).text()).toBe("/chefs");
   });
+
+  it("routes the whole /sitemap*.xml family to the sitemap handler", async () => {
+    const index = await get("https://ezfind.app/sitemap.xml");
+    expect(index.status).toBe(200);
+    expect(await index.text()).toContain("<sitemapindex");
+    const child = await get("https://ezfind.app/sitemap-chefs.xml");
+    expect(child.status).toBe(200);
+    expect(await child.text()).toContain("<urlset");
+  });
 });

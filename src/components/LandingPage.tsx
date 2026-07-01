@@ -7,6 +7,11 @@ export interface LandingStep {
   body: string;
 }
 
+export interface LandingLink {
+  href: string;
+  label: string;
+}
+
 export interface LandingConfig {
   // Wordmark: "ezfind" plus an optional Hebrew suffix, e.g. "שפים" → "ezfind שפים".
   brandSuffix?: string;
@@ -19,6 +24,10 @@ export interface LandingConfig {
   heroCta: string;
   steps: [LandingStep, LandingStep, LandingStep];
   footerText: string;
+  // Optional footer nav — used for umbrella↔mini-site internal linking (the
+  // umbrella links to each service mini-site; a mini-site links to the umbrella
+  // and its key pages). Plain <a> so they're crawlable.
+  links?: LandingLink[];
 }
 
 function Wordmark({ suffix, className }: { suffix?: string; className?: string }) {
@@ -90,6 +99,15 @@ export default function LandingPage({
       <footer className="ez__footer">
         <div className="container">
           <Wordmark suffix={config.brandSuffix} className="ez__wordmark--sm" />
+          {config.links && config.links.length > 0 && (
+            <nav className="ez__footer-links" aria-label="קישורים">
+              {config.links.map((l) => (
+                <a key={l.href} href={l.href}>
+                  {l.label}
+                </a>
+              ))}
+            </nav>
+          )}
           <p className="ez__footer-copy">{config.footerText}</p>
         </div>
       </footer>

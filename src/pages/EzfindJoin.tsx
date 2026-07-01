@@ -1,13 +1,17 @@
 import LandingPage, { type LandingConfig } from "../components/LandingPage.tsx";
 import JoinForm from "../components/landing/JoinForm.tsx";
+import { SERVICES, servicePath } from "@shared/services/registry.ts";
 
-// The umbrella ezfind.app landing — for professionals of any trade who want to
-// join the network and receive leads.
+// The umbrella ezfind.app landing (served at the apex "/") — for professionals of
+// any trade who want to join the network and receive leads. Its footer links to
+// every service mini-site (registry-driven), so new verticals are discoverable
+// and get internal links from the platform's highest-authority page.
 const config: LandingConfig = {
   seoTitle: "ezfind — הצטרפו לרשת בעלי המקצוע",
   seoDescription:
     "ezfind מחברת לקוחות עם בעלי מקצוע מובילים. הצטרפו כדי לקבל פניות אמיתיות מלקוחות באזור שלכם — הרשמה חינם, בלי התחייבות.",
-  canonicalPath: "/join",
+  canonicalPath: "/",
+  links: SERVICES.map((s) => ({ href: servicePath(s), label: s.name.he })),
   heroEyebrow: "לבעלי מקצוע",
   heroTitle: (
     <>

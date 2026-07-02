@@ -3,7 +3,6 @@ import Layout from "./components/Layout.tsx";
 import FindAChef from "./pages/FindAChef.tsx";
 import LeadReceived from "./pages/LeadReceived.tsx";
 import LeadUnlock from "./pages/LeadUnlock.tsx";
-import Chefs from "./pages/Chefs.tsx";
 import HowItWorks from "./pages/HowItWorks.tsx";
 import Faq from "./pages/Faq.tsx";
 import Privacy from "./pages/Privacy.tsx";
@@ -50,9 +49,6 @@ const chefRoutes: RouteRecord[] = [
     children: [
       { path: "find-a-chef", Component: FindAChef },
       { path: "lead-received", Component: LeadReceived },
-      // Provider info ("how to buy a lead"), relocated from /chefs now that the
-      // client mini-site owns that path.
-      { path: "for-chefs", Component: Chefs },
       { path: "how-it-works", Component: HowItWorks },
       { path: "faq", Component: Faq },
       { path: "privacy", Component: Privacy },

@@ -32,6 +32,10 @@ export interface LandingConfig {
   // Optional closing line shown just above the form card.
   formLead?: string;
   footerText: string;
+  // Optional footer override — pass the shared site <Footer> so a mini-site
+  // landing uses the exact same footer as its inner pages. When set, the
+  // built-in ez__footer (and `links`/`footerText`) are not rendered.
+  footer?: ReactNode;
   // Optional footer nav — used for umbrella↔mini-site internal linking (the
   // umbrella links to each service mini-site; a mini-site links to the umbrella
   // and its key pages). Plain <a> so they're crawlable.
@@ -104,21 +108,23 @@ export default function LandingPage({
         </section>
       </main>
 
-      <footer className="ez__footer">
-        <div className="container">
-          <Wordmark suffix={config.brandSuffix} className="ez__wordmark--sm" />
-          {config.links && config.links.length > 0 && (
-            <nav className="ez__footer-links" aria-label="קישורים">
-              {config.links.map((l) => (
-                <a key={l.href} href={l.href}>
-                  {l.label}
-                </a>
-              ))}
-            </nav>
-          )}
-          <p className="ez__footer-copy">{config.footerText}</p>
-        </div>
-      </footer>
+      {config.footer ?? (
+        <footer className="ez__footer">
+          <div className="container">
+            <Wordmark suffix={config.brandSuffix} className="ez__wordmark--sm" />
+            {config.links && config.links.length > 0 && (
+              <nav className="ez__footer-links" aria-label="קישורים">
+                {config.links.map((l) => (
+                  <a key={l.href} href={l.href}>
+                    {l.label}
+                  </a>
+                ))}
+              </nav>
+            )}
+            <p className="ez__footer-copy">{config.footerText}</p>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }

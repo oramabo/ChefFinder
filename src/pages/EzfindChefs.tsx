@@ -1,21 +1,13 @@
 import LandingPage, { type LandingConfig } from "../components/LandingPage.tsx";
 import LeadRequestForm from "../components/landing/LeadRequestForm.tsx";
-import { seoPagesByKind } from "@shared/seo/pages.ts";
+import Footer from "../components/Footer.tsx";
 import { serviceBySlug, servicePath } from "@shared/services/registry.ts";
 
-// This IS the chef service mini-site, so its logo shows "ezfind" over the
-// service name and links back to the mini-site home.
+// The chef service mini-site landing (served at ezfind.app/chefs), for CLIENTS
+// looking to hire a private chef. Its logo shows "ezfind" over the service name
+// and links to the mini-site home, and it uses the shared site <Footer> so the
+// whole mini-site (landing + inner pages) has the exact same footer.
 const CHEF = serviceBySlug("chefs")!;
-
-// The chef mini-site landing (served at ezfind.app/chefs) — same template/
-// branding as the umbrella page, but for CLIENTS looking to hire a private chef.
-// The form creates a lead (the same pipeline that distributes requests to chefs).
-// Footer links point to find-a-chef, the top city programmatic pages (spreading
-// authority to the money pages) and back to the umbrella.
-const topCityLinks = seoPagesByKind("city")
-  .filter((p) => p.serviceSlug === "chefs")
-  .slice(0, 6)
-  .map((p) => ({ href: encodeURI(p.hePath), label: p.h1 }));
 
 const config: LandingConfig = {
   seoTitle: "ezfind — מצאו שף פרטי לאירוע שלכם",
@@ -24,11 +16,6 @@ const config: LandingConfig = {
   canonicalPath: "/chefs",
   brandSuffix: CHEF.name.he,
   homeHref: servicePath(CHEF),
-  links: [
-    { href: "/find-a-chef", label: "מצאו שף" },
-    ...topCityLinks,
-    { href: "/", label: "בעלי מקצוע — הצטרפו לרשת" },
-  ],
   heroEyebrow: "שף פרטי לכל אירוע",
   heroTitle: (
     <>
@@ -48,6 +35,7 @@ const config: LandingConfig = {
   ],
   formLead: "נשאר לכם רק למלא פרטים ולסגור אירוע מושלם ללא מאמץ.",
   footerText: "© 2026 ezfind · מוצאים לכם את השף הפרטי המושלם",
+  footer: <Footer />,
 };
 
 export default function EzfindChefs() {

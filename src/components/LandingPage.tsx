@@ -16,6 +16,9 @@ export interface LandingLink {
 export interface LandingConfig {
   // Wordmark: "ezfind" plus an optional Hebrew suffix, e.g. "שפים" → "ezfind שפים".
   brandSuffix?: string;
+  // Where the logo links to (the site's own home). Umbrella → "/", a mini-site →
+  // its own home, e.g. "/chefs". Defaults to "/".
+  homeHref?: string;
   seoTitle: string;
   seoDescription: string;
   canonicalPath: string;
@@ -56,7 +59,9 @@ export default function LandingPage({
 
       <header className="ez__bar">
         <div className="ez__bar-inner container">
-          <Wordmark suffix={config.brandSuffix} />
+          <a className="ez__bar-brand" href={config.homeHref ?? "/"} aria-label="דף הבית">
+            <Wordmark suffix={config.brandSuffix} />
+          </a>
           <a className="btn btn--primary ez__bar-cta" href="#join">
             {config.heroCta}
           </a>

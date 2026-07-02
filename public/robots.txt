@@ -1,7 +1,12 @@
+# ezfind — all crawlers welcome, including AI answer engines (GEO). The one
+# rule below already permits AI/LLM bots (GPTBot, OAI-SearchBot, ChatGPT-User,
+# PerplexityBot, ClaudeBot, anthropic-ai, Google-Extended, CCBot, …) since they
+# match "*"; we intentionally do NOT block them, so ezfind can be cited in AI
+# answers. Only private/functional paths are disallowed.
 User-agent: *
 Allow: /
 Disallow: /lead/
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: /sitemap.xml
+Sitemap: https://ezfind.app/sitemap.xml

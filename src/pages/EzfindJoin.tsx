@@ -6,11 +6,33 @@ import { SERVICES, servicePath } from "@shared/services/registry.ts";
 // any trade who want to join the network and receive leads. Its footer links to
 // every service mini-site (registry-driven), so new verticals are discoverable
 // and get internal links from the platform's highest-authority page.
+
+// Organization + WebSite schema on the homepage: names the ezfind entity for
+// Google's knowledge graph and for AI answer engines (helps GEO — being cited).
+const ORGANIZATION_LD = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "ezfind",
+  url: "https://ezfind.app",
+  description:
+    "ezfind מחברת לקוחות עם בעלי מקצוע מובילים בישראל — החל משפים פרטיים לאירועים.",
+  areaServed: { "@type": "Country", name: "Israel" },
+  knowsLanguage: ["he", "en"],
+};
+const WEBSITE_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "ezfind",
+  url: "https://ezfind.app",
+  inLanguage: "he",
+};
+
 const config: LandingConfig = {
   seoTitle: "ezfind — הצטרפו לרשת בעלי המקצוע",
   seoDescription:
     "ezfind מחברת לקוחות עם בעלי מקצוע מובילים. הצטרפו כדי לקבל פניות אמיתיות מלקוחות באזור שלכם — הרשמה חינם, בלי התחייבות.",
   canonicalPath: "/",
+  jsonLd: [ORGANIZATION_LD, WEBSITE_LD],
   links: SERVICES.map((s) => ({ href: servicePath(s), label: s.name.he })),
   heroEyebrow: "לבעלי מקצוע",
   heroTitle: (

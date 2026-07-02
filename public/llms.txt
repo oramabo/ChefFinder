@@ -1,0 +1,33 @@
+# ezfind
+
+> ezfind connects people in Israel with top local service providers. The first
+> service is private chefs (Hebrew: שף פרטי): you tell us about your event and we
+> match you with private chefs in your area — free and with no obligation. The
+> site is Hebrew-first (RTL).
+
+## Private chef service (שף פרטי)
+
+- How it works: fill a short form about your event → up to 3 vetted private chefs
+  contact you with a tailored quote → you compare and choose. Free, no obligation.
+  If you don't close, ezfind keeps searching until there's a precise match.
+- Coverage: private chefs across Israel, including Tel Aviv, Jerusalem, Haifa,
+  Rishon LeZion, Petah Tikva, Netanya, Be'er Sheva, Herzliya, Ramat Gan, Ra'anana,
+  Kfar Saba, Ashdod, Modi'in, Eilat and Caesarea.
+- Typical price: about ₪130–₪550 per guest, depending on the city, the menu and
+  the number of guests.
+- Occasions: birthdays, anniversaries, romantic dinners, business events and
+  family gatherings. Kosher menus (kosher private chef / שף פרטי כשר) are available.
+
+## Key pages
+
+- Find a private chef (landing): https://ezfind.app/chefs
+- Start a request (lead form): https://ezfind.app/find-a-chef
+- How it works: https://ezfind.app/how-it-works
+- FAQ: https://ezfind.app/faq
+- City pages (Hebrew, canonical), e.g.: https://ezfind.app/שף-פרטי/תל-אביב
+- Kosher city pages, e.g.: https://ezfind.app/שף-פרטי-כשר/ירושלים
+- Full list of pages: https://ezfind.app/sitemap.xml
+
+## For professionals
+
+- Join the ezfind network to receive client leads: https://ezfind.app/

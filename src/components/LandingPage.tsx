@@ -22,6 +22,8 @@ export interface LandingConfig {
   seoTitle: string;
   seoDescription: string;
   canonicalPath: string;
+  // Optional JSON-LD for the page (e.g. Organization + WebSite on the umbrella).
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   heroEyebrow: string;
   heroTitle: ReactNode;
   heroSub: string;
@@ -59,6 +61,7 @@ export default function LandingPage({
         title={config.seoTitle}
         description={config.seoDescription}
         canonicalPath={config.canonicalPath}
+        jsonLd={config.jsonLd}
       />
 
       <header className="ez__bar">

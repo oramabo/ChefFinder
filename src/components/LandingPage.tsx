@@ -13,6 +13,11 @@ export interface LandingLink {
   label: string;
 }
 
+export interface LandingFaq {
+  q: string;
+  a: string;
+}
+
 export interface LandingConfig {
   // Wordmark: "ezfind" plus an optional Hebrew suffix, e.g. "שפים" → "ezfind שפים".
   brandSuffix?: string;
@@ -33,6 +38,9 @@ export interface LandingConfig {
   steps: [LandingStep, LandingStep, LandingStep];
   // Optional closing line shown just above the form card.
   formLead?: string;
+  // Optional FAQ — rendered as an on-page accordion AND emitted as FAQPage
+  // JSON-LD (rich results + material for AI answer engines / GEO).
+  faq?: LandingFaq[];
   footerText: string;
   // Optional footer override — pass the shared site <Footer> so a mini-site
   // landing uses the exact same footer as its inner pages. When set, the
@@ -55,13 +63,31 @@ export default function LandingPage({
   config: LandingConfig;
   children: ReactNode;
 }) {
+  // Combine any page JSON-LD with a FAQPage built from config.faq.
+  const baseLd = config.jsonLd ? (Array.isArray(config.jsonLd) ? config.jsonLd : [config.jsonLd]) : [];
+  const faqLd =
+    config.faq && config.faq.length > 0
+      ? [
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: config.faq.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
+          },
+        ]
+      : [];
+  const jsonLd = [...baseLd, ...faqLd];
+
   return (
     <div className="ez">
       <Seo
         title={config.seoTitle}
         description={config.seoDescription}
         canonicalPath={config.canonicalPath}
-        jsonLd={config.jsonLd}
+        jsonLd={jsonLd.length > 0 ? jsonLd : undefined}
       />
 
       <header className="ez__bar">
@@ -109,6 +135,18 @@ export default function LandingPage({
           {config.formLead && <p className="ez__form-lead">{config.formLead}</p>}
           <div className="card ez__form-card">{children}</div>
         </section>
+
+        {config.faq && config.faq.length > 0 && (
+          <section className="container section ez__faq">
+            <h2>שאלות נפוצות</h2>
+            {config.faq.map((f, i) => (
+              <details key={f.q} open={i === 0}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </section>
+        )}
       </main>
 
       {config.footer ?? (

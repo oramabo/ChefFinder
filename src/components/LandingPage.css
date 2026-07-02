@@ -72,6 +72,28 @@
   font-weight: 600;
 }
 
+.ez__faq {
+  max-inline-size: 60ch;
+  margin-inline: auto;
+}
+.ez__faq h2 {
+  text-align: center;
+  margin-block-end: var(--space-5);
+}
+.ez__faq details {
+  border-block-end: 1px solid var(--color-border);
+  padding-block: var(--space-3);
+}
+.ez__faq summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+.ez__faq details p {
+  margin-block-start: var(--space-2);
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
 /* ── Steps ───────────────────────────────────────────────────────────────── */
 .ez__step-num {
   display: inline-grid;

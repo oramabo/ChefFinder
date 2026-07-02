@@ -1,21 +1,13 @@
 import LandingPage, { type LandingConfig } from "../components/LandingPage.tsx";
 import LeadRequestForm from "../components/landing/LeadRequestForm.tsx";
-import { seoPagesByKind } from "@shared/seo/pages.ts";
+import Footer from "../components/Footer.tsx";
 import { serviceBySlug, servicePath } from "@shared/services/registry.ts";
 
-// This IS the chef service mini-site, so its logo shows "ezfind" over the
-// service name and links back to the mini-site home.
+// The chef service mini-site landing (served at ezfind.app/chefs), for CLIENTS
+// looking to hire a private chef. Its logo shows "ezfind" over the service name
+// and links to the mini-site home, and it uses the shared site <Footer> so the
+// whole mini-site (landing + inner pages) has the exact same footer.
 const CHEF = serviceBySlug("chefs")!;
-
-// The chef mini-site landing (served at ezfind.app/chefs) — same template/
-// branding as the umbrella page, but for CLIENTS looking to hire a private chef.
-// The form creates a lead (the same pipeline that distributes requests to chefs).
-// Footer links point to find-a-chef, the top city programmatic pages (spreading
-// authority to the money pages) and back to the umbrella.
-const topCityLinks = seoPagesByKind("city")
-  .filter((p) => p.serviceSlug === "chefs")
-  .slice(0, 6)
-  .map((p) => ({ href: encodeURI(p.hePath), label: p.h1 }));
 
 const config: LandingConfig = {
   seoTitle: "ezfind — מצאו שף פרטי לאירוע שלכם",
@@ -24,11 +16,6 @@ const config: LandingConfig = {
   canonicalPath: "/chefs",
   brandSuffix: CHEF.name.he,
   homeHref: servicePath(CHEF),
-  links: [
-    { href: "/find-a-chef", label: "מצאו שף" },
-    ...topCityLinks,
-    { href: "/", label: "בעלי מקצוע — הצטרפו לרשת" },
-  ],
   heroEyebrow: "שף פרטי לכל אירוע",
   heroTitle: (
     <>
@@ -47,7 +34,34 @@ const config: LandingConfig = {
     { title: "עד התאמה מדויקת", body: "לא סגרתם? נמשיך לחפש לכם עד שנמצא את השף המתאים." },
   ],
   formLead: "נשאר לכם רק למלא פרטים ולסגור אירוע מושלם ללא מאמץ.",
+  faq: [
+    {
+      q: "כמה עולה שף פרטי לאירוע?",
+      a: "המחיר תלוי במספר האורחים, בתפריט ובאזור, ולרוב נע בין ₪150 ל-₪450 לאורח. משאירים פרטים ומקבלים הצעות מדויקות משפים באזור שלכם — בחינם ובלי התחייבות.",
+    },
+    {
+      q: "איך זה עובד?",
+      a: "ממלאים טופס קצר על האירוע (סוג האירוע, מספר אורחים ותאריך), ועד 3 שפים פרטיים מתאימים מהאזור חוזרים אליכם עם הצעה. אתם משווים ובוחרים את מי שהכי מתאים לכם.",
+    },
+    {
+      q: "השירות באמת בחינם?",
+      a: "כן. השארת הפרטים וקבלת ההצעות היא בחינם לחלוטין ובלי התחייבות. משלמים רק לשף שבחרתם, לפי מה שסגרתם איתו ישירות.",
+    },
+    {
+      q: "לאילו אירועים אפשר להזמין שף פרטי?",
+      a: "ימי הולדת, ארוחות זוגיות ורומנטיות, אירועים עסקיים, אירוחי משפחה וחגים ועוד. אפשר גם תפריט כשר בהשגחה.",
+    },
+    {
+      q: "באילו אזורים פועל השירות?",
+      a: "שפים פרטיים בכל הארץ — תל אביב, ירושלים, חיפה, הרצליה, נתניה, באר שבע ועוד. ציינו את האזור בטופס ונחבר אתכם לשפים מקומיים.",
+    },
+    {
+      q: "תוך כמה זמן אקבל הצעות?",
+      a: "לרוב תוך זמן קצר. אם לא נסגר לכם שף מתאים, נמשיך לחפש עד שתימצא התאמה מדויקת.",
+    },
+  ],
   footerText: "© 2026 ezfind · מוצאים לכם את השף הפרטי המושלם",
+  footer: <Footer />,
 };
 
 export default function EzfindChefs() {

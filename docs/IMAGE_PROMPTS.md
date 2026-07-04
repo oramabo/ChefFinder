@@ -65,7 +65,7 @@ Where: marketplace home hero (`src/pages/Home.tsx`).
 
 ### `chef.png` — ~900×900
 
-Where: "for chefs" info page (`src/pages/Chefs.tsx`).
+Where: currently unused (was the "for chefs" info page, removed).
 
 > Portrait of a professional chef in a white chef jacket smiling while checking
 > a smartphone in a modern kitchen, natural window light, shallow depth of
@@ -73,7 +73,7 @@ Where: "for chefs" info page (`src/pages/Chefs.tsx`).
 
 ### `olive.png` — ~600×600, transparent background
 
-Where: decorative accent on the "for chefs" page (`src/pages/Chefs.tsx`).
+Where: currently unused (was a decorative accent on the removed "for chefs" page).
 
 > Minimal hand-drawn illustration of an olive branch with three olives, thin
 > violet line art (#7c3aed) with saffron-gold olives, on a fully transparent
@@ -111,4 +111,4 @@ Where: favicon/app icon (`index.html`).
 - Keep all photos in the same "session": same grading (violet shadows, warm
   highlights) so pages feel like one brand.
 - After replacing images, run `npm run build` and spot-check `/`, `/chefs`,
-  `/for-chefs`, and a shared link preview (og.png).
+  and a shared link preview (og.png).

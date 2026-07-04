@@ -194,6 +194,18 @@ export default {
       });
     }
 
+    // Removed pages: permanent redirect so stale links and indexed URLs don't
+    // 404. /for-chefs (provider info) already canonicalised to /chefs before
+    // its removal.
+    if (path === "/for-chefs") {
+      const target = new URL(url.toString());
+      target.pathname = "/chefs";
+      return new Response(null, {
+        status: 301,
+        headers: { location: target.toString(), ...SECURITY_HEADERS },
+      });
+    }
+
     // The sitemap family (index + per-service children, /sitemap-{service}.xml)
     // is served by one handler that dispatches on the pathname, so a new
     // service's child sitemap works without a routing change.

@@ -13,7 +13,7 @@ import type { Handler } from "../functions-lib/handler.ts";
 const XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>';
 
 // Platform-level pages that aren't specific to one vertical.
-const PLATFORM_PATHS = ["/", "/chefs", "/find-a-chef", "/how-it-works", "/faq", "/for-chefs"];
+const PLATFORM_PATHS = ["/", "/chefs", "/find-a-chef", "/how-it-works", "/faq"];
 
 function xmlResponse(body: string): Response {
   return new Response(body, {

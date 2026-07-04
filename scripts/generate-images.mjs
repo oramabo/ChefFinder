@@ -99,7 +99,7 @@ const IMAGES = [
   },
   {
     file: "chef.png",
-    where: '"for chefs" info page (src/pages/Chefs.tsx)',
+    where: "currently unused (was the removed for-chefs page)",
     flex: "1792x1792", // ~2x of 900×900, /16-aligned
     fixed: "1024x1024",
     target: { width: 900, height: 900 },
@@ -112,7 +112,7 @@ const IMAGES = [
   },
   {
     file: "olive.png",
-    where: 'decorative accent on the "for chefs" page (src/pages/Chefs.tsx)',
+    where: "currently unused (was a decorative accent on the removed for-chefs page)",
     flex: "1200x1200",
     fixed: "1024x1024",
     target: { width: 600, height: 600 },
@@ -388,7 +388,7 @@ async function main() {
     console.error(`[images] re-run just those: node scripts/generate-images.mjs ${failures.join(" ")}`);
     process.exit(1);
   }
-  console.log("[images] all images generated. Next: npm run build, then spot-check /, /chefs, /for-chefs and a share preview (og.png).");
+  console.log("[images] all images generated. Next: npm run build, then spot-check /, /chefs and a share preview (og.png).");
 }
 
 main().catch((err) => {

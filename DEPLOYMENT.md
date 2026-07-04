@@ -138,8 +138,10 @@ the `VITE_*` values.
    supabase db push
    ```
    or paste each file from `supabase/migrations/` (`0001_init.sql` →
-   `0005_reveal_token.sql`) into the SQL editor, in order. **Do not** run
-   `supabase/seed.sql` in production.
+   `0009_phone_otps.sql`) into the SQL editor, in order. **Do not** run
+   `supabase/seed.sql` in production. The CLI route is strongly preferred —
+   `supabase db push` remembers what has already been applied, so future
+   migrations are a single command.
 3. Enable the **`pg_cron`** extension: Database → Extensions → enable `pg_cron`.
    `0003_sweep.sql` schedules the abandoned-reservation sweep every 5 minutes.
    If the extension was off when migrations ran, re-run the `cron.schedule(...)`

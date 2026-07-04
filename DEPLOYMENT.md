@@ -20,6 +20,35 @@ payment provider is missing, so half-configured states can't leak data.
 > Security: never paste secrets into chat, commits, or screenshots. Enter them
 > directly in the provider and Cloudflare dashboards.
 
+## 🚀 Launch checklist (Bit-only start)
+
+Everything on this list must be done before real chefs pay real money:
+
+1. **Remove `MOCK_PAYMENTS = "true"` from `wrangler.toml`.** While it is set,
+   `/api/payment/mock-complete` lets anyone unlock client contacts without
+   paying.
+2. **Set the `BIT_PHONE` secret** (and optionally `BIT_LINK`). With Grow unset,
+   the reserve flow shows Bit instructions and you confirm payments in `/admin`.
+3. **Set `TURNSTILE_SECRET` (secret) + `VITE_TURNSTILE_SITE_KEY` (build var).**
+   Turnstile now gates **both** the lead form and the reserve endpoint. Without
+   the secret, the factory logs an error on every request and anti-spam is
+   effectively off.
+4. **Set `ADMIN_TOKEN`** (strong secret; the admin API accepts it via the
+   `x-admin-token` header only — query-param tokens are rejected).
+5. **Set `PUBLIC_BASE_URL`** to the real domain (`https://ezfind.app`) so unlock
+   and recovery links point at the canonical host.
+6. **Add WAF rate-limiting rules** on `/api/lead` and `/api/lead/*/reserve`
+   (section 6b) — Turnstile raises the cost of abuse; the WAF caps its volume.
+7. **Apply migrations** through `0008` (late-payment recovery + multi-vertical
+   columns). The reservation sweep runs via pg_cron when available **and** via
+   the Worker cron trigger (every 10 min, `wrangler.toml [triggers]`) as a
+   backstop.
+8. **After confirming a Bit payment in `/admin`, send the chef the recovery
+   link** the panel shows — it restores contact access from any device (chefs
+   often pay inside in-app browsers that lose local storage).
+9. **Reviews stay off** (`REVIEWS_ARE_REAL=false` in `shared/seo/reviews.ts`)
+   until the seed reviews are replaced with real, verifiable customer reviews.
+
 ## Recommended first deploy: full flow, placeholder checkout
 
 To test the **complete flow** — lead capture, distribution, unlock-link

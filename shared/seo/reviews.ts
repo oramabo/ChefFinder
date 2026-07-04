@@ -14,7 +14,7 @@
 //   1. Replace the seed entries with real, verified reviews — e.g. collected
 //      from the ~1,000-chef WhatsApp group and their clients (SEO strategy #6).
 //   2. Flip REVIEWS_ARE_REAL to true.
-export const REVIEWS_ARE_REAL = true;
+export const REVIEWS_ARE_REAL = false;
 
 export interface Review {
   author: string; // display name (first name + initial)

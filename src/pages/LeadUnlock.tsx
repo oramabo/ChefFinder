@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import Seo from "../components/Seo.tsx";
 import Badge from "../components/Badge.tsx";
 import SlotsLeft from "../components/SlotsLeft.tsx";
+import Turnstile from "../components/Turnstile.tsx";
 import { Button } from "../components/Button.tsx";
 import { Field, TextInput } from "../components/Field.tsx";
 import { EVENT_TYPES, CUISINES } from "@shared/constants.ts";
@@ -32,6 +33,7 @@ export default function LeadUnlock() {
   const [working, setWorking] = useState(false);
   const [message, setMessage] = useState("");
   const [bit, setBit] = useState<ManualBit | null>(null);
+  const [captcha, setCaptcha] = useState("");
 
   const refreshLead = useCallback(async () => {
     const res = await getLead(token);
@@ -65,8 +67,16 @@ export default function LeadUnlock() {
       const storedPhone =
         typeof window !== "undefined" ? localStorage.getItem(phoneKey(token)) : null;
       if (storedPhone) setPhone(storedPhone);
+      // A recovery link (?reveal=...) sent by the operator after payment takes
+      // precedence over any stored token: it lets a paying chef back in from a
+      // new device or after an in-app browser dropped localStorage.
+      const urlReveal = params.get("reveal");
+      if (urlReveal && typeof window !== "undefined") {
+        localStorage.setItem(revealKey(token), urlReveal);
+      }
       const storedReveal =
-        typeof window !== "undefined" ? localStorage.getItem(revealKey(token)) : null;
+        urlReveal ??
+        (typeof window !== "undefined" ? localStorage.getItem(revealKey(token)) : null);
 
       // Returning from the (mock) payment page: finish + reveal.
       const mockPay = params.get("mock_pay");
@@ -112,7 +122,7 @@ export default function LeadUnlock() {
       // Identify the chef by hashed phone (no raw PII leaves the browser).
       identify(`chef_${await sha256Hex(trimmed)}`);
       localStorage.setItem(phoneKey(token), trimmed);
-      const res = await reserveLead(token, trimmed);
+      const res = await reserveLead(token, trimmed, captcha);
       if (res.ok && res.manual_bit) {
         // Manual Bit: no redirect — show instructions and poll until the
         // operator confirms the payment.
@@ -142,6 +152,11 @@ export default function LeadUnlock() {
         await refreshLead();
       } else if (res.reason === "payments_unavailable") {
         setMessage("רכישת לידים תיפתח בקרוב. תודה על הסבלנות!");
+      } else if (res.reason === "expired") {
+        setMessage("פג תוקף הליד — מועד האירוע עבר.");
+        await refreshLead();
+      } else if (res.reason === "turnstile_failed") {
+        setMessage("אימות האנטי-ספאם נכשל. רעננו את הדף ונסו שוב.");
       } else if (res.reason === "not_found") {
         setNotFound(true);
       } else {
@@ -270,6 +285,11 @@ export default function LeadUnlock() {
               בדקו אם אושר
             </Button>
           </div>
+        ) : lead.expired ? (
+          <div className="leadunlock__soldout">
+            <Badge tone="danger">פג תוקף</Badge>
+            <p>מועד האירוע עבר ולא ניתן לרכוש את הליד. עקבו אחרי לידים חדשים בקבוצה.</p>
+          </div>
         ) : lead.status === "sold_out" || lead.slots_left <= 0 ? (
           <div className="leadunlock__soldout">
             <Badge tone="danger">נמכר</Badge>
@@ -290,6 +310,7 @@ export default function LeadUnlock() {
                 onChange={(e) => setPhone(e.target.value)}
               />
             </Field>
+            <Turnstile onToken={setCaptcha} />
             <Button type="button" onClick={pay} disabled={working} full>
               {working ? "מעבד…" : `תשלום ${formatCurrency(lead.price)} וקבלת הטלפון`}
             </Button>

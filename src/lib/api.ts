@@ -106,9 +106,14 @@ export interface ReserveResponse {
   error?: string;
 }
 
-export function reserveLead(token: string, chefPhone: string): Promise<ReserveResponse> {
+export function reserveLead(
+  token: string,
+  chefPhone: string,
+  turnstileToken: string,
+): Promise<ReserveResponse> {
   return postJson<ReserveResponse>(`/api/lead/${encodeURIComponent(token)}/reserve`, {
     chef_phone: chefPhone,
+    turnstile_token: turnstileToken,
   });
 }
 
@@ -197,17 +202,28 @@ export async function listPending(token: string): Promise<{ status: number; body
   return { status: res.status, body: (await res.json()) as PendingResponse };
 }
 
+export interface ConfirmPurchaseResponse {
+  ok: boolean;
+  transitioned?: boolean;
+  result?: string;
+  reason?: string;
+  error?: string;
+  // Unlock page + reveal token, for the operator to send to the paying chef so
+  // they can open the contact from any device (in-app browsers lose storage).
+  recovery_url?: string;
+}
+
 // Operator action (admin-gated): confirm a manual Bit payment by its reference
 // (the purchase id), which unlocks the contact for the paying chef.
 export async function confirmPurchase(
   reference: string,
   adminToken: string,
-): Promise<{ status: number; body: { ok: boolean; transitioned?: boolean; error?: string } }> {
+): Promise<{ status: number; body: ConfirmPurchaseResponse }> {
   const res = await fetch(`/api/admin/purchase/${encodeURIComponent(reference)}/confirm`, {
     method: "POST",
     headers: adminToken ? { "x-admin-token": adminToken } : {},
   });
-  return { status: res.status, body: (await res.json()) as { ok: boolean; transitioned?: boolean; error?: string } };
+  return { status: res.status, body: (await res.json()) as ConfirmPurchaseResponse };
 }
 
 // Operator action (admin-gated): re-send a lead's distribution message. Omit

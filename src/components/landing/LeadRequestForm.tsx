@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Field, TextInput, Select } from "../Field.tsx";
+import Turnstile from "../Turnstile.tsx";
 import { createLead } from "../../lib/api.ts";
 import { EVENT_TYPES, BUDGET_BANDS } from "@shared/constants.ts";
 
@@ -33,6 +34,7 @@ export default function LeadRequestForm({ source = "ezfind-chefs-landing" }: { s
   const [form, setForm] = useState<FormState>(EMPTY);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [captcha, setCaptcha] = useState("");
 
   const set = (key: keyof FormState) => (value: string) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -53,7 +55,7 @@ export default function LeadRequestForm({ source = "ezfind-chefs-landing" }: { s
         client_name: form.client_name,
         client_phone: form.client_phone,
         client_email: form.client_email || "",
-        turnstile_token: "",
+        turnstile_token: captcha,
         source,
       });
       if (res.ok) {
@@ -204,6 +206,8 @@ export default function LeadRequestForm({ source = "ezfind-chefs-landing" }: { s
             {errorMsg}
           </p>
         )}
+
+        <Turnstile onToken={setCaptcha} />
 
         <button
           type="submit"

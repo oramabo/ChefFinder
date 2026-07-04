@@ -4,7 +4,9 @@ import {
   PURCHASE_STATUS,
   RESERVE_REASON,
   JOIN_STATUS,
+  COMPLETE_RESULT,
   type JoinStatus,
+  type CompleteResult,
 } from "@shared/constants.ts";
 import type { DbPort, InsertLeadInput, InsertJoinApplicationInput } from "../ports/db.ts";
 
@@ -62,6 +64,8 @@ export function createMockDb(store: MockStore = globalStore): DbPort {
         buyers_count: 0,
         paid_by: [],
         status: LEAD_STATUS.available,
+        service_slug: input.service_slug ?? "chefs",
+        details: input.details ?? null,
         source: input.source ?? null,
         created_at: new Date().toISOString(),
       };
@@ -72,6 +76,11 @@ export function createMockDb(store: MockStore = globalStore): DbPort {
 
     async getLeadByToken(token: string): Promise<Lead | null> {
       const lead = leadByToken(token);
+      return lead ? structuredClone(lead) : null;
+    },
+
+    async getLeadById(id: string): Promise<Lead | null> {
+      const lead = store.leads.get(id);
       return lead ? structuredClone(lead) : null;
     },
 
@@ -158,16 +167,28 @@ export function createMockDb(store: MockStore = globalStore): DbPort {
       if (p) p.provider_ref = providerRef;
     },
 
-    async completePurchase(id: string, invoiceRef?: string | null): Promise<boolean> {
+    async completePurchase(id: string, invoiceRef?: string | null): Promise<CompleteResult> {
       const p = store.purchases.get(id);
-      if (!p || p.status !== PURCHASE_STATUS.pending) return false;
+      if (!p) return COMPLETE_RESULT.not_found;
+      if (p.status === PURCHASE_STATUS.paid) return COMPLETE_RESULT.noop;
+
+      const lead = store.leads.get(p.lead_id);
+      const wasReleased =
+        p.status === PURCHASE_STATUS.expired || p.status === PURCHASE_STATUS.failed;
+      if (wasReleased) {
+        // Late payment: the held slot was released by the sweep/failure — retake
+        // it only if capacity remains, otherwise the operator must refund.
+        if (!lead || lead.buyers_count >= lead.buyers_cap) return COMPLETE_RESULT.conflict;
+        lead.buyers_count += 1;
+        if (lead.buyers_count >= lead.buyers_cap) lead.status = LEAD_STATUS.sold_out;
+      }
+
       p.status = PURCHASE_STATUS.paid;
       if (invoiceRef) p.invoice_ref = invoiceRef;
-      const lead = store.leads.get(p.lead_id);
       if (lead && !lead.paid_by.includes(p.chef_phone)) {
         lead.paid_by.push(p.chef_phone);
       }
-      return true;
+      return wasReleased ? COMPLETE_RESULT.recovered : COMPLETE_RESULT.completed;
     },
 
     async releasePurchase(id: string, status: "failed" | "expired"): Promise<boolean> {

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Field, TextInput, Select } from "../Field.tsx";
+import Turnstile from "../Turnstile.tsx";
 import { submitJoin } from "../../lib/api.ts";
 import { JOIN_CATEGORIES } from "@shared/constants.ts";
 
@@ -30,6 +31,7 @@ export default function JoinForm({ source = "ezfind-landing" }: { source?: strin
   const [form, setForm] = useState<FormState>(EMPTY);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [captcha, setCaptcha] = useState("");
 
   const set = (key: keyof FormState) => (value: string) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -40,7 +42,7 @@ export default function JoinForm({ source = "ezfind-landing" }: { source?: strin
     setStatus("sending");
     setErrorMsg("");
     try {
-      const res = await submitJoin({ ...form, source });
+      const res = await submitJoin({ ...form, turnstile_token: captcha, source });
       if (res.ok) {
         setStatus("done");
         setForm(EMPTY);
@@ -169,6 +171,8 @@ export default function JoinForm({ source = "ezfind-landing" }: { source?: strin
             {errorMsg}
           </p>
         )}
+
+        <Turnstile onToken={setCaptcha} />
 
         <button
           type="submit"

@@ -69,16 +69,20 @@ do $$
 declare
   v_pid uuid;
   arr text[];
-  done boolean;
+  outcome text;
 begin
   insert into purchases (lead_id, chef_phone, amount, status)
   select id, '0523333333', 30, 'pending' from leads where lead_token = 'test_cap1'
   returning id into v_pid;
 
-  done := complete_purchase(v_pid, 'inv-1');
-  if not done then raise exception 'expected complete to transition'; end if;
-  done := complete_purchase(v_pid, 'inv-1');
-  if done then raise exception 'expected second complete to be a no-op'; end if;
+  outcome := complete_purchase(v_pid, 'inv-1');
+  if outcome <> 'completed' then
+    raise exception 'expected complete to return completed, got %', outcome;
+  end if;
+  outcome := complete_purchase(v_pid, 'inv-1');
+  if outcome <> 'noop' then
+    raise exception 'expected second complete to be noop, got %', outcome;
+  end if;
 
   select paid_by into arr from leads where lead_token = 'test_cap1';
   if array_length(arr, 1) <> 1 or arr[1] <> '0523333333' then
@@ -86,6 +90,55 @@ begin
   end if;
 
   raise notice 'OK: complete_purchase appends paid_by once';
+end $$;
+
+-- Late payment recovery: an expired purchase is recovered while capacity
+-- remains, and reports a conflict once the lead has sold to capacity.
+do $$
+declare
+  v_lead_id uuid;
+  v_p1 uuid;
+  v_p2 uuid;
+  r record;
+  outcome text;
+  cnt int;
+begin
+  insert into leads (lead_token, kosher, client_name, client_phone, price, buyers_cap)
+  values ('test_late1', false, 'בדיקה', '0500000000', 30, 1)
+  returning id into v_lead_id;
+
+  -- Chef 1 reserves; the sweep expires the reservation before payment.
+  select * into r from reserve_lead('test_late1', '0521111111');
+  insert into purchases (lead_id, chef_phone, amount, status)
+  values (v_lead_id, '0521111111', 30, 'pending')
+  returning id into v_p1;
+  if not release_lead(v_p1, 'expired') then
+    raise exception 'expected expiry release to succeed';
+  end if;
+
+  -- Late payment arrives with the slot still free: recovered, slot retaken.
+  outcome := complete_purchase(v_p1, 'inv-late');
+  if outcome <> 'recovered' then
+    raise exception 'expected recovered, got %', outcome;
+  end if;
+  select buyers_count into cnt from leads where id = v_lead_id;
+  if cnt <> 1 then
+    raise exception 'expected buyers_count=1 after recovery, got %', cnt;
+  end if;
+
+  -- Chef 2's expired purchase pays late with the lead at capacity: conflict.
+  insert into purchases (lead_id, chef_phone, amount, status)
+  values (v_lead_id, '0522222222', 30, 'expired')
+  returning id into v_p2;
+  outcome := complete_purchase(v_p2, 'inv-late2');
+  if outcome <> 'conflict' then
+    raise exception 'expected conflict, got %', outcome;
+  end if;
+  if (select status from purchases where id = v_p2) <> 'expired' then
+    raise exception 'conflict must leave the purchase untouched';
+  end if;
+
+  raise notice 'OK: late payments recover with capacity, conflict without';
 end $$;
 
 rollback;

@@ -4,11 +4,10 @@ import { json, error } from "../../../functions-lib/http.ts";
 import type { Handler } from "../../../functions-lib/handler.ts";
 
 // GET /api/admin/leads — read-only operator view of recent leads (includes PII).
-// Gated by ADMIN_TOKEN (header `x-admin-token`); open only in stub/dev mode.
+// Gated by ADMIN_TOKEN (header `x-admin-token` only — a query param would leak
+// the token into logs, history and referrers); open only in stub/dev mode.
 export const onRequestGet: Handler = async ({ request, env }) => {
-  const provided =
-    request.headers.get("x-admin-token") ??
-    new URL(request.url).searchParams.get("token");
+  const provided = request.headers.get("x-admin-token");
   if (!adminAuthorized(env, provided)) {
     return error("לא מורשה", 401, { reason: "unauthorized" });
   }

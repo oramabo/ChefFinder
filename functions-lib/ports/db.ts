@@ -5,7 +5,7 @@ import type {
   ReserveResult,
   JoinApplication,
 } from "@shared/types.ts";
-import type { JoinStatus } from "@shared/constants.ts";
+import type { JoinStatus, CompleteResult } from "@shared/constants.ts";
 
 export interface InsertJoinApplicationInput {
   full_name: string;
@@ -33,6 +33,8 @@ export interface InsertLeadInput {
   price: number;
   buyers_cap: number;
   source?: string | null;
+  service_slug?: string;
+  details?: Record<string, unknown> | null;
 }
 
 // All database access goes through this port. Real adapter wraps Supabase RPC +
@@ -40,6 +42,7 @@ export interface InsertLeadInput {
 export interface DbPort {
   insertLead(input: InsertLeadInput): Promise<Lead>;
   getLeadByToken(token: string): Promise<Lead | null>;
+  getLeadById(id: string): Promise<Lead | null>;
   // Operator view: most-recent leads first (includes PII; admin-gated callers only).
   listRecentLeads(limit: number): Promise<Lead[]>;
   // Operator view: pending purchases awaiting manual confirmation, newest first.
@@ -56,8 +59,9 @@ export interface DbPort {
   getPurchaseByProviderRef(ref: string): Promise<Purchase | null>;
   getPurchaseByRevealToken(revealToken: string): Promise<Purchase | null>;
   setPurchaseProviderRef(id: string, providerRef: string): Promise<void>;
-  // pending -> paid, append chef to lead.paid_by (idempotent). true if transitioned.
-  completePurchase(id: string, invoiceRef?: string | null): Promise<boolean>;
+  // Mark a purchase paid and append the chef to lead.paid_by. Handles late
+  // payments on expired/failed purchases (slot retake) — see COMPLETE_RESULT.
+  completePurchase(id: string, invoiceRef?: string | null): Promise<CompleteResult>;
   // pending -> failed|expired, decrement buyers_count (idempotent). true if released.
   releasePurchase(id: string, status: "failed" | "expired"): Promise<boolean>;
   sweepStale(ttlMinutes: number): Promise<number>;

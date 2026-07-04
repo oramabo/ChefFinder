@@ -1,6 +1,6 @@
 import { notifyJoin } from "../../functions-lib/joinAlert.ts";
 import { buildContainer } from "../../functions-lib/factory.ts";
-import { json, readJson, validate } from "../../functions-lib/http.ts";
+import { json, error, readJson, validate } from "../../functions-lib/http.ts";
 import type { Handler } from "../../functions-lib/handler.ts";
 import { JoinInput } from "@shared/schema.ts";
 import { JOIN_CATEGORIES } from "@shared/constants.ts";
@@ -14,6 +14,19 @@ export const onRequestPost: Handler = async ({ request, env }) => {
   const parsed = validate(JoinInput, body);
   if (!parsed.success) return parsed.response;
   const input = parsed.data;
+
+  // Anti-spam gate, same as the lead form. The container build is wrapped so a
+  // config error (e.g. missing DB in prod) can't take down the join intake —
+  // but a failed verification rejects the submission.
+  try {
+    const { turnstile } = buildContainer(env, request);
+    const remoteIp = request.headers.get("cf-connecting-ip") ?? undefined;
+    if (!(await turnstile.verify(input.turnstile_token, remoteIp))) {
+      return error("אימות אנטי-ספאם נכשל", 403, { reason: "turnstile_failed" });
+    }
+  } catch (err) {
+    console.error("join turnstile check skipped:", err);
+  }
 
   // Map the category slug to its Hebrew label for a readable alert.
   const category =

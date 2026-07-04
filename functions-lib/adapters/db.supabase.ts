@@ -1,6 +1,11 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Lead, Purchase, ReserveResult, JoinApplication } from "@shared/types.ts";
-import { RESERVE_REASON, type JoinStatus } from "@shared/constants.ts";
+import {
+  RESERVE_REASON,
+  COMPLETE_RESULT,
+  type JoinStatus,
+  type CompleteResult,
+} from "@shared/constants.ts";
 import type { DbPort, InsertLeadInput, InsertJoinApplicationInput } from "../ports/db.ts";
 
 export function createSupabaseDb(url: string, serviceKey: string): DbPort {
@@ -22,6 +27,12 @@ export function createSupabaseDb(url: string, serviceKey: string): DbPort {
         .eq("lead_token", token)
         .maybeSingle();
       if (error) throw new Error(`getLeadByToken: ${error.message}`);
+      return (data as Lead) ?? null;
+    },
+
+    async getLeadById(id: string): Promise<Lead | null> {
+      const { data, error } = await sb.from("leads").select("*").eq("id", id).maybeSingle();
+      if (error) throw new Error(`getLeadById: ${error.message}`);
       return (data as Lead) ?? null;
     },
 
@@ -115,13 +126,18 @@ export function createSupabaseDb(url: string, serviceKey: string): DbPort {
       if (error) throw new Error(`setPurchaseProviderRef: ${error.message}`);
     },
 
-    async completePurchase(id: string, invoiceRef?: string | null): Promise<boolean> {
+    async completePurchase(id: string, invoiceRef?: string | null): Promise<CompleteResult> {
       const { data, error } = await sb.rpc("complete_purchase", {
         p_purchase_id: id,
         p_invoice_ref: invoiceRef ?? null,
       });
       if (error) throw new Error(`completePurchase: ${error.message}`);
-      return Boolean(data);
+      const known = Object.values(COMPLETE_RESULT) as string[];
+      const result = String(data);
+      if (!known.includes(result)) {
+        throw new Error(`completePurchase: unexpected result "${result}"`);
+      }
+      return result as CompleteResult;
     },
 
     async releasePurchase(id: string, status: "failed" | "expired"): Promise<boolean> {

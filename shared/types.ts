@@ -4,6 +4,7 @@ import type {
   ReserveReason,
   JoinStatus,
 } from "./constants.ts";
+import { LEAD_MAX_AGE_DAYS } from "./constants.ts";
 
 // A professional/business who applied to join the ezfind network via the
 // umbrella landing form. Managed by an operator in the admin panel.
@@ -40,6 +41,11 @@ export interface Lead {
   buyers_count: number;
   paid_by: string[];
   status: LeadStatus;
+  // Which registered vertical this lead belongs to (see shared/services/registry).
+  service_slug: string;
+  // Vertical-specific fields for future services (the chef vertical keeps its
+  // dedicated columns; new verticals put their qualifying answers here).
+  details: Record<string, unknown> | null;
   source: string | null;
   created_at: string;
 }
@@ -57,6 +63,9 @@ export interface PublicLead {
   price: number;
   status: LeadStatus;
   slots_left: number;
+  // The event date has passed (or an undated lead went stale). Expired leads
+  // can't be reserved; already-paid chefs keep contact access.
+  expired: boolean;
 }
 
 // Client contact details — only ever returned to a chef who paid.
@@ -96,7 +105,23 @@ export interface LeadSummary {
   price: number;
 }
 
-export function toPublicLead(lead: Lead): PublicLead {
+// A lead is expired when its event date has passed, or — for undated leads —
+// when it is older than LEAD_MAX_AGE_DAYS. Compared in UTC dates; `now` is
+// injectable for tests.
+export function isLeadExpired(
+  lead: Pick<Lead, "event_date" | "created_at">,
+  now: number = Date.now(),
+): boolean {
+  if (lead.event_date) {
+    // The event day itself is still valid; expired from the following day.
+    const eventEnd = Date.parse(`${lead.event_date}T23:59:59Z`);
+    return Number.isFinite(eventEnd) && now > eventEnd;
+  }
+  const created = Date.parse(lead.created_at);
+  return Number.isFinite(created) && now - created > LEAD_MAX_AGE_DAYS * 86_400_000;
+}
+
+export function toPublicLead(lead: Lead, now: number = Date.now()): PublicLead {
   return {
     lead_token: lead.lead_token,
     event_type: lead.event_type,
@@ -109,6 +134,7 @@ export function toPublicLead(lead: Lead): PublicLead {
     price: lead.price,
     status: lead.status,
     slots_left: Math.max(0, lead.buyers_cap - lead.buyers_count),
+    expired: isLeadExpired(lead, now),
   };
 }
 

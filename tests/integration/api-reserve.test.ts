@@ -54,6 +54,21 @@ describe("POST /api/lead/:token/reserve", () => {
     expect(json).toEqual({ ok: false, reason: "not_found" });
   });
 
+  it("blocks reserving a lead whose event date has passed", async () => {
+    const lead = await db.insertLead({
+      lead_token: "rsv_exp_" + Math.random().toString(36).slice(2),
+      event_date: "2020-01-01",
+      kosher: false,
+      client_name: "לקוח",
+      client_phone: "0500000000",
+      price: 30,
+      buyers_cap: 3,
+    });
+    const res = await doReserve(lead.lead_token, "0521111111");
+    const json = (await res.json()) as any;
+    expect(json).toEqual({ ok: false, reason: "expired" });
+  });
+
   it("rejects an invalid chef phone with 422", async () => {
     const token = await seedLead();
     const res = await reserve(

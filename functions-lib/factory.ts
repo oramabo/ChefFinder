@@ -41,6 +41,14 @@ export function buildContainer(env: Env, _request?: Request): Container {
       ? createBitPayments(env)
       : createMockPayments();
 
+  // The Turnstile mock passes everything, which in a real deployment means
+  // unthrottled spam straight into the WhatsApp/Telegram groups — shout about
+  // it on every request so a missing TURNSTILE_SECRET can't go unnoticed.
+  if (!globalStubs(env) && !useReal(env, "turnstile")) {
+    console.error(
+      "TURNSTILE_SECRET is not set in a non-stub deployment — anti-spam is DISABLED",
+    );
+  }
   const turnstile: TurnstilePort = useReal(env, "turnstile")
     ? createTurnstile(env.TURNSTILE_SECRET!)
     : createMockTurnstile();

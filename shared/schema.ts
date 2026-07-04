@@ -29,6 +29,10 @@ export type LeadInputType = z.infer<typeof LeadInput>;
 
 export const ReserveInput = z.object({
   chef_phone: phone,
+  // Anti-abuse: reserving holds a slot for RESERVATION_TTL_MINUTES, so the
+  // reserve endpoint is Turnstile-gated just like lead creation. Verified
+  // server-side; the mock verifier accepts anything in stub/dev mode.
+  turnstile_token: z.string().optional().default(""),
 });
 export type ReserveInputType = z.infer<typeof ReserveInput>;
 
@@ -42,6 +46,7 @@ export const JoinInput = z.object({
   phone: phone,
   email: z.string().trim().email().max(120).optional().or(z.literal("")),
   message: z.string().trim().max(1000).optional().or(z.literal("")),
+  turnstile_token: z.string().optional().default(""),
   source: z.string().trim().max(200).optional(),
 });
 export type JoinInputType = z.infer<typeof JoinInput>;

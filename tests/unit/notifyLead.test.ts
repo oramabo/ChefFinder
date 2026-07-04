@@ -21,6 +21,8 @@ const lead: Lead = {
   buyers_count: 0,
   paid_by: [],
   status: "available",
+  service_slug: "chefs",
+  details: null,
   source: "seed",
   created_at: new Date().toISOString(),
 };

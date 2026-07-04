@@ -8,8 +8,9 @@ design. This repo is the **M1 Core MVP**.
   qualifying form → a *lead*.
 - **Distribution:** on submit, a PII-free summary + unlock link goes to the
   operator's WhatsApp (forwarded to the chef group) and a Telegram group.
-- **Chef funnel:** chef opens `/lead/:token`, pays a fixed fee (₪30) to unlock the
-  client's phone. Each lead is sold to at most 3 chefs (atomic, oversell-proof).
+- **Chef funnel:** chef opens `/lead/:token`, pays a fee (₪30 base, tiered up by
+  the client's budget band) to unlock the client's phone. Each lead is sold to at
+  most 3 chefs (atomic, oversell-proof); leads expire once the event date passes.
 
 ## Stack
 

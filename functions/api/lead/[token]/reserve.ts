@@ -4,7 +4,8 @@ import { publicBaseUrl, paymentsAvailable } from "../../../../functions-lib/env.
 import { generateLeadToken } from "../../../../functions-lib/crypto.ts";
 import type { Handler } from "../../../../functions-lib/handler.ts";
 import { ReserveInput } from "@shared/schema.ts";
-import { toLeadSummary } from "@shared/types.ts";
+import { toLeadSummary, isLeadExpired } from "@shared/types.ts";
+import { RESERVE_REASON } from "@shared/constants.ts";
 import { notifyReservation } from "../../../../functions-lib/adminAlert.ts";
 
 // POST /api/lead/:token/reserve — atomically reserve a slot then start payment.
@@ -15,7 +16,7 @@ export const onRequestPost: Handler = async ({ request, env, params, waitUntil }
   const body = await readJson(request);
   const parsed = validate(ReserveInput, body);
   if (!parsed.success) return parsed.response;
-  const { chef_phone } = parsed.data;
+  const { chef_phone, turnstile_token } = parsed.data;
 
   // Fail closed when no checkout is available (no real provider AND not in a
   // stub/placeholder mode): never reserve a slot for a flow that cannot complete,
@@ -24,17 +25,32 @@ export const onRequestPost: Handler = async ({ request, env, params, waitUntil }
     return json({ ok: false, reason: "payments_unavailable" });
   }
 
-  const { db, payments } = buildContainer(env, request);
+  const { db, payments, turnstile } = buildContainer(env, request);
+
+  // Anti-abuse: a reservation holds one of the lead's few slots for the TTL,
+  // so it gets the same Turnstile gate as lead creation — otherwise anyone with
+  // the group link could keep every lead "sold out" for free.
+  const remoteIp = request.headers.get("cf-connecting-ip") ?? undefined;
+  const human = await turnstile.verify(turnstile_token, remoteIp);
+  if (!human) return error("אימות אנטי-ספאם נכשל", 403, { reason: "turnstile_failed" });
 
   const lead = await db.getLeadByToken(token);
   if (!lead) return json({ ok: false, reason: "not_found" });
+
+  // A lead whose event has passed (or that went stale) can't be sold; chefs who
+  // already paid keep contact access via the contact endpoint.
+  if (isLeadExpired(lead)) {
+    return json({ ok: false, reason: RESERVE_REASON.expired });
+  }
 
   const reserved = await db.reserveLead(token, chef_phone);
   if (!reserved.ok) return json({ ok: false, reason: reserved.reason });
 
   // Slot held (buyers_count incremented). Create the pending purchase + payment.
   // The reveal_token is the chef's bearer secret for unlocking contact details
-  // once paid; it is returned only here and never placed in a URL or message.
+  // once paid. It is returned here, and after payment confirmation the operator
+  // gets a recovery link containing it (admin confirm) to send privately to the
+  // paying chef — it is never broadcast to the group.
   const reveal_token = generateLeadToken(32);
   const purchase = await db.createPurchase({
     lead_id: lead.id,

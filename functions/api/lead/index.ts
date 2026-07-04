@@ -5,7 +5,7 @@ import { json, error, readJson, validate } from "../../../functions-lib/http.ts"
 import { publicBaseUrl } from "../../../functions-lib/env.ts";
 import type { Handler } from "../../../functions-lib/handler.ts";
 import { LeadInput } from "@shared/schema.ts";
-import { DEFAULT_CAP, DEFAULT_PRICE } from "@shared/constants.ts";
+import { DEFAULT_CAP, leadPrice } from "@shared/constants.ts";
 
 // POST /api/lead — create a lead, then distribute (WhatsApp + Telegram).
 export const onRequestPost: Handler = async ({ request, env }) => {
@@ -32,9 +32,13 @@ export const onRequestPost: Handler = async ({ request, env }) => {
     client_name: input.client_name,
     client_phone: input.client_phone,
     client_email: input.client_email ? input.client_email : null,
-    price: DEFAULT_PRICE,
+    // Tiered by the client's budget band — stamped on the row at creation.
+    price: leadPrice(input.budget),
     buyers_cap: DEFAULT_CAP,
     source: input.source ?? null,
+    // The qualifying form is the chef vertical; future verticals set their own
+    // slug and put extra qualifying answers in `details`.
+    service_slug: "chefs",
   });
 
   const notify = await notifyLead(messaging, lead, publicBaseUrl(env, request));

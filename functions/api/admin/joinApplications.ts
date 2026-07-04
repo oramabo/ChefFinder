@@ -6,9 +6,7 @@ import type { Handler } from "../../../functions-lib/handler.ts";
 // GET /api/admin/join-applications — operator view of ezfind join applications
 // (includes contact details). Gated by ADMIN_TOKEN (header `x-admin-token`).
 export const onRequestGet: Handler = async ({ request, env }) => {
-  const provided =
-    request.headers.get("x-admin-token") ??
-    new URL(request.url).searchParams.get("token");
+  const provided = request.headers.get("x-admin-token");
   if (!adminAuthorized(env, provided)) {
     return error("לא מורשה", 401, { reason: "unauthorized" });
   }

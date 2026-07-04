@@ -7,9 +7,7 @@ import type { Handler } from "../../../functions-lib/handler.ts";
 // Admin-gated. Each row carries the chef's phone + lead summary so the operator
 // can approve by phone from the list.
 export const onRequestGet: Handler = async ({ request, env }) => {
-  const provided =
-    request.headers.get("x-admin-token") ??
-    new URL(request.url).searchParams.get("token");
+  const provided = request.headers.get("x-admin-token");
   if (!adminAuthorized(env, provided)) {
     return error("לא מורשה", 401, { reason: "unauthorized" });
   }

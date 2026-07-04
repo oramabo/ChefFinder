@@ -35,6 +35,7 @@ export default function LeadsSection({ token, onUnauthorized }: Props) {
   const [pending, setPending] = useState<PendingPurchase[] | null>(null);
   const [pendingMsg, setPendingMsg] = useState("");
   const [approveBusy, setApproveBusy] = useState<string | null>(null);
+  const [recoveryUrl, setRecoveryUrl] = useState("");
 
   const setMsg = (leadToken: string, text: string) =>
     setRowMsg((m) => ({ ...m, [leadToken]: text }));
@@ -84,12 +85,23 @@ export default function LeadsSection({ token, onUnauthorized }: Props) {
     async (p: PendingPurchase) => {
       setApproveBusy(p.id);
       setPendingMsg("");
+      setRecoveryUrl("");
       try {
         const { status, body } = await confirmPurchase(p.id, token);
         if (status === 401) return setPendingMsg("אסימון שגוי או חסר.");
-        if (!body.ok) return setPendingMsg(body.error || "האישור נכשל.");
+        if (!body.ok) {
+          // Payment landed after the reservation expired and the lead has since
+          // sold to capacity — the chef must be refunded.
+          if (body.reason === "conflict_sold_out") {
+            return setPendingMsg(
+              `⚠️ הליד כבר נמכר עד התקרה — יש להחזיר לשף ${p.chef_phone} את הכסף (₪${p.amount}).`,
+            );
+          }
+          return setPendingMsg(body.error || "האישור נכשל.");
+        }
         setPending((cur) => (cur ?? []).filter((x) => x.id !== p.id));
         setPendingMsg(`אושר תשלום של ${p.chef_phone} — הפרטים נחשפו לשף ✓`);
+        if (body.recovery_url) setRecoveryUrl(body.recovery_url);
       } catch {
         setPendingMsg("שגיאת רשת.");
       } finally {
@@ -98,6 +110,15 @@ export default function LeadsSection({ token, onUnauthorized }: Props) {
     },
     [token],
   );
+
+  const copyRecovery = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(recoveryUrl);
+      setPendingMsg("קישור השחזור הועתק ✓ שלחו אותו לשף ששילם.");
+    } catch {
+      // Leave the link on screen for manual copying.
+    }
+  }, [recoveryUrl]);
 
   const load = useCallback(
     async (t: string) => {
@@ -149,6 +170,15 @@ export default function LeadsSection({ token, onUnauthorized }: Props) {
             אוטומטית.
           </p>
           {pendingMsg && <p className="admin__bitmsg">{pendingMsg}</p>}
+          {recoveryUrl && (
+            <p className="admin__bitmsg">
+              קישור גישה לשף (שלחו לו בביט/וואטסאפ — עובד מכל מכשיר):{" "}
+              <code dir="ltr">{recoveryUrl}</code>{" "}
+              <Button type="button" variant="ghost" className="admin__btn" onClick={copyRecovery}>
+                העתק
+              </Button>
+            </p>
+          )}
           {pending.length === 0 ? (
             <p>אין תשלומים ממתינים.</p>
           ) : (

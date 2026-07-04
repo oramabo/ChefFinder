@@ -14,6 +14,8 @@
 import type { Env } from "../functions-lib/env.ts";
 import type { FnCtx, Handler } from "../functions-lib/handler.ts";
 import { error } from "../functions-lib/http.ts";
+import { buildContainer } from "../functions-lib/factory.ts";
+import { RESERVATION_TTL_MINUTES } from "@shared/constants.ts";
 
 import { onRequestPost as createLead } from "../functions/api/lead/index.ts";
 import { onRequestGet as getLead } from "../functions/api/lead/[token]/index.ts";
@@ -225,5 +227,19 @@ export default {
     // this is rarely reached, but fall back to the static assets (which apply
     // the SPA `not_found_handling`) so behaviour is correct either way.
     return env.ASSETS.fetch(request);
+  },
+
+  // Cron backstop for the reservation sweep (see wrangler.toml [triggers]).
+  // Supabase's pg_cron runs the same sweep when available, but the migration
+  // silently skips scheduling where pg_cron isn't permitted — without this,
+  // abandoned reservations would hold lead slots forever.
+  async scheduled(_event: unknown, env: WorkerEnv, _ctx: ExecutionContext): Promise<void> {
+    try {
+      const { db } = buildContainer(env);
+      const released = await db.sweepStale(RESERVATION_TTL_MINUTES);
+      if (released > 0) console.log(`sweep: reopened ${released} stale reservation(s)`);
+    } catch (err) {
+      console.error("scheduled sweep failed:", err);
+    }
   },
 };

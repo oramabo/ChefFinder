@@ -19,10 +19,6 @@ export default function Header() {
         >
           <Wordmark suffix={CHEF.name.he} />
         </Link>
-        <nav className="header__nav" aria-label="ניווט ראשי">
-          <Link to="/how-it-works">איך זה עובד</Link>
-          <Link to="/faq">שאלות נפוצות</Link>
-        </nav>
         <LinkButton to="/find-a-chef" variant="primary">
           מצאו שף
         </LinkButton>

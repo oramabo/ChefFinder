@@ -12,8 +12,8 @@
   align-items: center;
   justify-content: space-between;
   /* Logo on the left, CTA on the right (RTL): reverse the row so the first DOM
-     child — the brand — lands at the physical left and the CTA at the right,
-     with the nav centered. Matches the landing bar. */
+     child — the brand — lands at the physical left and the CTA at the right.
+     Matches the landing bar; nav links live in the footer only. */
   flex-direction: row-reverse;
   gap: var(--space-5);
   padding-block: var(--space-2);
@@ -30,42 +30,3 @@
   display: block;
 }
 
-.header__nav {
-  display: none;
-  gap: var(--space-6);
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.header__nav a {
-  position: relative;
-  padding-block: var(--space-1);
-  transition: color 0.15s ease;
-}
-
-.header__nav a:hover {
-  color: var(--color-text);
-}
-
-.header__nav a::after {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  inset-block-end: -2px;
-  block-size: 2px;
-  background: var(--color-saffron);
-  transform: scaleX(0);
-  transform-origin: inline-end;
-  transition: transform 0.2s ease;
-}
-
-.header__nav a:hover::after {
-  transform: scaleX(1);
-  transform-origin: inline-start;
-}
-
-@media (min-width: 760px) {
-  .header__nav {
-    display: flex;
-  }
-}

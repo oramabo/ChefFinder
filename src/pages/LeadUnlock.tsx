@@ -3,11 +3,19 @@ import { useParams, useSearchParams } from "react-router-dom";
 import Seo from "../components/Seo.tsx";
 import Badge from "../components/Badge.tsx";
 import SlotsLeft from "../components/SlotsLeft.tsx";
+import Turnstile from "../components/Turnstile.tsx";
 import { Button } from "../components/Button.tsx";
 import { Field, TextInput } from "../components/Field.tsx";
 import { EVENT_TYPES, CUISINES } from "@shared/constants.ts";
 import type { PublicLead, LeadContact } from "@shared/types.ts";
-import { getLead, reserveLead, getContact, mockComplete, type ManualBit } from "../lib/api.ts";
+import {
+  getLead,
+  reserveLead,
+  getContact,
+  mockComplete,
+  recoverAccess,
+  type ManualBit,
+} from "../lib/api.ts";
 import { formatDate, formatCurrency } from "../lib/format.ts";
 import { track, identify } from "../lib/analytics.ts";
 import { sha256Hex } from "../lib/hash.ts";
@@ -32,6 +40,13 @@ export default function LeadUnlock() {
   const [working, setWorking] = useState(false);
   const [message, setMessage] = useState("");
   const [bit, setBit] = useState<ManualBit | null>(null);
+  const [captcha, setCaptcha] = useState("");
+  // Self-service access recovery for a chef who paid on another device.
+  const [recoverOpen, setRecoverOpen] = useState(false);
+  const [recoverPhone, setRecoverPhone] = useState("");
+  const [recoverCaptcha, setRecoverCaptcha] = useState("");
+  const [recoverMsg, setRecoverMsg] = useState("");
+  const [recoverBusy, setRecoverBusy] = useState(false);
 
   const refreshLead = useCallback(async () => {
     const res = await getLead(token);
@@ -65,8 +80,16 @@ export default function LeadUnlock() {
       const storedPhone =
         typeof window !== "undefined" ? localStorage.getItem(phoneKey(token)) : null;
       if (storedPhone) setPhone(storedPhone);
+      // A recovery link (?reveal=...) sent by the operator after payment takes
+      // precedence over any stored token: it lets a paying chef back in from a
+      // new device or after an in-app browser dropped localStorage.
+      const urlReveal = params.get("reveal");
+      if (urlReveal && typeof window !== "undefined") {
+        localStorage.setItem(revealKey(token), urlReveal);
+      }
       const storedReveal =
-        typeof window !== "undefined" ? localStorage.getItem(revealKey(token)) : null;
+        urlReveal ??
+        (typeof window !== "undefined" ? localStorage.getItem(revealKey(token)) : null);
 
       // Returning from the (mock) payment page: finish + reveal.
       const mockPay = params.get("mock_pay");
@@ -112,7 +135,7 @@ export default function LeadUnlock() {
       // Identify the chef by hashed phone (no raw PII leaves the browser).
       identify(`chef_${await sha256Hex(trimmed)}`);
       localStorage.setItem(phoneKey(token), trimmed);
-      const res = await reserveLead(token, trimmed);
+      const res = await reserveLead(token, trimmed, captcha);
       if (res.ok && res.manual_bit) {
         // Manual Bit: no redirect — show instructions and poll until the
         // operator confirms the payment.
@@ -142,6 +165,11 @@ export default function LeadUnlock() {
         await refreshLead();
       } else if (res.reason === "payments_unavailable") {
         setMessage("רכישת לידים תיפתח בקרוב. תודה על הסבלנות!");
+      } else if (res.reason === "expired") {
+        setMessage("פג תוקף הליד — מועד האירוע עבר.");
+        await refreshLead();
+      } else if (res.reason === "turnstile_failed") {
+        setMessage("אימות האנטי-ספאם נכשל. רעננו את הדף ונסו שוב.");
       } else if (res.reason === "not_found") {
         setNotFound(true);
       } else {
@@ -151,6 +179,32 @@ export default function LeadUnlock() {
       setMessage("אירעה שגיאת רשת. נסו שוב.");
     } finally {
       setWorking(false);
+    }
+  }
+
+  async function requestRecovery() {
+    if (recoverBusy) return;
+    const trimmed = (recoverPhone || phone).trim();
+    if (!/^[+]?[0-9\s-]{9,20}$/.test(trimmed)) {
+      setRecoverMsg("נא להזין מספר טלפון תקין");
+      return;
+    }
+    setRecoverBusy(true);
+    setRecoverMsg("");
+    try {
+      const res = await recoverAccess(token, trimmed, recoverCaptcha);
+      if (res.ok) {
+        setRecoverMsg("אם המספר תואם רכישה — שלחנו אליו עכשיו קישור גישה בוואטסאפ.");
+        track("access_recovery_requested");
+      } else if (res.reason === "disabled") {
+        setRecoverMsg("שחזור אוטומטי אינו זמין כרגע — פנו אלינו ונשלח לכם את הקישור.");
+      } else {
+        setRecoverMsg(res.error || "אירעה שגיאה. רעננו את הדף ונסו שוב.");
+      }
+    } catch {
+      setRecoverMsg("אירעה שגיאת רשת. נסו שוב.");
+    } finally {
+      setRecoverBusy(false);
     }
   }
 
@@ -270,6 +324,11 @@ export default function LeadUnlock() {
               בדקו אם אושר
             </Button>
           </div>
+        ) : lead.expired ? (
+          <div className="leadunlock__soldout">
+            <Badge tone="danger">פג תוקף</Badge>
+            <p>מועד האירוע עבר ולא ניתן לרכוש את הליד. עקבו אחרי לידים חדשים בקבוצה.</p>
+          </div>
         ) : lead.status === "sold_out" || lead.slots_left <= 0 ? (
           <div className="leadunlock__soldout">
             <Badge tone="danger">נמכר</Badge>
@@ -290,10 +349,46 @@ export default function LeadUnlock() {
                 onChange={(e) => setPhone(e.target.value)}
               />
             </Field>
+            <Turnstile onToken={setCaptcha} />
             <Button type="button" onClick={pay} disabled={working} full>
               {working ? "מעבד…" : `תשלום ${formatCurrency(lead.price)} וקבלת הטלפון`}
             </Button>
             {message && <p className="leadunlock__message">{message}</p>}
+          </div>
+        )}
+
+        {!contact && !bit && (
+          <div className="leadunlock__recover">
+            {!recoverOpen ? (
+              <button
+                type="button"
+                className="leadunlock__recover-toggle"
+                onClick={() => {
+                  setRecoverOpen(true);
+                  setRecoverPhone(phone);
+                }}
+              >
+                כבר שילמתם ואין לכם גישה? קבלו את הקישור בוואטסאפ
+              </button>
+            ) : (
+              <div className="leadunlock__recover-form">
+                <Field label="הטלפון שאיתו ביצעתם את הרכישה" htmlFor="recover_phone">
+                  <TextInput
+                    id="recover_phone"
+                    type="tel"
+                    inputMode="tel"
+                    placeholder="050-1234567"
+                    value={recoverPhone}
+                    onChange={(e) => setRecoverPhone(e.target.value)}
+                  />
+                </Field>
+                <Turnstile onToken={setRecoverCaptcha} />
+                <Button type="button" variant="ghost" onClick={requestRecovery} disabled={recoverBusy}>
+                  {recoverBusy ? "שולח…" : "שלחו לי את קישור הגישה"}
+                </Button>
+                {recoverMsg && <p className="leadunlock__message">{recoverMsg}</p>}
+              </div>
+            )}
           </div>
         )}
       </div>

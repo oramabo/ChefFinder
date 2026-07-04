@@ -40,7 +40,7 @@ describe("POST /api/payment/webhook", () => {
 
     const body = await signMockWebhook(purchase_id, providerRef, "paid");
     const res1 = (await (await postWebhook(body)).json()) as any;
-    expect(res1).toEqual({ ok: true, status: "paid", transitioned: true });
+    expect(res1).toEqual({ ok: true, status: "paid", transitioned: true, result: "completed" });
 
     // Contact now revealed via the reveal token (not the phone).
     const c = await contact(
@@ -51,6 +51,50 @@ describe("POST /api/payment/webhook", () => {
     // Replay: no second transition.
     const res2 = (await (await postWebhook(body)).json()) as any;
     expect(res2.transitioned).toBe(false);
+    expect(res2.result).toBe("noop");
+  });
+
+  it("recovers a payment that arrives after the sweep expired the reservation", async () => {
+    const token = await seedLead(3);
+    const { purchase_id, reveal_token } = await reserveOne(token, "0526666666");
+    const purchase = await db.getPurchase(purchase_id);
+
+    // The chef dawdled on the payment page: the sweep releases the slot.
+    expect(await db.releasePurchase(purchase_id, "expired")).toBe(true);
+
+    const body = await signMockWebhook(purchase_id, purchase!.provider_ref!, "paid");
+    const res = (await (await postWebhook(body)).json()) as any;
+    expect(res).toEqual({ ok: true, status: "paid", transitioned: true, result: "recovered" });
+
+    // The chef still gets the contact.
+    const c = await contact(
+      ctx({ url: `http://localhost/api/lead/${token}/contact?reveal=${reveal_token}`, params: { token } }),
+    );
+    expect(c.status).toBe(200);
+  });
+
+  it("reports conflict (no unlock) when a late payment finds the lead sold out", async () => {
+    const token = await seedLead(1);
+    const { purchase_id, reveal_token } = await reserveOne(token, "0527777777");
+    const purchase = await db.getPurchase(purchase_id);
+    expect(await db.releasePurchase(purchase_id, "expired")).toBe(true);
+
+    // Another chef takes and pays for the reopened single slot.
+    const second = await reserveOne(token, "0528888888");
+    const p2 = await db.getPurchase(second.purchase_id);
+    const body2 = await signMockWebhook(second.purchase_id, p2!.provider_ref!, "paid");
+    expect(((await (await postWebhook(body2)).json()) as any).transitioned).toBe(true);
+
+    // The late payment can't be honoured; the response flags it for a refund.
+    const late = await signMockWebhook(purchase_id, purchase!.provider_ref!, "paid");
+    const res = (await (await postWebhook(late)).json()) as any;
+    expect(res).toEqual({ ok: true, status: "paid", transitioned: false, result: "conflict" });
+
+    // And the late chef's reveal token stays locked.
+    const c = await contact(
+      ctx({ url: `http://localhost/api/lead/${token}/contact?reveal=${reveal_token}`, params: { token } }),
+    );
+    expect(c.status).toBe(403);
   });
 
   it("rejects a bad signature", async () => {

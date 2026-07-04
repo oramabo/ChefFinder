@@ -12,9 +12,7 @@ type Channel = "whatsapp" | "telegram";
 // identical to the original new-lead notification — no client name/phone/email.
 // Body: { channel?: "whatsapp" | "telegram" } — omit to send to both.
 export const onRequestPost: Handler = async ({ request, env, params }) => {
-  const provided =
-    request.headers.get("x-admin-token") ??
-    new URL(request.url).searchParams.get("token");
+  const provided = request.headers.get("x-admin-token");
   if (!adminAuthorized(env, provided)) {
     return error("לא מורשה", 401, { reason: "unauthorized" });
   }

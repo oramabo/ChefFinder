@@ -20,6 +20,36 @@ payment provider is missing, so half-configured states can't leak data.
 > Security: never paste secrets into chat, commits, or screenshots. Enter them
 > directly in the provider and Cloudflare dashboards.
 
+## 🚀 Launch checklist (Bit-only start)
+
+Everything on this list must be done before real chefs pay real money:
+
+1. **Remove `MOCK_PAYMENTS = "true"` from `wrangler.toml`.** While it is set,
+   `/api/payment/mock-complete` lets anyone unlock client contacts without
+   paying.
+2. **Set the `BIT_PHONE` secret** (and optionally `BIT_LINK`). With Grow unset,
+   the reserve flow shows Bit instructions and you confirm payments in `/admin`.
+3. **Set `TURNSTILE_SECRET` (secret) + `VITE_TURNSTILE_SITE_KEY` (build var).**
+   Turnstile now gates **both** the lead form and the reserve endpoint. Without
+   the secret, the factory logs an error on every request and anti-spam is
+   effectively off.
+4. **Set `ADMIN_TOKEN`** (strong secret; the admin API accepts it via the
+   `x-admin-token` header only — query-param tokens are rejected).
+5. **Set `PUBLIC_BASE_URL`** to the real domain (`https://ezfind.app`) so unlock
+   and recovery links point at the canonical host.
+6. **Add WAF rate-limiting rules** on `/api/lead` and `/api/lead/*/reserve`
+   (section 6b) — Turnstile raises the cost of abuse; the WAF caps its volume.
+7. **Apply migrations** through `0008` (late-payment recovery + multi-vertical
+   columns). The reservation sweep runs via pg_cron when available **and** via
+   the Worker cron trigger (every 10 min, `wrangler.toml [triggers]`) as a
+   backstop.
+8. **After confirming a Bit payment in `/admin`, send the chef the recovery
+   link** the panel shows — it restores contact access from any device (chefs
+   often pay inside in-app browsers that lose local storage). With
+   `RECOVERY_ENABLED=true` this happens automatically over WhatsApp (see 6d).
+9. **Reviews stay off** (`REVIEWS_ARE_REAL=false` in `shared/seo/reviews.ts`)
+   until the seed reviews are replaced with real, verifiable customer reviews.
+
 ## Recommended first deploy: full flow, placeholder checkout
 
 To test the **complete flow** — lead capture, distribution, unlock-link
@@ -102,14 +132,22 @@ the `VITE_*` values.
 ## 1. Supabase (database)
 
 1. Create a project; pick a region near Israel (e.g. Frankfurt / `eu-central`).
-2. Apply migrations **in order**. Either with the CLI:
+2. Apply migrations **in order**. Preferred: automatic — the
+   `.github/workflows/db-migrate.yml` workflow runs `supabase db push` whenever
+   a migration file lands on `main`. Enable it once by adding three repository
+   secrets (GitHub → Settings → Secrets and variables → Actions):
+   `SUPABASE_ACCESS_TOKEN` (dashboard → Account → Access Tokens),
+   `SUPABASE_PROJECT_REF` (project settings), and `SUPABASE_DB_PASSWORD`
+   (project Settings → Database). Until the secrets exist the workflow skips
+   cleanly, and you can apply manually instead — with the CLI:
    ```bash
    supabase link --project-ref <your-ref>
    supabase db push
    ```
    or paste each file from `supabase/migrations/` (`0001_init.sql` →
-   `0005_reveal_token.sql`) into the SQL editor, in order. **Do not** run
-   `supabase/seed.sql` in production.
+   `0009_phone_otps.sql`) into the SQL editor, in order. **Do not** run
+   `supabase/seed.sql` in production. `supabase db push` (CLI or workflow)
+   remembers what has already been applied, so it only runs the new files.
 3. Enable the **`pg_cron`** extension: Database → Extensions → enable `pg_cron`.
    `0003_sweep.sql` schedules the abandoned-reservation sweep every 5 minutes.
    If the extension was off when migrations ran, re-run the `cron.schedule(...)`
@@ -205,7 +243,38 @@ required) and is the recommended mechanism for the DRP's rate-limit requirement.
 
 ---
 
-## 6c. Operator view (`/admin`)
+## 6c. WhatsApp direct messages: client OTP + chef access links
+
+Two independent feature flags ride the existing WhatsApp Cloud API credentials
+(`WA_CLOUD_TOKEN`, `WA_PHONE_NUMBER_ID`). Both are **off by default** — the
+product behaves exactly as before until you flip them.
+
+**`OTP_ENABLED=true` — client phone verification.** The lead form asks the
+client for a 6-digit code delivered to their WhatsApp before the lead is
+accepted. This kills junk leads (the #1 churn driver in pay-per-lead) and
+verifies the exact product you sell chefs — a working client phone number.
+Requires an approved **AUTHENTICATION**-category template (name in
+`WA_OTP_TEMPLATE`, default `otp_code`): body variable = the code, with the
+standard copy-code button. Codes are stored hashed, expire after 10 minutes,
+allow 5 attempts, and resends are throttled to one per minute per phone. The
+send endpoint is Turnstile-gated so bots can't burn template messages.
+
+**`RECOVERY_ENABLED=true` — chef access links.** When a payment is confirmed,
+the paying chef automatically receives their unlock link on WhatsApp, and the
+lead page gains a self-service "send me my access link" option. The phone
+number is never a credential: the link is only ever *delivered to* the phone
+stored on the paid purchase, and the API response never reveals whether a
+purchase exists. Requires an approved **UTILITY**-category template (name in
+`WA_ACCESS_TEMPLATE`, default `lead_access`) with a URL button configured as
+`{PUBLIC_BASE_URL}{{1}}` — the app passes the link's path+query as the
+variable.
+
+One-time Meta setup for both: verified Meta Business, a dedicated sender
+number, and template approval (typically 1–3 days). Until approved, leave the
+flags off. Apply migration `0009` (the `phone_otps` table + RPCs) before
+enabling OTP.
+
+## 6d. Operator view (`/admin`)
 
 A read-only recent-leads table lives at `/admin` (shows PII: name, phone, email,
 status, buyers). Set **`ADMIN_TOKEN`** to a strong secret; the operator enters it

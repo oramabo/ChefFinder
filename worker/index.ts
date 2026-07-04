@@ -14,11 +14,15 @@
 import type { Env } from "../functions-lib/env.ts";
 import type { FnCtx, Handler } from "../functions-lib/handler.ts";
 import { error } from "../functions-lib/http.ts";
+import { buildContainer } from "../functions-lib/factory.ts";
+import { RESERVATION_TTL_MINUTES } from "@shared/constants.ts";
 
 import { onRequestPost as createLead } from "../functions/api/lead/index.ts";
 import { onRequestGet as getLead } from "../functions/api/lead/[token]/index.ts";
 import { onRequestGet as getContact } from "../functions/api/lead/[token]/contact.ts";
 import { onRequestPost as reserveLead } from "../functions/api/lead/[token]/reserve.ts";
+import { onRequestPost as recoverAccess } from "../functions/api/lead/[token]/recover.ts";
+import { onRequestPost as sendOtp } from "../functions/api/otp/send.ts";
 import { onRequestPost as mockComplete } from "../functions/api/payment/mock-complete.ts";
 import { onRequestPost as paymentWebhook } from "../functions/api/payment/webhook.ts";
 import { onRequestGet as adminLeads } from "../functions/api/admin/leads.ts";
@@ -59,6 +63,8 @@ const routes: Route[] = [
   { method: "GET", pattern: "/api/lead/:token", handler: getLead },
   { method: "GET", pattern: "/api/lead/:token/contact", handler: getContact },
   { method: "POST", pattern: "/api/lead/:token/reserve", handler: reserveLead },
+  { method: "POST", pattern: "/api/lead/:token/recover", handler: recoverAccess },
+  { method: "POST", pattern: "/api/otp/send", handler: sendOtp },
   { method: "POST", pattern: "/api/payment/mock-complete", handler: mockComplete },
   { method: "POST", pattern: "/api/payment/webhook", handler: paymentWebhook },
   { method: "GET", pattern: "/api/admin/leads", handler: adminLeads },
@@ -225,5 +231,19 @@ export default {
     // this is rarely reached, but fall back to the static assets (which apply
     // the SPA `not_found_handling`) so behaviour is correct either way.
     return env.ASSETS.fetch(request);
+  },
+
+  // Cron backstop for the reservation sweep (see wrangler.toml [triggers]).
+  // Supabase's pg_cron runs the same sweep when available, but the migration
+  // silently skips scheduling where pg_cron isn't permitted — without this,
+  // abandoned reservations would hold lead slots forever.
+  async scheduled(_event: unknown, env: WorkerEnv, _ctx: ExecutionContext): Promise<void> {
+    try {
+      const { db } = buildContainer(env);
+      const released = await db.sweepStale(RESERVATION_TTL_MINUTES);
+      if (released > 0) console.log(`sweep: reopened ${released} stale reservation(s)`);
+    } catch (err) {
+      console.error("scheduled sweep failed:", err);
+    }
   },
 };

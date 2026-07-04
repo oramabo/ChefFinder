@@ -10,7 +10,7 @@ import { createMockPayments } from "./adapters/payments.mock.ts";
 import { createGrowPayments } from "./adapters/payments.grow.ts";
 import { createBitPayments } from "./adapters/payments.bit.ts";
 import { createMockMessaging } from "./adapters/messaging.mock.ts";
-import { createWhatsAppMessaging } from "./adapters/messaging.whatsapp.ts";
+import { createWhatsAppMessaging, createWhatsAppDirect } from "./adapters/messaging.whatsapp.ts";
 import { createTelegramMessaging } from "./adapters/messaging.telegram.ts";
 import { createTurnstile, createMockTurnstile } from "./adapters/turnstile.ts";
 
@@ -41,17 +41,31 @@ export function buildContainer(env: Env, _request?: Request): Container {
       ? createBitPayments(env)
       : createMockPayments();
 
+  // The Turnstile mock passes everything, which in a real deployment means
+  // unthrottled spam straight into the WhatsApp/Telegram groups — shout about
+  // it on every request so a missing TURNSTILE_SECRET can't go unnoticed.
+  if (!globalStubs(env) && !useReal(env, "turnstile")) {
+    console.error(
+      "TURNSTILE_SECRET is not set in a non-stub deployment — anti-spam is DISABLED",
+    );
+  }
   const turnstile: TurnstilePort = useReal(env, "turnstile")
     ? createTurnstile(env.TURNSTILE_SECRET!)
     : createMockTurnstile();
 
-  // Messaging is per-channel: WhatsApp and Telegram each go real or mock.
+  // Messaging is per-channel: WhatsApp and Telegram each go real or mock. The
+  // direct-to-user messages (OTP, access link) ride the WhatsApp credentials;
+  // whether they are used at all is decided per-feature by OTP_ENABLED /
+  // RECOVERY_ENABLED in the handlers.
   const mock = createMockMessaging();
   const wa = useReal(env, "wa") ? createWhatsAppMessaging(env) : mock;
   const tg = useReal(env, "tg") ? createTelegramMessaging(env) : mock;
+  const direct = useReal(env, "wa") ? createWhatsAppDirect(env) : mock;
   const messaging: MessagingPort = {
     sendWhatsApp: (input) => wa.sendWhatsApp(input),
     sendTelegram: (input) => tg.sendTelegram(input),
+    sendOtp: (to, code) => direct.sendOtp(to, code),
+    sendAccessLink: (to, url) => direct.sendAccessLink(to, url),
   };
 
   return { db, payments, messaging, turnstile };

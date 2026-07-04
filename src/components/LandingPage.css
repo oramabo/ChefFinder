@@ -176,3 +176,44 @@
   font-size: 0.85rem;
 }
 
+
+/* Hero visual (optional per-landing image; placeholder until real art lands —
+   see docs/IMAGE_PROMPTS.md). Side-by-side on wide screens, stacked on mobile. */
+.ez__hero-inner--split {
+  display: grid;
+  gap: var(--space-8);
+  align-items: center;
+}
+@media (min-width: 860px) {
+  .ez__hero-inner--split {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+}
+.ez__hero-img {
+  inline-size: 100%;
+  block-size: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border, rgba(0, 0, 0, 0.06));
+  box-shadow: 0 18px 48px rgba(109, 40, 217, 0.14);
+}
+
+/* The success mark is an inline SVG icon (no emoji); size it inside the disc. */
+.ez__success-mark svg {
+  inline-size: 1.7rem;
+  block-size: 1.7rem;
+}
+
+.ez__step-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: var(--space-3);
+}
+.ez__step-icon {
+  color: var(--color-accent);
+  display: inline-flex;
+}
+.ez__step-icon svg {
+  inline-size: 1.9rem;
+  block-size: 1.9rem;
+}

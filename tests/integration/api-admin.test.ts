@@ -153,8 +153,27 @@ describe("manual Bit: pending list + confirm", () => {
       }),
     );
     expect(confirmRes.status).toBe(200);
+    const confirmed = (await confirmRes.json()) as {
+      ok: boolean;
+      result: string;
+      recovery_url?: string;
+    };
+    expect(confirmed.result).toBe("completed");
+    // The operator gets a recovery link (unlock page + reveal token) to send
+    // to the paying chef, so payment survives lost localStorage / new devices.
+    expect(confirmed.recovery_url).toContain(`/lead/${lead.lead_token}?reveal=`);
     const paid = await db.getPurchase(purchase.id);
     expect(paid?.status).toBe("paid");
+  });
+
+  it("rejects the admin token as a query param (header only)", async () => {
+    const res = await adminPending(
+      ctx({
+        url: "http://localhost/api/admin/pending?token=s3cret",
+        env: { USE_STUBS: "false", ADMIN_TOKEN: "s3cret" },
+      }),
+    );
+    expect(res.status).toBe(401);
   });
 
   it("confirm denies without a valid token (401)", async () => {

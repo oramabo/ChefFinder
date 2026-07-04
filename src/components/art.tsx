@@ -75,6 +75,24 @@ export function IconSend(props: IconProps) {
   );
 }
 
+export function IconCheck(props: IconProps) {
+  return (
+    <svg {...stroke} aria-hidden="true" {...props}>
+      <path d="M4.5 12.5 9.5 17.5 19.5 6.5" />
+    </svg>
+  );
+}
+
+export function IconAlert(props: IconProps) {
+  return (
+    <svg {...stroke} aria-hidden="true" {...props}>
+      <path d="M12 4 2.8 19.5h18.4Z" />
+      <path d="M12 10v4.5" />
+      <circle cx="12" cy="17" r="0.7" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 // Hero illustration: a plated place setting, drawn by hand. The single
 // "served bite" — an olive sprig with pomegranate berries — sits at the centre.
 export function HeroPlate(props: IconProps) {

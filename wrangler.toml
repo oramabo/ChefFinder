@@ -22,6 +22,13 @@ not_found_handling = "single-page-application"
 # `_headers` continue to work.
 run_worker_first = true
 
+# Cron backstop for the reservation TTL sweep. Supabase pg_cron runs the same
+# sweep every 5 minutes when available, but its scheduling is silently skipped
+# where pg_cron isn't permitted — this trigger guarantees abandoned
+# reservations always reopen (see worker/index.ts `scheduled`).
+[triggers]
+crons = ["*/10 * * * *"]
+
 # Non-secret runtime variables. These live here (not the dashboard) on purpose:
 # Workers Builds runs `wrangler deploy` on every push, and a deploy resets
 # plaintext vars to exactly what this config declares — so dashboard-set plaintext
@@ -30,7 +37,10 @@ run_worker_first = true
 [vars]
 PUBLIC_BASE_URL = "https://cheffinder.oramabo9-b2c.workers.dev"
 # Placeholder-checkout mode: instant click-through reservation, no real provider.
-# Remove this (and add the GROW_* secrets) when wiring real payments.
+# ⚠️ LAUNCH BLOCKER: while this is "true", /api/payment/mock-complete lets
+# anyone unlock client contacts WITHOUT paying. Before going live with manual
+# Bit payments: delete this line and set the BIT_PHONE secret (and optionally
+# BIT_LINK). See "Launch checklist" in DEPLOYMENT.md.
 MOCK_PAYMENTS = "true"
 
 # Sensitive values (SUPABASE_*, TURNSTILE_SECRET, TG_*, WA_*, ADMIN_TOKEN,

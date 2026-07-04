@@ -30,6 +30,21 @@ export interface Env {
   // Template for the operator reservation alert (defaults to "new_reservation").
   WA_RESERVATION_TEMPLATE?: string;
 
+  // ── WhatsApp direct messages to end users (feature-flagged) ───────────────
+  // Client phone verification: "true" requires an OTP (sent to the client's
+  // WhatsApp) before a lead is accepted. Flip off any time to return to
+  // no-verification lead capture.
+  OTP_ENABLED?: string;
+  // Chef access links: "true" sends the paying chef their unlock/recovery link
+  // on WhatsApp when a payment is confirmed, and enables the self-service
+  // "send me my access link" endpoint on the lead page.
+  RECOVERY_ENABLED?: string;
+  // Meta AUTHENTICATION-category template for the OTP (default "otp_code").
+  WA_OTP_TEMPLATE?: string;
+  // Meta UTILITY-category template with a URL button for the access link
+  // (default "lead_access").
+  WA_ACCESS_TEMPLATE?: string;
+
   TG_TOKEN?: string;
   TG_CHAT_ID?: string;
   // Separate operator/admin Telegram channel for reservation + payment alerts.
@@ -73,6 +88,17 @@ export function useReal(env: Env, service: "db" | "payments" | "wa" | "tg" | "tu
 // Placeholder-payments mode is explicitly enabled (independent of USE_STUBS).
 export function mockPaymentsEnabled(env: Env): boolean {
   return String(env.MOCK_PAYMENTS).toLowerCase() === "true";
+}
+
+// Client phone verification (OTP over WhatsApp) is on. Off by default so the
+// funnel is unchanged until the operator flips it.
+export function otpEnabled(env: Env): boolean {
+  return String(env.OTP_ENABLED).toLowerCase() === "true";
+}
+
+// Chef access-link delivery/recovery over WhatsApp is on. Off by default.
+export function recoveryEnabled(env: Env): boolean {
+  return String(env.RECOVERY_ENABLED).toLowerCase() === "true";
 }
 
 // Manual Bit mode: a Bit phone number is configured and no real aggregator is.

@@ -19,11 +19,42 @@ async function getJson<T>(url: string): Promise<T> {
 export interface CreateLeadResponse {
   ok: boolean;
   error?: string;
+  // otp_required | otp_invalid | otp_expired | otp_too_many | turnstile_failed
+  reason?: string;
   notify?: { whatsapp: string; telegram: string };
 }
 
 export function createLead(input: LeadInputType): Promise<CreateLeadResponse> {
   return postJson<CreateLeadResponse>("/api/lead", input);
+}
+
+export interface OtpSendResponse {
+  ok: boolean;
+  // disabled | too_soon | send_failed | turnstile_failed
+  reason?: string;
+  error?: string;
+}
+
+// Ask the server to WhatsApp a verification code to the client's phone.
+// Returns {ok:false, reason:"disabled"} when OTP is off server-side.
+export function sendOtp(phone: string, turnstileToken: string): Promise<OtpSendResponse> {
+  return postJson<OtpSendResponse>("/api/otp/send", {
+    phone,
+    turnstile_token: turnstileToken,
+  });
+}
+
+// Ask the server to re-send a paying chef's access link to the phone on record.
+// The response is generic by design (no purchase-existence leak).
+export function recoverAccess(
+  token: string,
+  chefPhone: string,
+  turnstileToken: string,
+): Promise<{ ok: boolean; reason?: string; error?: string }> {
+  return postJson(`/api/lead/${encodeURIComponent(token)}/recover`, {
+    chef_phone: chefPhone,
+    turnstile_token: turnstileToken,
+  });
 }
 
 export interface JoinResponse {
@@ -106,9 +137,14 @@ export interface ReserveResponse {
   error?: string;
 }
 
-export function reserveLead(token: string, chefPhone: string): Promise<ReserveResponse> {
+export function reserveLead(
+  token: string,
+  chefPhone: string,
+  turnstileToken: string,
+): Promise<ReserveResponse> {
   return postJson<ReserveResponse>(`/api/lead/${encodeURIComponent(token)}/reserve`, {
     chef_phone: chefPhone,
+    turnstile_token: turnstileToken,
   });
 }
 
@@ -197,17 +233,28 @@ export async function listPending(token: string): Promise<{ status: number; body
   return { status: res.status, body: (await res.json()) as PendingResponse };
 }
 
+export interface ConfirmPurchaseResponse {
+  ok: boolean;
+  transitioned?: boolean;
+  result?: string;
+  reason?: string;
+  error?: string;
+  // Unlock page + reveal token, for the operator to send to the paying chef so
+  // they can open the contact from any device (in-app browsers lose storage).
+  recovery_url?: string;
+}
+
 // Operator action (admin-gated): confirm a manual Bit payment by its reference
 // (the purchase id), which unlocks the contact for the paying chef.
 export async function confirmPurchase(
   reference: string,
   adminToken: string,
-): Promise<{ status: number; body: { ok: boolean; transitioned?: boolean; error?: string } }> {
+): Promise<{ status: number; body: ConfirmPurchaseResponse }> {
   const res = await fetch(`/api/admin/purchase/${encodeURIComponent(reference)}/confirm`, {
     method: "POST",
     headers: adminToken ? { "x-admin-token": adminToken } : {},
   });
-  return { status: res.status, body: (await res.json()) as { ok: boolean; transitioned?: boolean; error?: string } };
+  return { status: res.status, body: (await res.json()) as ConfirmPurchaseResponse };
 }
 
 // Operator action (admin-gated): re-send a lead's distribution message. Omit

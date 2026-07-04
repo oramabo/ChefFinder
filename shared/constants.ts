@@ -4,8 +4,39 @@
 export const DEFAULT_PRICE = 30; // ILS per unlock
 export const DEFAULT_CAP = 3; // chefs per lead
 
+// Lead price (ILS) by the client's budget band — a bigger event is worth more
+// to a chef. Ordered high→low; the first tier whose minBudget the lead's
+// budget meets wins, otherwise DEFAULT_PRICE. Prices are stamped on the lead
+// row at creation time, so tuning these never reprices existing leads.
+export const LEAD_PRICE_TIERS: { minBudget: number; price: number }[] = [
+  { minBudget: 12000, price: 50 },
+  { minBudget: 5000, price: 40 },
+];
+
+export function leadPrice(budget?: number | null): number {
+  if (budget == null) return DEFAULT_PRICE;
+  return LEAD_PRICE_TIERS.find((t) => budget >= t.minBudget)?.price ?? DEFAULT_PRICE;
+}
+
 // Minutes a pending reservation holds a slot before the sweep reopens it.
 export const RESERVATION_TTL_MINUTES = 20;
+
+// A lead with no event date goes stale this many days after creation; a dated
+// lead expires once its event date passes. Expired leads can't be reserved.
+export const LEAD_MAX_AGE_DAYS = 30;
+
+// Client phone verification (OTP over WhatsApp, feature-flagged server-side).
+export const OTP_LENGTH = 6;
+export const OTP_TTL_MINUTES = 10;
+export const OTP_MAX_ATTEMPTS = 5;
+export const OTP_MIN_RESEND_SECONDS = 60;
+
+export type OtpVerifyStatus =
+  | "ok"
+  | "not_found"
+  | "expired"
+  | "too_many_attempts"
+  | "mismatch";
 
 export const LEAD_STATUS = {
   available: "available",
@@ -27,9 +58,25 @@ export const RESERVE_REASON = {
   already_purchased: "already_purchased",
   sold_out: "sold_out",
   not_found: "not_found",
+  expired: "expired",
 } as const;
 export type ReserveReason =
   (typeof RESERVE_REASON)[keyof typeof RESERVE_REASON];
+
+// Outcome of complete_purchase. `completed` is the normal pending→paid path.
+// `recovered` means the payment landed after the reservation was released
+// (expired/failed) and the slot was successfully retaken. `conflict` means the
+// payment landed late AND the lead has since sold to capacity — the chef paid
+// but can't be given the slot, so the operator must refund.
+export const COMPLETE_RESULT = {
+  completed: "completed",
+  recovered: "recovered",
+  conflict: "conflict",
+  noop: "noop",
+  not_found: "not_found",
+} as const;
+export type CompleteResult =
+  (typeof COMPLETE_RESULT)[keyof typeof COMPLETE_RESULT];
 
 // Event types offered in the qualifying form (slug + Hebrew label).
 export const EVENT_TYPES = [

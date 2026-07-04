@@ -72,10 +72,46 @@ describe("mock reserveLead semantics", () => {
     const lead = await makeLead(db, 3);
     const p = await db.createPurchase({ lead_id: lead.id, chef_phone: "0521111111", amount: 30 });
     await db.reserveLead(lead.lead_token, "0521111111");
-    expect(await db.completePurchase(p.id, "inv-1")).toBe(true);
-    expect(await db.completePurchase(p.id, "inv-1")).toBe(false); // idempotent
+    expect(await db.completePurchase(p.id, "inv-1")).toBe("completed");
+    expect(await db.completePurchase(p.id, "inv-1")).toBe("noop"); // idempotent
     const l = await db.getLeadByToken(lead.lead_token);
     expect(l?.paid_by).toEqual(["0521111111"]);
+  });
+
+  it("recovers a payment that lands after the reservation expired (capacity left)", async () => {
+    const lead = await makeLead(db, 3);
+    const p = await db.createPurchase({ lead_id: lead.id, chef_phone: "0521111111", amount: 30 });
+    await db.reserveLead(lead.lead_token, "0521111111");
+    // Sweep expires the reservation before the payment arrives.
+    expect(await db.releasePurchase(p.id, "expired")).toBe(true);
+
+    expect(await db.completePurchase(p.id, "inv-late")).toBe("recovered");
+    const l = await db.getLeadByToken(lead.lead_token);
+    expect(l?.buyers_count).toBe(1); // slot retaken
+    expect(l?.paid_by).toEqual(["0521111111"]);
+    expect((await db.getPurchase(p.id))?.status).toBe("paid");
+  });
+
+  it("reports conflict when a late payment finds the lead sold to capacity", async () => {
+    const lead = await makeLead(db, 1);
+    const p1 = await db.createPurchase({ lead_id: lead.id, chef_phone: "0521111111", amount: 30 });
+    await db.reserveLead(lead.lead_token, "0521111111");
+    expect(await db.releasePurchase(p1.id, "expired")).toBe(true);
+
+    // Someone else takes (and pays for) the reopened slot.
+    const p2 = await db.createPurchase({ lead_id: lead.id, chef_phone: "0522222222", amount: 30 });
+    await db.reserveLead(lead.lead_token, "0522222222");
+    expect(await db.completePurchase(p2.id)).toBe("completed");
+
+    // The late payment cannot be honoured — operator must refund.
+    expect(await db.completePurchase(p1.id, "inv-late")).toBe("conflict");
+    expect((await db.getPurchase(p1.id))?.status).toBe("expired");
+    const l = await db.getLeadByToken(lead.lead_token);
+    expect(l?.paid_by).toEqual(["0522222222"]);
+  });
+
+  it("returns not_found for an unknown purchase", async () => {
+    expect(await db.completePurchase("missing")).toBe("not_found");
   });
 
   it("sweepStale expires old pending purchases", async () => {

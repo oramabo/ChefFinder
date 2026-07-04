@@ -2,6 +2,7 @@ import { allowMockComplete } from "../../../functions-lib/env.ts";
 import { buildContainer } from "../../../functions-lib/factory.ts";
 import { json, error, readJson } from "../../../functions-lib/http.ts";
 import type { Handler } from "../../../functions-lib/handler.ts";
+import { COMPLETE_RESULT } from "@shared/constants.ts";
 
 // POST /api/payment/mock-complete — finishes the placeholder checkout (the mock
 // "payment page" redirects back here). Allowed only when payments are mocked
@@ -31,6 +32,8 @@ export const onRequestPost: Handler = async ({ request, env }) => {
     provider_ref: purchase.provider_ref ?? `mock_${purchaseId}`,
     amount: purchase.amount,
   });
-  const transitioned = await db.completePurchase(purchaseId, invoiceRef);
-  return json({ ok: true, status: "paid", transitioned });
+  const result = await db.completePurchase(purchaseId, invoiceRef);
+  const transitioned =
+    result === COMPLETE_RESULT.completed || result === COMPLETE_RESULT.recovered;
+  return json({ ok: true, status: "paid", transitioned, result });
 };

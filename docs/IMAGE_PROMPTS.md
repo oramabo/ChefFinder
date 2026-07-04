@@ -5,6 +5,12 @@ generation prompt. Generate each image, save it under `public/images/` with the
 **exact file name** below (overwriting the placeholder), and redeploy — no code
 changes needed.
 
+**Automated:** `npm run images:generate` (needs `OPENAI_API_KEY` in the env or
+`.env.local`) generates the whole set below via the OpenAI Images API
+(gpt-image-2; the transparent images use gpt-image-1, which still supports
+alpha) and writes them straight to `public/images/`. See
+`scripts/generate-images.mjs` for subset/dry-run/quality options.
+
 Brand palette to keep the set cohesive:
 
 - Background lilac-white `#f8f5fc`, surfaces `#ffffff` / `#efe9f8`

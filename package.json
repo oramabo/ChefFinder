@@ -18,6 +18,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:db": "node scripts/run-pgtap.mjs",
+    "images:generate": "node scripts/generate-images.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.functions.json --noEmit && tsc -p tsconfig.node.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit"
   },
@@ -45,6 +46,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "jsdom": "^25.0.1",
+    "sharp": "^0.35.3",
     "typescript": "^5.6.2",
     "vite": "^5.4.8",
     "vitest": "^2.1.1",

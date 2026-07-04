@@ -132,16 +132,22 @@ the `VITE_*` values.
 ## 1. Supabase (database)
 
 1. Create a project; pick a region near Israel (e.g. Frankfurt / `eu-central`).
-2. Apply migrations **in order**. Either with the CLI:
+2. Apply migrations **in order**. Preferred: automatic — the
+   `.github/workflows/db-migrate.yml` workflow runs `supabase db push` whenever
+   a migration file lands on `main`. Enable it once by adding three repository
+   secrets (GitHub → Settings → Secrets and variables → Actions):
+   `SUPABASE_ACCESS_TOKEN` (dashboard → Account → Access Tokens),
+   `SUPABASE_PROJECT_REF` (project settings), and `SUPABASE_DB_PASSWORD`
+   (project Settings → Database). Until the secrets exist the workflow skips
+   cleanly, and you can apply manually instead — with the CLI:
    ```bash
    supabase link --project-ref <your-ref>
    supabase db push
    ```
    or paste each file from `supabase/migrations/` (`0001_init.sql` →
    `0009_phone_otps.sql`) into the SQL editor, in order. **Do not** run
-   `supabase/seed.sql` in production. The CLI route is strongly preferred —
-   `supabase db push` remembers what has already been applied, so future
-   migrations are a single command.
+   `supabase/seed.sql` in production. `supabase db push` (CLI or workflow)
+   remembers what has already been applied, so it only runs the new files.
 3. Enable the **`pg_cron`** extension: Database → Extensions → enable `pg_cron`.
    `0003_sweep.sql` schedules the abandoned-reservation sweep every 5 minutes.
    If the extension was off when migrations ran, re-run the `cron.schedule(...)`

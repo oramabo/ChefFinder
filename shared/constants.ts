@@ -25,6 +25,19 @@ export const RESERVATION_TTL_MINUTES = 20;
 // lead expires once its event date passes. Expired leads can't be reserved.
 export const LEAD_MAX_AGE_DAYS = 30;
 
+// Client phone verification (OTP over WhatsApp, feature-flagged server-side).
+export const OTP_LENGTH = 6;
+export const OTP_TTL_MINUTES = 10;
+export const OTP_MAX_ATTEMPTS = 5;
+export const OTP_MIN_RESEND_SECONDS = 60;
+
+export type OtpVerifyStatus =
+  | "ok"
+  | "not_found"
+  | "expired"
+  | "too_many_attempts"
+  | "mismatch";
+
 export const LEAD_STATUS = {
   available: "available",
   sold_out: "sold_out",

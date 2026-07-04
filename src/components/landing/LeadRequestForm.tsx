@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { Field, TextInput, Select } from "../Field.tsx";
 import Turnstile from "../Turnstile.tsx";
-import { createLead } from "../../lib/api.ts";
+import { IconCheck } from "../art.tsx";
+import { createLead, sendOtp } from "../../lib/api.ts";
 import { EVENT_TYPES, BUDGET_BANDS } from "@shared/constants.ts";
 
 type Status = "idle" | "sending" | "done" | "error";
@@ -35,9 +36,31 @@ export default function LeadRequestForm({ source = "ezfind-chefs-landing" }: { s
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [captcha, setCaptcha] = useState("");
+  // Remount key — Turnstile tokens are single-use; bump after a consuming call.
+  const [captchaKey, setCaptchaKey] = useState(0);
+  // Phone verification (active only when the server runs with OTP_ENABLED).
+  const [otpStage, setOtpStage] = useState<"none" | "sent">("none");
+  const [otpCode, setOtpCode] = useState("");
 
   const set = (key: keyof FormState) => (value: string) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  async function requestOtp(): Promise<void> {
+    const res = await sendOtp(form.client_phone, captcha);
+    setCaptchaKey((k) => k + 1);
+    if (res.ok || res.reason === "too_soon") {
+      setOtpStage("sent");
+      setStatus("idle");
+      setErrorMsg("");
+      return;
+    }
+    setStatus("error");
+    setErrorMsg(
+      res.reason === "send_failed"
+        ? "שליחת קוד האימות נכשלה. ודאו שהמספר פעיל בוואטסאפ ונסו שוב."
+        : res.error ?? "אירעה תקלה. נסו שוב בעוד רגע.",
+    );
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -56,11 +79,24 @@ export default function LeadRequestForm({ source = "ezfind-chefs-landing" }: { s
         client_phone: form.client_phone,
         client_email: form.client_email || "",
         turnstile_token: captcha,
+        otp_code: otpCode.trim(),
         source,
       });
       if (res.ok) {
         setStatus("done");
         setForm(EMPTY);
+        setOtpStage("none");
+        setOtpCode("");
+      } else if (res.reason === "otp_required") {
+        await requestOtp();
+      } else if (res.reason === "otp_invalid") {
+        setStatus("error");
+        setErrorMsg("הקוד שגוי — נסו שוב.");
+      } else if (res.reason === "otp_expired" || res.reason === "otp_too_many") {
+        setOtpCode("");
+        await requestOtp();
+        setStatus("error");
+        setErrorMsg("הקוד כבר לא בתוקף — שלחנו קוד חדש לוואטסאפ.");
       } else {
         setStatus("error");
         setErrorMsg(res.error ?? "אירעה תקלה. נסו שוב בעוד רגע.");
@@ -75,7 +111,7 @@ export default function LeadRequestForm({ source = "ezfind-chefs-landing" }: { s
     return (
       <div className="ez__success">
         <span className="ez__success-mark" aria-hidden="true">
-          ✓
+          <IconCheck />
         </span>
         <h2>קיבלנו! מחפשים לכם שף.</h2>
         <p>
@@ -201,20 +237,36 @@ export default function LeadRequestForm({ source = "ezfind-chefs-landing" }: { s
           </Field>
         </div>
 
+        {otpStage === "sent" && (
+          <Field label="קוד אימות (נשלח אליכם בוואטסאפ)" htmlFor="otp_code">
+            <TextInput
+              id="otp_code"
+              name="otp_code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="6 ספרות"
+              maxLength={6}
+              value={otpCode}
+              onChange={(e) => setOtpCode(e.target.value)}
+            />
+          </Field>
+        )}
+
         {status === "error" && (
           <p className="ez__error" role="alert">
             {errorMsg}
           </p>
         )}
 
-        <Turnstile onToken={setCaptcha} />
+        <Turnstile key={captchaKey} onToken={setCaptcha} />
 
         <button
           type="submit"
           className="btn btn--primary btn--full ez__submit"
-          disabled={status === "sending"}
+          disabled={status === "sending" || (otpStage === "sent" && otpCode.trim().length < 4)}
         >
-          {status === "sending" ? "שולח…" : "מצאו לי שף"}
+          {status === "sending" ? "שולח…" : otpStage === "sent" ? "אימות ושליחה" : "מצאו לי שף"}
         </button>
 
         <p className="ez__consent">

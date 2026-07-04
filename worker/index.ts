@@ -21,6 +21,8 @@ import { onRequestPost as createLead } from "../functions/api/lead/index.ts";
 import { onRequestGet as getLead } from "../functions/api/lead/[token]/index.ts";
 import { onRequestGet as getContact } from "../functions/api/lead/[token]/contact.ts";
 import { onRequestPost as reserveLead } from "../functions/api/lead/[token]/reserve.ts";
+import { onRequestPost as recoverAccess } from "../functions/api/lead/[token]/recover.ts";
+import { onRequestPost as sendOtp } from "../functions/api/otp/send.ts";
 import { onRequestPost as mockComplete } from "../functions/api/payment/mock-complete.ts";
 import { onRequestPost as paymentWebhook } from "../functions/api/payment/webhook.ts";
 import { onRequestGet as adminLeads } from "../functions/api/admin/leads.ts";
@@ -61,6 +63,8 @@ const routes: Route[] = [
   { method: "GET", pattern: "/api/lead/:token", handler: getLead },
   { method: "GET", pattern: "/api/lead/:token/contact", handler: getContact },
   { method: "POST", pattern: "/api/lead/:token/reserve", handler: reserveLead },
+  { method: "POST", pattern: "/api/lead/:token/recover", handler: recoverAccess },
+  { method: "POST", pattern: "/api/otp/send", handler: sendOtp },
   { method: "POST", pattern: "/api/payment/mock-complete", handler: mockComplete },
   { method: "POST", pattern: "/api/payment/webhook", handler: paymentWebhook },
   { method: "GET", pattern: "/api/admin/leads", handler: adminLeads },

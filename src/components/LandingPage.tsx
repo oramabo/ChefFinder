@@ -6,6 +6,8 @@ import "./LandingPage.css";
 export interface LandingStep {
   title: string;
   body: string;
+  // Line icon from src/components/art.tsx, rendered above the step number.
+  icon?: ReactNode;
 }
 
 export interface LandingLink {
@@ -26,6 +28,10 @@ export interface LandingConfig {
   heroTitle: ReactNode;
   heroSub: string;
   heroCta: string;
+  // Optional hero visual, shown beside the hero copy on wide screens and below
+  // it on mobile. Files live in public/images (see docs/IMAGE_PROMPTS.md for
+  // the generation prompt of each placeholder).
+  heroImage?: { src: string; alt: string };
   // Optional body paragraph shown between the hero and the 3-step explainer.
   intro?: ReactNode;
   steps: [LandingStep, LandingStep, LandingStep];
@@ -70,13 +76,28 @@ export default function LandingPage({
 
       <main id="main">
         <section className="ez__hero">
-          <div className="container ez__hero-inner">
-            <p className="eyebrow">{config.heroEyebrow}</p>
-            <h1 className="ez__title">{config.heroTitle}</h1>
-            <p className="ez__sub lead-text">{config.heroSub}</p>
-            <a className="btn btn--primary ez__hero-cta" href="#join">
-              {config.heroCta}
-            </a>
+          <div
+            className={`container ez__hero-inner ${config.heroImage ? "ez__hero-inner--split" : ""}`}
+          >
+            <div className="ez__hero-copy">
+              <p className="eyebrow">{config.heroEyebrow}</p>
+              <h1 className="ez__title">{config.heroTitle}</h1>
+              <p className="ez__sub lead-text">{config.heroSub}</p>
+              <a className="btn btn--primary ez__hero-cta" href="#join">
+                {config.heroCta}
+              </a>
+            </div>
+            {config.heroImage && (
+              <img
+                className="ez__hero-img"
+                src={config.heroImage.src}
+                alt={config.heroImage.alt}
+                width={800}
+                height={600}
+                loading="eager"
+                decoding="async"
+              />
+            )}
           </div>
         </section>
 
@@ -90,7 +111,10 @@ export default function LandingPage({
           <div className="grid grid-3">
             {config.steps.map((s, i) => (
               <div className="card" key={i}>
-                <span className="ez__step-num">{i + 1}</span>
+                <div className="ez__step-head">
+                  <span className="ez__step-num">{i + 1}</span>
+                  {s.icon && <span className="ez__step-icon">{s.icon}</span>}
+                </div>
                 <h3>{s.title}</h3>
                 <p>{s.body}</p>
               </div>

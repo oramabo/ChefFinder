@@ -49,7 +49,7 @@ export default function LeadsSection({ token, onUnauthorized }: Props) {
         const { status, body } = await resendNotify(leadToken, channel, token);
         if (status === 401) return setMsg(leadToken, "אסימון שגוי או חסר.");
         if (!body.ok) return setMsg(leadToken, body.error || "שליחה נכשלה.");
-        setMsg(leadToken, body.notify?.[channel] === "sent" ? `${label}: נשלח ✓` : `${label}: נכשל ✗`);
+        setMsg(leadToken, body.notify?.[channel] === "sent" ? `${label}: נשלח` : `${label}: נכשל`);
       } catch {
         setMsg(leadToken, "שגיאת רשת.");
       } finally {
@@ -63,7 +63,7 @@ export default function LeadsSection({ token, onUnauthorized }: Props) {
     const link = leadLink(leadToken);
     try {
       await navigator.clipboard.writeText(link);
-      setMsg(leadToken, "הקישור הועתק ✓");
+      setMsg(leadToken, "הקישור הועתק");
     } catch {
       setMsg(leadToken, link);
     }
@@ -94,13 +94,13 @@ export default function LeadsSection({ token, onUnauthorized }: Props) {
           // sold to capacity — the chef must be refunded.
           if (body.reason === "conflict_sold_out") {
             return setPendingMsg(
-              `⚠️ הליד כבר נמכר עד התקרה — יש להחזיר לשף ${p.chef_phone} את הכסף (₪${p.amount}).`,
+              `שימו לב: הליד כבר נמכר עד התקרה — יש להחזיר לשף ${p.chef_phone} את הכסף (₪${p.amount}).`,
             );
           }
           return setPendingMsg(body.error || "האישור נכשל.");
         }
         setPending((cur) => (cur ?? []).filter((x) => x.id !== p.id));
-        setPendingMsg(`אושר תשלום של ${p.chef_phone} — הפרטים נחשפו לשף ✓`);
+        setPendingMsg(`אושר תשלום של ${p.chef_phone} — הפרטים נחשפו לשף.`);
         if (body.recovery_url) setRecoveryUrl(body.recovery_url);
       } catch {
         setPendingMsg("שגיאת רשת.");
@@ -114,7 +114,7 @@ export default function LeadsSection({ token, onUnauthorized }: Props) {
   const copyRecovery = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(recoveryUrl);
-      setPendingMsg("קישור השחזור הועתק ✓ שלחו אותו לשף ששילם.");
+      setPendingMsg("קישור השחזור הועתק — שלחו אותו לשף ששילם.");
     } catch {
       // Leave the link on screen for manual copying.
     }

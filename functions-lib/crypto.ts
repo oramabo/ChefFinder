@@ -13,6 +13,17 @@ export function generateLeadToken(length = 22): string {
   return out;
 }
 
+// Numeric one-time code for phone verification (crypto-random digits).
+export function generateOtpCode(length = 6): string {
+  const bytes = new Uint8Array(length);
+  crypto.getRandomValues(bytes);
+  let out = "";
+  for (let i = 0; i < length; i++) {
+    out += String(bytes[i] % 10);
+  }
+  return out;
+}
+
 function toHex(buf: ArrayBuffer): string {
   return [...new Uint8Array(buf)]
     .map((b) => b.toString(16).padStart(2, "0"))

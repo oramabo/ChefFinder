@@ -6,7 +6,7 @@ import Turnstile from "../components/Turnstile.tsx";
 import { Button } from "../components/Button.tsx";
 import { Field, TextInput, OptionGroup } from "../components/Field.tsx";
 import { EVENT_TYPES, BUDGET_BANDS, CUISINES } from "@shared/constants.ts";
-import { createLead } from "../lib/api.ts";
+import { createLead, sendOtp } from "../lib/api.ts";
 import { track } from "../lib/analytics.ts";
 import "./FindAChef.css";
 
@@ -43,9 +43,15 @@ export default function FindAChef() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>(EMPTY);
   const [token, setToken] = useState("");
+  // Remount key for the Turnstile widget: tokens are single-use, so after a
+  // call that consumed one (e.g. sending an OTP) we bump this to get a fresh one.
+  const [captchaKey, setCaptchaKey] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [started, setStarted] = useState(false);
+  // Phone verification (active only when the server runs with OTP_ENABLED).
+  const [otpStage, setOtpStage] = useState<"none" | "sent">("none");
+  const [otpCode, setOtpCode] = useState("");
 
   // Refs mirror state so the unmount cleanup sees current values (not stale ones).
   const stepRef = useRef(step);
@@ -105,6 +111,25 @@ export default function FindAChef() {
     setStep((s) => Math.max(s - 1, 0));
   }
 
+  // Ask the server to WhatsApp a code to the client. Consumes the current
+  // Turnstile token, so a fresh widget is mounted right after.
+  async function requestOtp() {
+    const res = await sendOtp(form.client_phone.trim(), token);
+    setCaptchaKey((k) => k + 1);
+    if (res.ok || res.reason === "too_soon") {
+      setOtpStage("sent");
+      setError(res.ok ? "" : "קוד כבר נשלח — בדקו את הוואטסאפ.");
+      track("otp_sent");
+      return true;
+    }
+    setError(
+      res.reason === "send_failed"
+        ? "שליחת הקוד נכשלה. ודאו שהמספר פעיל בוואטסאפ ונסו שוב."
+        : res.error || "אירעה שגיאה. נסו שוב.",
+    );
+    return false;
+  }
+
   async function submit() {
     if (!stepValid() || submitting) return;
     setSubmitting(true);
@@ -122,10 +147,22 @@ export default function FindAChef() {
         client_phone: form.client_phone.trim(),
         client_email: form.client_email.trim() || undefined,
         turnstile_token: token,
+        otp_code: otpCode.trim(),
         source: typeof window !== "undefined" ? window.location.search.slice(1) : undefined,
       });
       if (!res.ok) {
-        setError(res.error || "אירעה שגיאה. נסו שוב.");
+        // Server-side phone verification flow (OTP_ENABLED).
+        if (res.reason === "otp_required") {
+          await requestOtp();
+        } else if (res.reason === "otp_invalid") {
+          setError("הקוד שגוי — נסו שוב.");
+        } else if (res.reason === "otp_expired" || res.reason === "otp_too_many") {
+          setOtpCode("");
+          setError("הקוד כבר לא בתוקף — שלחנו קוד חדש.");
+          await requestOtp();
+        } else {
+          setError(res.error || "אירעה שגיאה. נסו שוב.");
+        }
         setSubmitting(false);
         return;
       }
@@ -151,7 +188,17 @@ export default function FindAChef() {
       <h1>בואו נמצא לכם שף</h1>
       <p className="findachef__sub">כמה פרטים קצרים — ועד שלושה שפים יחזרו אליכם עם הצעה.</p>
 
-      <div className="card findachef__card">
+      <div
+        className="card findachef__card"
+        onKeyDown={(e) => {
+          // Enter advances the wizard (mobile keyboards show "go"); on the last
+          // step the explicit submit button keeps control.
+          if (e.key === "Enter" && !isLast && stepValid()) {
+            e.preventDefault();
+            next();
+          }
+        }}
+      >
         <Stepper steps={STEP_LABELS} current={step} />
 
         {step === 0 && (
@@ -263,7 +310,21 @@ export default function FindAChef() {
                 onChange={(e) => set("client_email", e.target.value)}
               />
             </Field>
-            <Turnstile onToken={setToken} />
+            {otpStage === "sent" && (
+              <Field label="קוד אימות (נשלח אליכם בוואטסאפ)" htmlFor="otp_code">
+                <TextInput
+                  id="otp_code"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="6 ספרות"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                />
+              </Field>
+            )}
+            <Turnstile key={captchaKey} onToken={setToken} />
             <p className="findachef__consent">
               בשליחת הטופס אני מאשר/ת שפרטיי יועברו לשפים מקצועיים לצורך יצירת קשר,
               בהתאם ל<a href="/privacy">מדיניות הפרטיות</a>.
@@ -284,8 +345,16 @@ export default function FindAChef() {
               המשך
             </Button>
           ) : (
-            <Button type="button" onClick={submit} disabled={!stepValid() || submitting}>
-              {submitting ? "שולח..." : "שליחה וקבלת הצעות"}
+            <Button
+              type="button"
+              onClick={submit}
+              disabled={!stepValid() || submitting || (otpStage === "sent" && otpCode.trim().length < 4)}
+            >
+              {submitting
+                ? "שולח..."
+                : otpStage === "sent"
+                  ? "אימות ושליחה"
+                  : "שליחה וקבלת הצעות"}
             </Button>
           )}
         </div>

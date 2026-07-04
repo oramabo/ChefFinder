@@ -23,9 +23,28 @@ export const LeadInput = z.object({
   client_phone: phone,
   client_email: z.string().trim().email().max(120).optional().or(z.literal("")),
   turnstile_token: z.string().optional().default(""),
+  // Verification code the client received on WhatsApp. Required (and checked
+  // instead of Turnstile) only when the server runs with OTP_ENABLED=true.
+  otp_code: z.string().trim().max(10).optional().default(""),
   source: z.string().trim().max(200).optional(),
 });
 export type LeadInputType = z.infer<typeof LeadInput>;
+
+// Request a verification code for a client phone (feature-flagged server-side).
+export const OtpSendInput = z.object({
+  phone: phone,
+  turnstile_token: z.string().optional().default(""),
+});
+export type OtpSendInputType = z.infer<typeof OtpSendInput>;
+
+// A chef who paid asks for their access link to be re-sent to the phone on
+// record. The phone is NOT a credential — the link is only ever delivered TO
+// that phone, never returned in the response.
+export const RecoverInput = z.object({
+  chef_phone: phone,
+  turnstile_token: z.string().optional().default(""),
+});
+export type RecoverInputType = z.infer<typeof RecoverInput>;
 
 export const ReserveInput = z.object({
   chef_phone: phone,

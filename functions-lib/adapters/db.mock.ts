@@ -7,17 +7,26 @@ import {
   COMPLETE_RESULT,
   type JoinStatus,
   type CompleteResult,
+  type OtpVerifyStatus,
 } from "@shared/constants.ts";
 import type { DbPort, InsertLeadInput, InsertJoinApplicationInput } from "../ports/db.ts";
 
 // In-memory DbPort with semantics identical to the SQL RPCs. Used under
 // USE_STUBS and in tests. A module-level store keeps data across requests in a
 // single worker/test process; pass a fresh store in tests for isolation.
+interface MockOtp {
+  code_hash: string;
+  attempts: number;
+  expires_at: number; // epoch ms
+  created_at: number; // epoch ms
+}
+
 export interface MockStore {
   leads: Map<string, Lead>; // keyed by id
   purchases: Map<string, Purchase>; // keyed by id
   tokenIndex: Map<string, string>; // lead_token -> lead id
   joinApplications: Map<string, JoinApplication>; // keyed by id
+  otps: Map<string, MockOtp>; // keyed by normalized phone
 }
 
 export function createMockStore(): MockStore {
@@ -26,6 +35,7 @@ export function createMockStore(): MockStore {
     purchases: new Map(),
     tokenIndex: new Map(),
     joinApplications: new Map(),
+    otps: new Map(),
   };
 }
 
@@ -212,6 +222,55 @@ export function createMockDb(store: MockStore = globalStore): DbPort {
         }
       }
       return released;
+    },
+
+    async getPaidPurchasesForLead(leadId: string): Promise<Purchase[]> {
+      return [...store.purchases.values()]
+        .filter((p) => p.lead_id === leadId && p.status === PURCHASE_STATUS.paid)
+        .map((p) => structuredClone(p));
+    },
+
+    async saveOtp(
+      phone: string,
+      codeHash: string,
+      ttlMinutes: number,
+      minIntervalSeconds: number,
+    ): Promise<boolean> {
+      const existing = store.otps.get(phone);
+      const now = Date.now();
+      if (existing && now - existing.created_at < minIntervalSeconds * 1000) {
+        return false;
+      }
+      store.otps.set(phone, {
+        code_hash: codeHash,
+        attempts: 0,
+        expires_at: now + ttlMinutes * 60_000,
+        created_at: now,
+      });
+      return true;
+    },
+
+    async verifyOtp(
+      phone: string,
+      codeHash: string,
+      maxAttempts: number,
+    ): Promise<OtpVerifyStatus> {
+      const r = store.otps.get(phone);
+      if (!r) return "not_found";
+      if (r.expires_at < Date.now()) {
+        store.otps.delete(phone);
+        return "expired";
+      }
+      if (r.attempts >= maxAttempts) {
+        store.otps.delete(phone);
+        return "too_many_attempts";
+      }
+      if (r.code_hash !== codeHash) {
+        r.attempts += 1;
+        return "mismatch";
+      }
+      store.otps.delete(phone); // single use
+      return "ok";
     },
 
     async insertJoinApplication(input: InsertJoinApplicationInput): Promise<JoinApplication> {

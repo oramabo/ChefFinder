@@ -5,6 +5,7 @@ import {
   COMPLETE_RESULT,
   type JoinStatus,
   type CompleteResult,
+  type OtpVerifyStatus,
 } from "@shared/constants.ts";
 import type { DbPort, InsertLeadInput, InsertJoinApplicationInput } from "../ports/db.ts";
 
@@ -155,6 +156,46 @@ export function createSupabaseDb(url: string, serviceKey: string): DbPort {
       });
       if (error) throw new Error(`sweepStale: ${error.message}`);
       return Number(data ?? 0);
+    },
+
+    async getPaidPurchasesForLead(leadId: string): Promise<Purchase[]> {
+      const { data, error } = await sb
+        .from("purchases")
+        .select("*")
+        .eq("lead_id", leadId)
+        .eq("status", "paid");
+      if (error) throw new Error(`getPaidPurchasesForLead: ${error.message}`);
+      return (data as Purchase[]) ?? [];
+    },
+
+    async saveOtp(
+      phone: string,
+      codeHash: string,
+      ttlMinutes: number,
+      minIntervalSeconds: number,
+    ): Promise<boolean> {
+      const { data, error } = await sb.rpc("save_otp", {
+        p_phone: phone,
+        p_code_hash: codeHash,
+        p_ttl_minutes: ttlMinutes,
+        p_min_interval_seconds: minIntervalSeconds,
+      });
+      if (error) throw new Error(`saveOtp: ${error.message}`);
+      return Boolean(data);
+    },
+
+    async verifyOtp(
+      phone: string,
+      codeHash: string,
+      maxAttempts: number,
+    ): Promise<OtpVerifyStatus> {
+      const { data, error } = await sb.rpc("verify_otp", {
+        p_phone: phone,
+        p_code_hash: codeHash,
+        p_max_attempts: maxAttempts,
+      });
+      if (error) throw new Error(`verifyOtp: ${error.message}`);
+      return String(data) as OtpVerifyStatus;
     },
 
     async insertJoinApplication(input: InsertJoinApplicationInput): Promise<JoinApplication> {

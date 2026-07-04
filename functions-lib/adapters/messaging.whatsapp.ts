@@ -1,5 +1,83 @@
 import type { MessagingPort, NotifyInput } from "../ports/messaging.ts";
 import type { Env } from "../env.ts";
+import { normalizeIlPhone } from "../phone.ts";
+
+// Send one approved template to one recipient. Shared by the direct-message
+// senders (OTP, access link); throws with Meta's error body on failure so the
+// exact template/language mismatch is visible in logs.
+async function sendTemplate(
+  env: Env,
+  to: string,
+  templateName: string,
+  components: unknown[],
+): Promise<void> {
+  const res = await fetch(
+    `https://graph.facebook.com/v20.0/${env.WA_PHONE_NUMBER_ID}/messages`,
+    {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${env.WA_CLOUD_TOKEN}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to,
+        type: "template",
+        template: {
+          name: templateName,
+          language: { code: env.WA_TEMPLATE_LANG || "he" },
+          components,
+        },
+      }),
+    },
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`WhatsApp template "${templateName}" to ${to} failed HTTP ${res.status}: ${text}`);
+  }
+}
+
+// Direct WhatsApp messages to an individual (client OTP, chef access link).
+// Unlike the group distribution above these go to end users, so both use
+// dedicated approved templates:
+//   WA_OTP_TEMPLATE    (default "otp_code")   — Meta AUTHENTICATION category;
+//     body param {{1}} = the code, plus the required copy-code button.
+//   WA_ACCESS_TEMPLATE (default "lead_access") — UTILITY category; a URL button
+//     whose variable suffix is appended to the base URL configured in Meta.
+export function createWhatsAppDirect(
+  env: Env,
+): Pick<MessagingPort, "sendOtp" | "sendAccessLink"> {
+  return {
+    async sendOtp(toPhone: string, code: string): Promise<void> {
+      // Meta authentication templates require the code as a body parameter AND
+      // as the copy-code button parameter.
+      await sendTemplate(env, normalizeIlPhone(toPhone), env.WA_OTP_TEMPLATE || "otp_code", [
+        { type: "body", parameters: [{ type: "text", text: code }] },
+        {
+          type: "button",
+          sub_type: "url",
+          index: "0",
+          parameters: [{ type: "text", text: code }],
+        },
+      ]);
+    },
+
+    async sendAccessLink(toPhone: string, url: string): Promise<void> {
+      // The template's URL button is configured in Meta as
+      // "{PUBLIC_BASE_URL}{{1}}" — we pass the path+query part as the variable
+      // so the full recovery link opens from the button.
+      const u = new URL(url);
+      await sendTemplate(env, normalizeIlPhone(toPhone), env.WA_ACCESS_TEMPLATE || "lead_access", [
+        {
+          type: "button",
+          sub_type: "url",
+          index: "0",
+          parameters: [{ type: "text", text: `${u.pathname}${u.search}` }],
+        },
+      ]);
+    },
+  };
+}
 
 // Parse one or more recipient numbers from a single env value. Accepts a comma-,
 // space-, semicolon-, or newline-separated list of E.164 numbers, so multiple

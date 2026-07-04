@@ -1,9 +1,10 @@
 import type { MessagingPort, NotifyInput } from "../ports/messaging.ts";
 
 export interface MockMessage {
-  channel: "whatsapp" | "telegram";
+  channel: "whatsapp" | "telegram" | "otp" | "access_link";
   text: string;
-  input: NotifyInput;
+  input?: NotifyInput;
+  to?: string;
 }
 
 // Records every message so tests can assert both channels fired and that no PII
@@ -37,6 +38,16 @@ export function createMockMessaging(sink: MockMessage[] = []): MessagingPort & {
       const text = render(input);
       sink.push({ channel: "telegram", text, input });
       console.log("[mock Telegram]\n" + text);
+    },
+    // Direct messages (client OTP / chef access link). The console log is the
+    // "delivery" in stub mode — the dev reads the code from the terminal.
+    async sendOtp(toPhone: string, code: string): Promise<void> {
+      sink.push({ channel: "otp", text: code, to: toPhone });
+      console.log(`[mock WhatsApp OTP] to ${toPhone}: ${code}`);
+    },
+    async sendAccessLink(toPhone: string, url: string): Promise<void> {
+      sink.push({ channel: "access_link", text: url, to: toPhone });
+      console.log(`[mock WhatsApp access link] to ${toPhone}: ${url}`);
     },
   };
 }

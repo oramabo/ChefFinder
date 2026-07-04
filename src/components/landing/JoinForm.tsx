@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Field, TextInput, Select } from "../Field.tsx";
 import Turnstile from "../Turnstile.tsx";
+import { IconCheck } from "../art.tsx";
 import { submitJoin } from "../../lib/api.ts";
 import { JOIN_CATEGORIES } from "@shared/constants.ts";
 
@@ -60,7 +61,7 @@ export default function JoinForm({ source = "ezfind-landing" }: { source?: strin
     return (
       <div className="ez__success">
         <span className="ez__success-mark" aria-hidden="true">
-          ✓
+          <IconCheck />
         </span>
         <h2>קיבלנו! תודה שהצטרפתם.</h2>
         <p>הפרטים שלכם נשלחו לצוות שלנו. ניצור איתכם קשר בקרוב עם הצעדים הבאים.</p>

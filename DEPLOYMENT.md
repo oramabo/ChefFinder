@@ -45,7 +45,8 @@ Everything on this list must be done before real chefs pay real money:
    backstop.
 8. **After confirming a Bit payment in `/admin`, send the chef the recovery
    link** the panel shows — it restores contact access from any device (chefs
-   often pay inside in-app browsers that lose local storage).
+   often pay inside in-app browsers that lose local storage). With
+   `RECOVERY_ENABLED=true` this happens automatically over WhatsApp (see 6d).
 9. **Reviews stay off** (`REVIEWS_ARE_REAL=false` in `shared/seo/reviews.ts`)
    until the seed reviews are replaced with real, verifiable customer reviews.
 
@@ -234,7 +235,38 @@ required) and is the recommended mechanism for the DRP's rate-limit requirement.
 
 ---
 
-## 6c. Operator view (`/admin`)
+## 6c. WhatsApp direct messages: client OTP + chef access links
+
+Two independent feature flags ride the existing WhatsApp Cloud API credentials
+(`WA_CLOUD_TOKEN`, `WA_PHONE_NUMBER_ID`). Both are **off by default** — the
+product behaves exactly as before until you flip them.
+
+**`OTP_ENABLED=true` — client phone verification.** The lead form asks the
+client for a 6-digit code delivered to their WhatsApp before the lead is
+accepted. This kills junk leads (the #1 churn driver in pay-per-lead) and
+verifies the exact product you sell chefs — a working client phone number.
+Requires an approved **AUTHENTICATION**-category template (name in
+`WA_OTP_TEMPLATE`, default `otp_code`): body variable = the code, with the
+standard copy-code button. Codes are stored hashed, expire after 10 minutes,
+allow 5 attempts, and resends are throttled to one per minute per phone. The
+send endpoint is Turnstile-gated so bots can't burn template messages.
+
+**`RECOVERY_ENABLED=true` — chef access links.** When a payment is confirmed,
+the paying chef automatically receives their unlock link on WhatsApp, and the
+lead page gains a self-service "send me my access link" option. The phone
+number is never a credential: the link is only ever *delivered to* the phone
+stored on the paid purchase, and the API response never reveals whether a
+purchase exists. Requires an approved **UTILITY**-category template (name in
+`WA_ACCESS_TEMPLATE`, default `lead_access`) with a URL button configured as
+`{PUBLIC_BASE_URL}{{1}}` — the app passes the link's path+query as the
+variable.
+
+One-time Meta setup for both: verified Meta Business, a dedicated sender
+number, and template approval (typically 1–3 days). Until approved, leave the
+flags off. Apply migration `0009` (the `phone_otps` table + RPCs) before
+enabling OTP.
+
+## 6d. Operator view (`/admin`)
 
 A read-only recent-leads table lives at `/admin` (shows PII: name, phone, email,
 status, buyers). Set **`ADMIN_TOKEN`** to a strong secret; the operator enters it

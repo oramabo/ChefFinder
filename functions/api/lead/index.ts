@@ -1,13 +1,19 @@
 import { buildContainer } from "../../../functions-lib/factory.ts";
 import { notifyLead } from "../../../functions-lib/notifyLead.ts";
-import { generateLeadToken } from "../../../functions-lib/crypto.ts";
+import { generateLeadToken, sha256Hex } from "../../../functions-lib/crypto.ts";
+import { normalizeIlPhone } from "../../../functions-lib/phone.ts";
 import { json, error, readJson, validate } from "../../../functions-lib/http.ts";
-import { publicBaseUrl } from "../../../functions-lib/env.ts";
+import { publicBaseUrl, otpEnabled } from "../../../functions-lib/env.ts";
 import type { Handler } from "../../../functions-lib/handler.ts";
 import { LeadInput } from "@shared/schema.ts";
-import { DEFAULT_CAP, leadPrice } from "@shared/constants.ts";
+import { DEFAULT_CAP, OTP_MAX_ATTEMPTS, leadPrice } from "@shared/constants.ts";
 
 // POST /api/lead — create a lead, then distribute (WhatsApp + Telegram).
+//
+// Anti-spam is one gate, not two: with OTP_ENABLED the client proves ownership
+// of their phone (the code was Turnstile-gated at send time), which supersedes
+// Turnstile here — a second widget token would already be consumed. With OTP
+// off, Turnstile gates this endpoint directly, as before.
 export const onRequestPost: Handler = async ({ request, env }) => {
   const body = await readJson(request);
   const parsed = validate(LeadInput, body);
@@ -16,9 +22,30 @@ export const onRequestPost: Handler = async ({ request, env }) => {
 
   const { db, messaging, turnstile } = buildContainer(env, request);
 
-  const remoteIp = request.headers.get("cf-connecting-ip") ?? undefined;
-  const ok = await turnstile.verify(input.turnstile_token, remoteIp);
-  if (!ok) return error("אימות אנטי-ספאם נכשל", 403, { reason: "turnstile_failed" });
+  if (otpEnabled(env)) {
+    const code = input.otp_code.trim();
+    // No code yet → tell the SPA to run the verification step. 200 with
+    // ok:false so the form renders it as a flow state, not an error.
+    if (!code) return json({ ok: false, reason: "otp_required" });
+    const status = await db.verifyOtp(
+      normalizeIlPhone(input.client_phone),
+      await sha256Hex(code),
+      OTP_MAX_ATTEMPTS,
+    );
+    if (status !== "ok") {
+      const reason =
+        status === "mismatch"
+          ? "otp_invalid"
+          : status === "too_many_attempts"
+            ? "otp_too_many"
+            : "otp_expired"; // expired / not_found → ask for a fresh code
+      return json({ ok: false, reason });
+    }
+  } else {
+    const remoteIp = request.headers.get("cf-connecting-ip") ?? undefined;
+    const ok = await turnstile.verify(input.turnstile_token, remoteIp);
+    if (!ok) return error("אימות אנטי-ספאם נכשל", 403, { reason: "turnstile_failed" });
+  }
 
   const lead = await db.insertLead({
     lead_token: generateLeadToken(),

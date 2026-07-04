@@ -19,11 +19,42 @@ async function getJson<T>(url: string): Promise<T> {
 export interface CreateLeadResponse {
   ok: boolean;
   error?: string;
+  // otp_required | otp_invalid | otp_expired | otp_too_many | turnstile_failed
+  reason?: string;
   notify?: { whatsapp: string; telegram: string };
 }
 
 export function createLead(input: LeadInputType): Promise<CreateLeadResponse> {
   return postJson<CreateLeadResponse>("/api/lead", input);
+}
+
+export interface OtpSendResponse {
+  ok: boolean;
+  // disabled | too_soon | send_failed | turnstile_failed
+  reason?: string;
+  error?: string;
+}
+
+// Ask the server to WhatsApp a verification code to the client's phone.
+// Returns {ok:false, reason:"disabled"} when OTP is off server-side.
+export function sendOtp(phone: string, turnstileToken: string): Promise<OtpSendResponse> {
+  return postJson<OtpSendResponse>("/api/otp/send", {
+    phone,
+    turnstile_token: turnstileToken,
+  });
+}
+
+// Ask the server to re-send a paying chef's access link to the phone on record.
+// The response is generic by design (no purchase-existence leak).
+export function recoverAccess(
+  token: string,
+  chefPhone: string,
+  turnstileToken: string,
+): Promise<{ ok: boolean; reason?: string; error?: string }> {
+  return postJson(`/api/lead/${encodeURIComponent(token)}/recover`, {
+    chef_phone: chefPhone,
+    turnstile_token: turnstileToken,
+  });
 }
 
 export interface JoinResponse {

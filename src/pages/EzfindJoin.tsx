@@ -1,5 +1,6 @@
 import LandingPage, { type LandingConfig } from "../components/LandingPage.tsx";
 import JoinForm from "../components/landing/JoinForm.tsx";
+import { IconForm, IconSend, IconCheck } from "../components/art.tsx";
 import { SERVICES, servicePath } from "@shared/services/registry.ts";
 
 // The umbrella ezfind.app landing (served at the apex "/") — for professionals of
@@ -21,10 +22,27 @@ const config: LandingConfig = {
   heroSub:
     "ezfind מחברת בין לקוחות שמחפשים שירות לבין בעלי המקצוע הטובים באזור. הצטרפו לרשת וקבלו פניות אמיתיות ישירות אליכם — הרשמה חינם, בלי התחייבות.",
   heroCta: "אני רוצה להצטרף",
+  // Placeholder image — generation prompt in docs/IMAGE_PROMPTS.md.
+  heroImage: {
+    src: "/images/landing-join-hero.png",
+    alt: "בעלי מקצוע מרוצים בעבודה — שף, צלמת ומפיק אירועים",
+  },
   steps: [
-    { title: "ממלאים פרטים", body: "משאירים פרטים ותחום עיסוק. לוקח פחות מדקה." },
-    { title: "מקבלים פניות", body: "אנחנו שולחים אליכם לקוחות רלוונטיים מהאזור שלכם." },
-    { title: "סוגרים עבודות", body: "יוצרים קשר ישיר עם הלקוח וסוגרים — אתם בשליטה." },
+    {
+      title: "ממלאים פרטים",
+      body: "משאירים פרטים ותחום עיסוק. לוקח פחות מדקה.",
+      icon: <IconForm />,
+    },
+    {
+      title: "מקבלים פניות",
+      body: "אנחנו שולחים אליכם לקוחות רלוונטיים מהאזור שלכם.",
+      icon: <IconSend />,
+    },
+    {
+      title: "סוגרים עבודות",
+      body: "יוצרים קשר ישיר עם הלקוח וסוגרים — אתם בשליטה.",
+      icon: <IconCheck />,
+    },
   ],
   footerText: "© 2026 ezfind · מחברים לקוחות עם בעלי מקצוע",
 };

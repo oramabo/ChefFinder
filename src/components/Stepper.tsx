@@ -1,3 +1,4 @@
+import { IconCheck } from "./art.tsx";
 import "./Stepper.css";
 
 interface StepperProps {
@@ -16,7 +17,9 @@ export default function Stepper({ steps, current }: StepperProps) {
           }`}
           aria-current={i === current ? "step" : undefined}
         >
-          <span className="stepper__dot">{i < current ? "✓" : i + 1}</span>
+          <span className="stepper__dot">
+            {i < current ? <IconCheck width={12} height={12} strokeWidth={2.4} /> : i + 1}
+          </span>
           <span className="stepper__label">{label}</span>
         </li>
       ))}

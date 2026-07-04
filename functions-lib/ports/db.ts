@@ -5,7 +5,7 @@ import type {
   ReserveResult,
   JoinApplication,
 } from "@shared/types.ts";
-import type { JoinStatus, CompleteResult } from "@shared/constants.ts";
+import type { JoinStatus, CompleteResult, OtpVerifyStatus } from "@shared/constants.ts";
 
 export interface InsertJoinApplicationInput {
   full_name: string;
@@ -65,6 +65,20 @@ export interface DbPort {
   // pending -> failed|expired, decrement buyers_count (idempotent). true if released.
   releasePurchase(id: string, status: "failed" | "expired"): Promise<boolean>;
   sweepStale(ttlMinutes: number): Promise<number>;
+  // Paid purchases on a lead (for phone-matched access-link recovery).
+  getPaidPurchasesForLead(leadId: string): Promise<Purchase[]>;
+  // ── Client phone verification (OTP; feature-flagged by OTP_ENABLED) ──────
+  // Store a fresh hashed code for the phone. false = a code was created less
+  // than minIntervalSeconds ago (resend throttle).
+  saveOtp(
+    phone: string,
+    codeHash: string,
+    ttlMinutes: number,
+    minIntervalSeconds: number,
+  ): Promise<boolean>;
+  // Atomically check a code: expires stale rows, counts attempts, consumes on
+  // success. See OtpVerifyStatus.
+  verifyOtp(phone: string, codeHash: string, maxAttempts: number): Promise<OtpVerifyStatus>;
   // ── Join applications (ezfind "join the network" intake) ─────────────────
   insertJoinApplication(input: InsertJoinApplicationInput): Promise<JoinApplication>;
   // Operator view: most-recent applications first (admin-gated callers only).

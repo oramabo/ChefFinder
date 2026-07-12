@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "./Button.tsx";
 import { getConsent, setConsent, CONSENT_EVENT } from "../lib/consent.ts";
 import { initAnalytics } from "../lib/analytics.ts";
+import { initAdRoll } from "../lib/adroll.ts";
 import "./CookieBanner.css";
 
 // Cookie consent banner. Shows only until the visitor makes a choice (stored in
@@ -24,6 +25,7 @@ export default function CookieBanner() {
   const accept = () => {
     setConsent("granted");
     initAnalytics();
+    initAdRoll();
     setVisible(false);
   };
   const decline = () => {

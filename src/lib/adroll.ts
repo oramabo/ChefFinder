@@ -9,8 +9,13 @@ let initialized = false;
 export function initAdRoll(): void {
   if (initialized || typeof window === "undefined") return;
   if (getConsent() !== "granted") return;
-  const advId = import.meta.env.VITE_ADROLL_ADV_ID as string | undefined;
-  const pixelId = import.meta.env.VITE_ADROLL_PIXEL_ID as string | undefined;
+  // IDs are public (they ship in client JS), so default to the ezfind pixel.
+  // This keeps the pixel working even where VITE_ADROLL_* isn't set at build
+  // time (e.g. the Cloudflare CI build); an env var still overrides when present.
+  const advId =
+    (import.meta.env.VITE_ADROLL_ADV_ID as string | undefined) || "SYD2UYQJPBF47NS2FBZFRT";
+  const pixelId =
+    (import.meta.env.VITE_ADROLL_PIXEL_ID as string | undefined) || "NOON7SZLKVBIXJLXKAGZYS";
   if (!advId || !pixelId) return;
 
   // AdRoll's official install snippet, adapted to run from a module: set the

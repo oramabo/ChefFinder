@@ -14,6 +14,12 @@ export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // The banner renders on every page shell (Layout and LandingPage), so it is
+    // the reliable place to (re)apply consent-gated trackers on mount for a
+    // returning visitor who already granted — LandingPage's own effect inits
+    // PostHog but not AdRoll. Both calls are self-gated + idempotent.
+    initAnalytics();
+    initAdRoll();
     if (getConsent() === null) setVisible(true);
     const reopen = () => setVisible(true);
     window.addEventListener(CONSENT_EVENT, reopen);

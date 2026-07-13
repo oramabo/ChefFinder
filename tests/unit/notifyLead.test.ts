@@ -28,12 +28,13 @@ const lead: Lead = {
 };
 
 describe("notifyLead", () => {
-  it("sends to both channels and never leaks PII", async () => {
+  it("sends to Telegram and never leaks PII", async () => {
     const messaging = createMockMessaging();
     const result = await notifyLead(messaging, lead, "https://chefleads.test");
 
-    expect(result).toEqual({ whatsapp: "sent", telegram: "sent" });
-    expect(messaging.sink).toHaveLength(2);
+    expect(result).toEqual({ telegram: "sent" });
+    // WhatsApp is disabled — only the Telegram message is emitted.
+    expect(messaging.sink).toHaveLength(1);
 
     const serialized = JSON.stringify(messaging.sink);
     expect(serialized).not.toContain("נועה כהן");
@@ -44,13 +45,12 @@ describe("notifyLead", () => {
     expect(serialized).toContain("תל אביב");
   });
 
-  it("tolerates one channel failing (allSettled)", async () => {
+  it("reports failed when Telegram throws", async () => {
     const messaging = createMockMessaging();
-    messaging.sendWhatsApp = async () => {
-      throw new Error("WA down");
+    messaging.sendTelegram = async () => {
+      throw new Error("TG down");
     };
     const result = await notifyLead(messaging, lead, "https://chefleads.test");
-    expect(result.whatsapp).toBe("failed");
-    expect(result.telegram).toBe("sent");
+    expect(result.telegram).toBe("failed");
   });
 });

@@ -49,7 +49,7 @@ describe("GET /api/admin/leads", () => {
 });
 
 describe("POST /api/admin/lead/:token/notify", () => {
-  it("re-sends to both channels in stub/dev mode", async () => {
+  it("re-sends to Telegram in stub/dev mode", async () => {
     const lead = await db.insertLead({
       lead_token: "ntfy_" + Math.random().toString(36).slice(2),
       kosher: false,
@@ -68,10 +68,10 @@ describe("POST /api/admin/lead/:token/notify", () => {
     expect(res.status).toBe(200);
     const json = (await res.json()) as any;
     expect(json.ok).toBe(true);
-    expect(json.notify).toEqual({ whatsapp: "sent", telegram: "sent" });
+    expect(json.notify).toEqual({ telegram: "sent" });
   });
 
-  it("re-sends to a single requested channel", async () => {
+  it("re-sends to Telegram (body is ignored — WhatsApp disabled)", async () => {
     const lead = await db.insertLead({
       lead_token: "ntfy1_" + Math.random().toString(36).slice(2),
       kosher: false,

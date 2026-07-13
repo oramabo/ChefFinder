@@ -7,7 +7,6 @@ import {
   confirmPurchase,
   listPending,
   type AdminLead,
-  type NotifyChannel,
   type PendingPurchase,
 } from "../../lib/api.ts";
 import { EVENT_TYPES } from "@shared/constants.ts";
@@ -41,15 +40,14 @@ export default function LeadsSection({ token, onUnauthorized }: Props) {
     setRowMsg((m) => ({ ...m, [leadToken]: text }));
 
   const resend = useCallback(
-    async (leadToken: string, channel: NotifyChannel) => {
-      const label = channel === "whatsapp" ? "וואטסאפ" : "טלגרם";
-      setBusyKey(`${leadToken}:${channel}`);
-      setMsg(leadToken, `שולח ל${label}…`);
+    async (leadToken: string) => {
+      setBusyKey(leadToken);
+      setMsg(leadToken, "שולח לטלגרם…");
       try {
-        const { status, body } = await resendNotify(leadToken, channel, token);
+        const { status, body } = await resendNotify(leadToken, token);
         if (status === 401) return setMsg(leadToken, "אסימון שגוי או חסר.");
         if (!body.ok) return setMsg(leadToken, body.error || "שליחה נכשלה.");
-        setMsg(leadToken, body.notify?.[channel] === "sent" ? `${label}: נשלח` : `${label}: נכשל`);
+        setMsg(leadToken, body.notify?.telegram === "sent" ? "טלגרם: נשלח" : "טלגרם: נכשל");
       } catch {
         setMsg(leadToken, "שגיאת רשת.");
       } finally {
@@ -282,17 +280,8 @@ export default function LeadsSection({ token, onUnauthorized }: Props) {
                           type="button"
                           variant="ghost"
                           className="admin__btn"
-                          disabled={busyKey === `${l.lead_token}:whatsapp`}
-                          onClick={() => resend(l.lead_token, "whatsapp")}
-                        >
-                          שלח לוואטסאפ
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          className="admin__btn"
-                          disabled={busyKey === `${l.lead_token}:telegram`}
-                          onClick={() => resend(l.lead_token, "telegram")}
+                          disabled={busyKey === l.lead_token}
+                          onClick={() => resend(l.lead_token)}
                         >
                           שלח לטלגרם
                         </Button>

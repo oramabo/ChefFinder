@@ -23,9 +23,9 @@ describe("POST /api/lead", () => {
       }),
     );
     expect(res.status).toBe(200);
-    const json = (await res.json()) as { ok: boolean; notify: { whatsapp: string; telegram: string } };
+    const json = (await res.json()) as { ok: boolean; notify: { telegram: string } };
     expect(json.ok).toBe(true);
-    expect(json.notify).toEqual({ whatsapp: "sent", telegram: "sent" });
+    expect(json.notify).toEqual({ telegram: "sent" });
   });
 
   it("rejects an invalid payload with 422", async () => {

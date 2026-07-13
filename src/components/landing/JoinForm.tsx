@@ -4,6 +4,8 @@ import Turnstile from "../Turnstile.tsx";
 import { IconCheck } from "../art.tsx";
 import { submitJoin } from "../../lib/api.ts";
 import { JOIN_CATEGORIES } from "@shared/constants.ts";
+import { track, identify } from "../../lib/analytics.ts";
+import { sha256Hex } from "../../lib/hash.ts";
 
 type Status = "idle" | "sending" | "done" | "error";
 
@@ -45,13 +47,19 @@ export default function JoinForm({ source = "ezfind-landing" }: { source?: strin
     try {
       const res = await submitJoin({ ...form, turnstile_token: captcha, source });
       if (res.ok) {
+        if (form.phone) {
+          identify(`prof_${await sha256Hex(form.phone.trim())}`, { category: form.category, city: form.city });
+        }
+        track("join_submitted", { source, category: form.category, city: form.city });
         setStatus("done");
         setForm(EMPTY);
       } else {
+        track("join_error");
         setStatus("error");
         setErrorMsg(res.error ?? "אירעה תקלה. נסו שוב בעוד רגע.");
       }
     } catch {
+      track("join_error");
       setStatus("error");
       setErrorMsg("לא הצלחנו לשלוח כרגע. בדקו את החיבור ונסו שוב.");
     }

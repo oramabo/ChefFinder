@@ -123,6 +123,11 @@ There are three places a value can live:
 | `GROW_USER_ID` | Grow user id |
 | `GROW_PAGE_CODE` | Grow payment page code |
 | `GROW_WEBHOOK_SECRET` | Grow webhook signing secret (if provided) |
+| `LEMONSQUEEZY_ENABLED` | `true` to route checkout through Lemon Squeezy (takes precedence over Grow/Bit). Omit/`false` to disable |
+| `LEMONSQUEEZY_API_KEY` | Lemon Squeezy API key (Settings → API) |
+| `LEMONSQUEEZY_STORE_ID` | Lemon Squeezy store id |
+| `LEMONSQUEEZY_VARIANT_ID` | Product **variant** id charged at checkout (enable "pay what you want" for per-lead pricing) |
+| `LEMONSQUEEZY_WEBHOOK_SECRET` | Webhook signing secret (Settings → Webhooks) |
 
 After changing build variables, trigger a **new deployment** so Vite re-inlines
 the `VITE_*` values.
@@ -216,6 +221,33 @@ server-side and fails closed on invalid tokens.
 
 Once `GROW_*` are set, the reserve flow goes live automatically and the dev-only
 `/api/payment/mock-complete` endpoint stays 404 in production.
+
+## 5b. Lemon Squeezy (payments + invoice) — alternative provider
+
+Lemon Squeezy is a **Merchant of Record**: it collects payment, handles VAT, and
+emails the buyer its own receipt/invoice — so no separate invoicing call is
+needed. It's gated behind a single toggle and takes precedence over Grow and Bit
+when on.
+
+1. Create a Lemon Squeezy store and a product. Note the **store id** and the
+   **variant id** of the product you want charged. Because each lead has its own
+   price, enable **"pay what you want"** on that variant so the app's per-lead
+   amount (`custom_price`) is honored; otherwise the variant's fixed price is
+   charged.
+2. Get an **API key** (Settings → API) → `LEMONSQUEEZY_API_KEY`.
+3. Add a **webhook** (Settings → Webhooks) pointing to
+   `https://<your-domain>/api/payment/webhook`, set a signing secret →
+   `LEMONSQUEEZY_WEBHOOK_SECRET`, and subscribe to **`order_created` only** (the
+   adapter ignores other events). The return URL after payment is passed per
+   reservation by the app.
+4. Set `LEMONSQUEEZY_STORE_ID` and `LEMONSQUEEZY_VARIANT_ID`.
+5. Flip the switch: **`LEMONSQUEEZY_ENABLED=true`** (and remove `MOCK_PAYMENTS`).
+   To disable and fall back to Grow/Bit/mock later, set it to `false` or remove
+   it — no code change.
+
+The adapter (`functions-lib/adapters/payments.lemonsqueezy.ts`) embeds the
+purchase id in `checkout_data.custom` and verifies the webhook's `X-Signature`
+(HMAC-SHA256 of the raw body) before crediting a payment.
 
 ## 6. PostHog (analytics)
 

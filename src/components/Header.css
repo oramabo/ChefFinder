@@ -30,3 +30,10 @@
   display: block;
 }
 
+/* Phones: a slimmer bar leaves more of the viewport to the content. */
+@media (max-width: 480px) {
+  .header__logo {
+    block-size: 48px;
+  }
+}
+

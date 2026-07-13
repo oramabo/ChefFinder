@@ -2,12 +2,13 @@ import type { DbPort } from "./ports/db.ts";
 import type { PaymentsPort } from "./ports/payments.ts";
 import type { MessagingPort } from "./ports/messaging.ts";
 import type { TurnstilePort } from "./ports/turnstile.ts";
-import { type Env, globalStubs, useReal, bitManualEnabled } from "./env.ts";
+import { type Env, globalStubs, useReal, bitManualEnabled, lemonSqueezyEnabled } from "./env.ts";
 
 import { createMockDb } from "./adapters/db.mock.ts";
 import { createSupabaseDb } from "./adapters/db.supabase.ts";
 import { createMockPayments } from "./adapters/payments.mock.ts";
 import { createGrowPayments } from "./adapters/payments.grow.ts";
+import { createLemonSqueezyPayments } from "./adapters/payments.lemonsqueezy.ts";
 import { createBitPayments } from "./adapters/payments.bit.ts";
 import { createMockMessaging } from "./adapters/messaging.mock.ts";
 import { createWhatsAppMessaging, createWhatsAppDirect } from "./adapters/messaging.whatsapp.ts";
@@ -35,11 +36,15 @@ export function buildContainer(env: Env, _request?: Request): Container {
     ? createSupabaseDb(env.SUPABASE_URL!, env.SUPABASE_SERVICE_KEY!)
     : createMockDb();
 
-  const payments: PaymentsPort = useReal(env, "payments")
-    ? createGrowPayments(env)
-    : bitManualEnabled(env)
-      ? createBitPayments(env)
-      : createMockPayments();
+  // Provider precedence: the explicit Lemon Squeezy toggle wins, then a
+  // configured Grow aggregator, then manual Bit, else the mock checkout.
+  const payments: PaymentsPort = lemonSqueezyEnabled(env)
+    ? createLemonSqueezyPayments(env)
+    : useReal(env, "payments")
+      ? createGrowPayments(env)
+      : bitManualEnabled(env)
+        ? createBitPayments(env)
+        : createMockPayments();
 
   // The Turnstile mock passes everything, which in a real deployment means
   // unthrottled spam straight into the WhatsApp/Telegram groups — shout about

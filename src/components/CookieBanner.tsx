@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./Button.tsx";
 import { getConsent, setConsent, CONSENT_EVENT } from "../lib/consent.ts";
-import { initAnalytics } from "../lib/analytics.ts";
+import { initAnalytics, track } from "../lib/analytics.ts";
 import { initAdRoll } from "../lib/adroll.ts";
 import "./CookieBanner.css";
 
@@ -32,6 +32,7 @@ export default function CookieBanner() {
     setConsent("granted");
     initAnalytics();
     initAdRoll();
+    track("consent_granted");
     setVisible(false);
   };
   const decline = () => {

@@ -1,39 +1,37 @@
 .stepper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-block-end: var(--space-6);
+  margin-block-end: var(--space-5);
 }
 
-.stepper__step {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
+.stepper__status {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-olive);
+  margin-block-end: var(--space-2);
 }
 
-.stepper__dot {
-  inline-size: 1.6rem;
-  block-size: 1.6rem;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  border: 1px solid var(--color-border);
-  font-size: 0.85rem;
-}
-
-.stepper__step.is-current {
+.stepper__status b {
   color: var(--color-text);
 }
 
-.stepper__step.is-current .stepper__dot {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+.stepper__track {
+  display: flex;
+  gap: var(--space-1);
 }
 
-.stepper__step.is-done .stepper__dot {
+.stepper__seg {
+  flex: 1;
+  block-size: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
+  transition: background-color 0.2s ease;
+}
+
+.stepper__seg.is-done {
   background: var(--color-accent);
-  color: var(--color-accent-contrast);
-  border-color: var(--color-accent);
+}
+
+/* The saffron tip: the brand's celebratory accent marks "you are here". */
+.stepper__seg.is-current {
+  background: var(--color-saffron);
 }

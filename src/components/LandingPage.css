@@ -147,36 +147,6 @@
   font-weight: 700;
 }
 
-/* ── Footer ──────────────────────────────────────────────────────────────── */
-.ez__footer {
-  margin-block-start: var(--space-10);
-  padding-block: var(--space-8);
-  border-block-start: 1px solid var(--color-border);
-  background: var(--color-surface);
-  text-align: center;
-}
-.ez__footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2) var(--space-4);
-  margin-block-start: var(--space-4);
-  font-size: 0.9rem;
-}
-.ez__footer-links a {
-  color: var(--color-text-muted);
-  text-decoration: none;
-}
-.ez__footer-links a:hover {
-  text-decoration: underline;
-}
-.ez__footer-copy {
-  margin-block-start: var(--space-2);
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-}
-
-
 /* Hero visual (optional per-landing image; placeholder until real art lands —
    see docs/IMAGE_PROMPTS.md). Side-by-side on wide screens, stacked on mobile. */
 .ez__hero-inner--split {

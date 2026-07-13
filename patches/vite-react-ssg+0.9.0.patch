@@ -1,0 +1,46 @@
+diff --git a/node_modules/vite-react-ssg/dist/shared/vite-react-ssg.DsKK_1op.mjs b/node_modules/vite-react-ssg/dist/shared/vite-react-ssg.DsKK_1op.mjs
+index 68eb8fb..8134da0 100644
+--- a/node_modules/vite-react-ssg/dist/shared/vite-react-ssg.DsKK_1op.mjs
++++ b/node_modules/vite-react-ssg/dist/shared/vite-react-ssg.DsKK_1op.mjs
+@@ -11,6 +11,7 @@ import { jsx, Fragment } from 'react/jsx-runtime';
+ import { HelmetProvider } from 'react-helmet-async';
+ import { once } from 'node:events';
+ import { Readable, Writable } from 'node:stream';
++import { StringDecoder } from 'node:string_decoder';
+ import * as ReactDomServer from 'react-dom/server';
+ import { M as META_CONTAINER_ID } from './vite-react-ssg.BqDzTpJh.mjs';
+ 
+@@ -306,7 +307,7 @@ function stripDataParam(request) {
+ }
+ 
+ async function renderStaticApp(app) {
+-  if (!ReactDomServer.renderToPipeableStream) {
++  if (true || !ReactDomServer.renderToPipeableStream) {
+     return ReactDomServer.renderToString(/* @__PURE__ */ jsx(Fragment, { children: app }));
+   }
+   const writableStream = new WritableAsPromise();
+@@ -326,6 +327,7 @@ class WritableAsPromise extends Writable {
+   constructor() {
+     super();
+     this._output = "";
++    this._decoder = new StringDecoder("utf8");
+     this._deferred = {
+       promise: null,
+       resolve: () => null,
+@@ -337,7 +339,7 @@ class WritableAsPromise extends Writable {
+     });
+   }
+   _write(chunk, _enc, next) {
+-    this._output += chunk.toString();
++    this._output += this._decoder.write(chunk);
+     next();
+   }
+   _destroy(error, next) {
+@@ -347,6 +349,7 @@ class WritableAsPromise extends Writable {
+       next();
+   }
+   end() {
++    this._output += this._decoder.end();
+     this._deferred.resolve(this._output);
+     return this.destroy();
+   }

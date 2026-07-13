@@ -5,6 +5,19 @@
   margin-block-end: var(--space-4);
 }
 
+/* Fieldset variant for control groups (chips) — reset the UA chrome. */
+.field--group {
+  border: 0;
+  padding: 0;
+  margin-inline: 0;
+  min-inline-size: 0;
+}
+
+.field--group legend {
+  padding: 0;
+  margin-block-end: var(--space-2);
+}
+
 .field__label {
   font-weight: 600;
   color: var(--color-text);
@@ -19,9 +32,33 @@
   font-size: 1rem;
 }
 
+/* Soft violet glow on focus. No `outline: none` — the global :focus-visible
+   ring still applies for keyboard users. */
 .field__input:focus {
   border-color: var(--color-accent);
-  outline: none;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
+}
+
+/* Dates, phones, emails and numbers are LTR content: without this, bidi
+   reorders "+972 50 ..." as you type inside the RTL page. text-align: end
+   keeps them visually right-aligned like the Hebrew fields. */
+.field__input:is([type="date"], [type="tel"], [type="email"], [type="number"]) {
+  direction: ltr;
+  text-align: end;
+}
+
+/* iOS Safari renders an empty date input collapsed and centered. */
+input[type="date"].field__input {
+  display: block;
+  inline-size: 100%;
+  min-block-size: 48px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.field__input::-webkit-date-and-time-value {
+  text-align: end;
+  min-block-size: 1.4em;
 }
 
 .field__error {
@@ -47,10 +84,18 @@
     transform 0.12s ease;
 }
 
-.optiongroup__item:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-  transform: translateY(-1px);
+/* Hover only on devices that hover — on touch the state sticks to the last
+   tapped chip and reads as a second selection. */
+@media (hover: hover) {
+  .optiongroup__item:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    transform: translateY(-1px);
+  }
+
+  .optiongroup__item.is-selected:hover {
+    color: var(--color-accent-contrast);
+  }
 }
 
 .optiongroup__item.is-selected {
@@ -60,6 +105,17 @@
   font-weight: 700;
 }
 
-.optiongroup__item.is-selected:hover {
-  color: var(--color-accent-contrast);
+/* Long Hebrew labels stack one-per-row on phones; a two-column grid keeps the
+   chips tidy with guaranteed 44px touch targets. */
+@media (max-width: 480px) {
+  .optiongroup {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .optiongroup__item {
+    padding-inline: var(--space-3);
+    min-block-size: 44px;
+    text-align: center;
+  }
 }

@@ -20,6 +20,15 @@ export interface Env {
   GROW_WEBHOOK_SECRET?: string;
   PUBLIC_BASE_URL?: string;
 
+  // ── Lemon Squeezy (Merchant of Record) — feature-flagged provider ─────────
+  // Master switch: "true" routes checkout through Lemon Squeezy (takes
+  // precedence over Grow/Bit). Flip off to disable without removing the keys.
+  LEMONSQUEEZY_ENABLED?: string;
+  LEMONSQUEEZY_API_KEY?: string;
+  LEMONSQUEEZY_STORE_ID?: string;
+  LEMONSQUEEZY_VARIANT_ID?: string;
+  LEMONSQUEEZY_WEBHOOK_SECRET?: string;
+
   WA_CLOUD_TOKEN?: string;
   WA_PHONE_NUMBER_ID?: string;
   WA_MY_NUMBER?: string;
@@ -90,6 +99,20 @@ export function mockPaymentsEnabled(env: Env): boolean {
   return String(env.MOCK_PAYMENTS).toLowerCase() === "true";
 }
 
+// Lemon Squeezy is the active provider: the master switch is on AND every
+// required key is present. Off (or a missing key) falls back to whatever else is
+// configured, so it's a clean enable/disable toggle. Disabled under global stubs.
+export function lemonSqueezyEnabled(env: Env): boolean {
+  if (globalStubs(env)) return false;
+  if (String(env.LEMONSQUEEZY_ENABLED).toLowerCase() !== "true") return false;
+  return present(
+    env.LEMONSQUEEZY_API_KEY,
+    env.LEMONSQUEEZY_STORE_ID,
+    env.LEMONSQUEEZY_VARIANT_ID,
+    env.LEMONSQUEEZY_WEBHOOK_SECRET,
+  );
+}
+
 // Client phone verification (OTP over WhatsApp) is on. Off by default so the
 // funnel is unchanged until the operator flips it.
 export function otpEnabled(env: Env): boolean {
@@ -101,10 +124,11 @@ export function recoveryEnabled(env: Env): boolean {
   return String(env.RECOVERY_ENABLED).toLowerCase() === "true";
 }
 
-// Manual Bit mode: a Bit phone number is configured and no real aggregator is.
-// The chef pays via Bit and the operator confirms the payment in /admin.
+// Manual Bit mode: a Bit phone number is configured and no automated provider
+// (Lemon Squeezy or Grow) is active. The chef pays via Bit and the operator
+// confirms the payment in /admin.
 export function bitManualEnabled(env: Env): boolean {
-  if (globalStubs(env) || useReal(env, "payments")) return false;
+  if (globalStubs(env) || lemonSqueezyEnabled(env) || useReal(env, "payments")) return false;
   return present(env.BIT_PHONE);
 }
 
@@ -112,11 +136,13 @@ export function bitInfo(env: Env): { phone: string; link?: string } {
   return { phone: env.BIT_PHONE ?? "", link: present(env.BIT_LINK) ? env.BIT_LINK : undefined };
 }
 
-// A checkout flow can run: stubbed, explicitly mocked, manual Bit, or a real provider.
+// A checkout flow can run: stubbed, explicitly mocked, manual Bit, or a real
+// provider (Lemon Squeezy or Grow).
 export function paymentsAvailable(env: Env): boolean {
   return (
     globalStubs(env) ||
     mockPaymentsEnabled(env) ||
+    lemonSqueezyEnabled(env) ||
     bitManualEnabled(env) ||
     useReal(env, "payments")
   );

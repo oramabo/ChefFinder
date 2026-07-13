@@ -42,6 +42,16 @@ describe("parseRecipients", () => {
     expect(parseRecipients("  ")).toEqual([]);
     expect(parseRecipients(undefined)).toEqual([]);
   });
+  it("normalizes local Israeli and +-prefixed numbers to E.164-without-plus", () => {
+    expect(parseRecipients("0542803334")).toEqual(["972542803334"]);
+    expect(parseRecipients("054-2803334")).toEqual(["972542803334"]);
+    expect(parseRecipients("+972542803334")).toEqual(["972542803334"]);
+    // Already-canonical numbers pass through untouched, including in a mixed list.
+    expect(parseRecipients("0542803334, 972500000002")).toEqual([
+      "972542803334",
+      "972500000002",
+    ]);
+  });
 });
 
 describe("createWhatsAppMessaging multi-recipient", () => {

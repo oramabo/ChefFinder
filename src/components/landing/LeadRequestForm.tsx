@@ -4,6 +4,7 @@ import Turnstile from "../Turnstile.tsx";
 import { IconCheck } from "../art.tsx";
 import { createLead, sendOtp } from "../../lib/api.ts";
 import { EVENT_TYPES, BUDGET_BANDS } from "@shared/constants.ts";
+import { track } from "../../lib/analytics.ts";
 
 type Status = "idle" | "sending" | "done" | "error";
 
@@ -48,6 +49,9 @@ export default function LeadRequestForm({ source = "ezfind-chefs-landing" }: { s
   async function requestOtp(): Promise<void> {
     const res = await sendOtp(form.client_phone, captcha);
     setCaptchaKey((k) => k + 1);
+    if (res.ok) {
+      track("otp_requested");
+    }
     if (res.ok || res.reason === "too_soon") {
       setOtpStage("sent");
       setStatus("idle");
@@ -83,6 +87,7 @@ export default function LeadRequestForm({ source = "ezfind-chefs-landing" }: { s
         source,
       });
       if (res.ok) {
+        track("chef_request_submitted", { source, event_type: form.event_type, city: form.city });
         setStatus("done");
         setForm(EMPTY);
         setOtpStage("none");
@@ -98,10 +103,12 @@ export default function LeadRequestForm({ source = "ezfind-chefs-landing" }: { s
         setStatus("error");
         setErrorMsg("הקוד כבר לא בתוקף — שלחנו קוד חדש לוואטסאפ.");
       } else {
+        track("chef_request_error");
         setStatus("error");
         setErrorMsg(res.error ?? "אירעה תקלה. נסו שוב בעוד רגע.");
       }
     } catch {
+      track("chef_request_error");
       setStatus("error");
       setErrorMsg("לא הצלחנו לשלוח כרגע. בדקו את החיבור ונסו שוב.");
     }

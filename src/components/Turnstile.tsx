@@ -32,6 +32,11 @@ export default function Turnstile({ onToken }: TurnstileProps) {
       if (ref.current && window.turnstile) {
         widgetId = window.turnstile.render(ref.current, {
           sitekey: siteKey,
+          // The default widget is a fixed 300px — wider than a phone-width
+          // card. Compact fits anywhere; flexible fills the container.
+          size: window.matchMedia("(max-width: 430px)").matches
+            ? "compact"
+            : "flexible",
           callback: (token: string) => onToken(token),
         });
       }

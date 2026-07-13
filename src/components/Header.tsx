@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { LinkButton } from "./Button.tsx";
 import Wordmark from "./Wordmark.tsx";
 import { serviceBySlug, servicePath } from "@shared/services/registry.ts";
@@ -9,6 +9,9 @@ import "./Header.css";
 const CHEF = serviceBySlug("chefs")!;
 
 export default function Header() {
+  // On the wizard itself the CTA would link to the current page and compete
+  // with the form's own buttons — hide it there.
+  const onWizard = useLocation().pathname === "/find-a-chef";
   return (
     <header className="header">
       <div className="container header__inner">
@@ -19,9 +22,11 @@ export default function Header() {
         >
           <Wordmark suffix={CHEF.name.he} />
         </Link>
-        <LinkButton to="/find-a-chef" variant="primary">
-          מצאו שף
-        </LinkButton>
+        {!onWizard && (
+          <LinkButton to="/find-a-chef" variant="primary">
+            מצאו שף
+          </LinkButton>
+        )}
       </div>
     </header>
   );

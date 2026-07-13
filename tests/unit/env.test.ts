@@ -5,6 +5,7 @@ import {
   paymentsAvailable,
   allowMockComplete,
   bitManualEnabled,
+  lemonSqueezyEnabled,
   useReal,
 } from "../../functions-lib/env.ts";
 import type { Env } from "../../functions-lib/env.ts";
@@ -13,6 +14,14 @@ const grow: Partial<Env> = {
   GROW_API_KEY: "k",
   GROW_USER_ID: "u",
   GROW_PAGE_CODE: "p",
+};
+
+const lemon: Partial<Env> = {
+  LEMONSQUEEZY_ENABLED: "true",
+  LEMONSQUEEZY_API_KEY: "k",
+  LEMONSQUEEZY_STORE_ID: "1",
+  LEMONSQUEEZY_VARIANT_ID: "2",
+  LEMONSQUEEZY_WEBHOOK_SECRET: "s",
 };
 
 describe("payment-mode env helpers", () => {
@@ -61,5 +70,34 @@ describe("payment-mode env helpers", () => {
   it("stub mode disables manual Bit", () => {
     const env = { USE_STUBS: "true", BIT_PHONE: "0541112233" } as Env;
     expect(bitManualEnabled(env)).toBe(false);
+  });
+
+  it("Lemon Squeezy enabled (flag + keys) makes payments available, no mock-complete", () => {
+    const env = { ...lemon } as Env;
+    expect(lemonSqueezyEnabled(env)).toBe(true);
+    expect(paymentsAvailable(env)).toBe(true);
+    expect(allowMockComplete(env)).toBe(false);
+  });
+
+  it("Lemon Squeezy disabled by flag falls back (toggle off)", () => {
+    const env = { ...lemon, LEMONSQUEEZY_ENABLED: "false" } as Env;
+    expect(lemonSqueezyEnabled(env)).toBe(false);
+    expect(paymentsAvailable(env)).toBe(false);
+  });
+
+  it("Lemon Squeezy enabled but missing a key stays disabled", () => {
+    const env = { ...lemon, LEMONSQUEEZY_WEBHOOK_SECRET: "" } as Env;
+    expect(lemonSqueezyEnabled(env)).toBe(false);
+  });
+
+  it("Lemon Squeezy takes precedence over Grow and manual Bit", () => {
+    const env = { ...lemon, ...grow, BIT_PHONE: "0541112233" } as Env;
+    expect(lemonSqueezyEnabled(env)).toBe(true);
+    expect(bitManualEnabled(env)).toBe(false);
+  });
+
+  it("stub mode disables Lemon Squeezy", () => {
+    const env = { USE_STUBS: "true", ...lemon } as Env;
+    expect(lemonSqueezyEnabled(env)).toBe(false);
   });
 });

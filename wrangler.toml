@@ -35,14 +35,18 @@ crons = ["*/10 * * * *"]
 # vars get wiped. Anything sensitive must be a Secret (dashboard / `wrangler
 # secret put`); secrets are preserved across deploys and must never go here.
 [vars]
-PUBLIC_BASE_URL = "https://cheffinder.oramabo9-b2c.workers.dev"
+PUBLIC_BASE_URL = "https://ezfind.app"
 # Placeholder-checkout mode: instant click-through reservation, no real provider.
 # ⚠️ LAUNCH BLOCKER: while this is "true", /api/payment/mock-complete lets
 # anyone unlock client contacts WITHOUT paying. Before going live with manual
 # Bit payments: delete this line and set the BIT_PHONE secret (and optionally
 # BIT_LINK). See "Launch checklist" in DEPLOYMENT.md.
-MOCK_PAYMENTS = "true"
+MOCK_PAYMENTS = "false"
 
 # Sensitive values (SUPABASE_*, TURNSTILE_SECRET, TG_*, WA_*, ADMIN_TOKEN,
-# GROW_*) are Secrets, set in the Cloudflare dashboard (or `wrangler secret put`)
-# and via .dev.vars locally (see .env.example). Do not commit real secrets here.
+# GROW_*, LEMONSQUEEZY_*) are Secrets, set in the Cloudflare dashboard (or
+# `wrangler secret put`) and via .dev.vars locally (see .env.example). Do not
+# commit real secrets here.
+#
+# Payments provider is chosen by env: LEMONSQUEEZY_ENABLED="true" (+ keys) →
+# Lemon Squeezy; else GROW_* → Grow; else BIT_PHONE → manual Bit; else the mock.

@@ -80,13 +80,16 @@ export function createWhatsAppDirect(
 }
 
 // Parse one or more recipient numbers from a single env value. Accepts a comma-,
-// space-, semicolon-, or newline-separated list of E.164 numbers, so multiple
-// operators/distributors can each receive the alert.
+// space-, semicolon-, or newline-separated list, so multiple operators/
+// distributors can each receive the alert. Each number is normalized to the
+// canonical E.164-without-plus form the Cloud API requires, so operators may
+// configure WA_MY_NUMBER in local Israeli form ("0542803334") or with a "+".
 export function parseRecipients(raw: string | undefined): string[] {
   return (raw ?? "")
     .split(/[\s,;]+/)
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .map(normalizeIlPhone);
 }
 
 // WhatsApp Cloud API. Sends an approved utility template to the operator number(s)

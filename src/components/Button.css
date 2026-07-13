@@ -16,8 +16,11 @@
   border: 1px solid transparent;
 }
 
-.btn:hover {
-  transform: translateY(-2px);
+/* Lift only on devices that hover — on touch the transform sticks after a tap. */
+@media (hover: hover) {
+  .btn:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .btn:disabled {

@@ -1,6 +1,9 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import Seo from "./Seo.tsx";
 import Wordmark from "./Wordmark.tsx";
+import Footer from "./Footer.tsx";
+import CookieBanner from "./CookieBanner.tsx";
+import { initAnalytics } from "../lib/analytics.ts";
 import "./LandingPage.css";
 
 export interface LandingStep {
@@ -8,11 +11,6 @@ export interface LandingStep {
   body: string;
   // Line icon from src/components/art.tsx, rendered above the step number.
   icon?: ReactNode;
-}
-
-export interface LandingLink {
-  href: string;
-  label: string;
 }
 
 export interface LandingConfig {
@@ -37,17 +35,13 @@ export interface LandingConfig {
   steps: [LandingStep, LandingStep, LandingStep];
   // Optional closing line shown just above the form card.
   formLead?: string;
-  footerText: string;
-  // Optional footer nav — used for umbrella↔mini-site internal linking (the
-  // umbrella links to each service mini-site; a mini-site links to the umbrella
-  // and its key pages). Plain <a> so they're crawlable.
-  links?: LandingLink[];
 }
 
 // Shared single-page landing template. The visual shell (bar, hero, 3-step
-// explainer, footer) is identical across audiences; only the copy (via `config`)
-// and the embedded form (via `children`) differ. The form card lives at #join so
-// the hero/bar CTAs anchor to it.
+// explainer) is identical across audiences; only the copy (via `config`) and
+// the embedded form (via `children`) differ. The form card lives at #join so
+// the hero/bar CTAs anchor to it. The footer is the shared site Footer so the
+// chrome matches every other page.
 export default function LandingPage({
   config,
   children,
@@ -55,6 +49,11 @@ export default function LandingPage({
   config: LandingConfig;
   children: ReactNode;
 }) {
+  useEffect(() => {
+    // Self-gated: only initializes if the visitor previously granted consent.
+    initAnalytics();
+  }, []);
+
   return (
     <div className="ez">
       <Seo
@@ -128,21 +127,8 @@ export default function LandingPage({
         </section>
       </main>
 
-      <footer className="ez__footer">
-        <div className="container">
-          <Wordmark suffix={config.brandSuffix} className="ez__wordmark--sm" />
-          {config.links && config.links.length > 0 && (
-            <nav className="ez__footer-links" aria-label="קישורים">
-              {config.links.map((l) => (
-                <a key={l.href} href={l.href}>
-                  {l.label}
-                </a>
-              ))}
-            </nav>
-          )}
-          <p className="ez__footer-copy">{config.footerText}</p>
-        </div>
-      </footer>
+      <Footer />
+      <CookieBanner />
     </div>
   );
 }

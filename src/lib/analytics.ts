@@ -9,10 +9,19 @@ let initialized = false;
 export function initAnalytics(): void {
   if (initialized || typeof window === "undefined") return;
   if (getConsent() !== "granted") return;
-  const key = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
+  // Public project key (phc_ keys are client-side by design), defaulted so the
+  // build ships a working key even where VITE_POSTHOG_KEY isn't set — the CF CI
+  // build lacks the local .env; an env var still overrides.
+  const key =
+    (import.meta.env.VITE_POSTHOG_KEY as string | undefined) ||
+    "phc_zS22NMwLBpDezRRTXba38hMEEkhAoTE93mnmciEAwXfo";
   if (!key) return;
+  // Only trust a proper URL for the host; a malformed VITE_POSTHOG_HOST (e.g.
+  // "r") would otherwise send every event to a dead endpoint. Project is EU.
+  const envHost = import.meta.env.VITE_POSTHOG_HOST as string | undefined;
+  const api_host = envHost && /^https?:\/\//.test(envHost) ? envHost : "https://eu.i.posthog.com";
   posthog.init(key, {
-    api_host: (import.meta.env.VITE_POSTHOG_HOST as string) || "https://eu.i.posthog.com",
+    api_host,
     capture_pageview: true,
     autocapture: false,
   });

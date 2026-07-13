@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Button } from "./Button.tsx";
 import { getConsent, setConsent, CONSENT_EVENT } from "../lib/consent.ts";
 import { initAnalytics, track } from "../lib/analytics.ts";
-import { initAdRoll } from "../lib/adroll.ts";
 import "./CookieBanner.css";
 
 // Cookie consent banner. Shows only until the visitor makes a choice (stored in
@@ -15,11 +14,9 @@ export default function CookieBanner() {
 
   useEffect(() => {
     // The banner renders on every page shell (Layout and LandingPage), so it is
-    // the reliable place to (re)apply consent-gated trackers on mount for a
-    // returning visitor who already granted — LandingPage's own effect inits
-    // PostHog but not AdRoll. Both calls are self-gated + idempotent.
+    // a reliable place to (re)apply analytics on mount for a returning visitor
+    // who already granted. Self-gated on consent + idempotent.
     initAnalytics();
-    initAdRoll();
     if (getConsent() === null) setVisible(true);
     const reopen = () => setVisible(true);
     window.addEventListener(CONSENT_EVENT, reopen);
@@ -31,7 +28,6 @@ export default function CookieBanner() {
   const accept = () => {
     setConsent("granted");
     initAnalytics();
-    initAdRoll();
     track("consent_granted");
     setVisible(false);
   };
